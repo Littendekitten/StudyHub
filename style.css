@@ -1421,3 +1421,265 @@ footer { color: #7587a3 !important; border-top-color: #283a54 !important; }
 .math-app .summary-content b { color:#f4f7ff !important; }
 .math-app .toast { background:#1a2940 !important;color:#f3f7ff !important;border-color:#3b506e !important; }
 @media (max-width: 680px) { .math-app .hero { grid-template-columns:1fr !important; } .math-app .stats { grid-template-columns:1fr !important; } .math-app .chapter-grid { grid-template-columns:1fr !important; } .math-app .quick-panel { align-items:stretch !important;flex-direction:column !important; } }
+
+/* ======================================================================
+   SIGN IN, ACCOUNT SETTINGS, INVENTORY AND VIP
+   ====================================================================== */
+body:not(.app-ready) > header,
+body:not(.app-ready) > main,
+body:not(.app-ready) > footer { display:none !important; }
+.auth-screen { position:fixed;inset:0;z-index:1000;display:grid;place-items:center;overflow-y:auto;padding:1.25rem;background:radial-gradient(circle at 12% 10%,rgba(16,185,129,.13),transparent 32%),radial-gradient(circle at 90% 90%,rgba(59,130,246,.13),transparent 34%),#07111f; }
+.auth-screen[hidden] { display:none !important; }
+.auth-screen.auth-overlay { background:rgba(3,8,16,.82);backdrop-filter:blur(12px); }
+.auth-card { width:min(100%,480px);padding:clamp(1.25rem,4vw,2.2rem);border:1px solid #34445e;border-radius:24px;background:linear-gradient(160deg,#1b2a40,#101b2d 70%);box-shadow:0 25px 90px rgba(0,0,0,.48); }
+.auth-brand { display:flex;align-items:center;gap:.8rem;margin-bottom:2rem; }
+.auth-welcome { margin-bottom:1.4rem; }
+.auth-welcome h1 { color:#fff;font-size:clamp(2rem,7vw,2.65rem);line-height:1.08;margin:.45rem 0 .75rem;font-weight:900;letter-spacing:-.04em; }
+.auth-welcome h1 span { color:#55d6ad; }
+.auth-welcome p { color:#aebbd0;font-size:.92rem;line-height:1.65; }
+.auth-google-btn { display:flex;align-items:center;justify-content:center;gap:.8rem;width:100%;padding:.9rem 1rem;border:1px solid #50617a;border-radius:12px;background:#f8fafc;color:#182235;font:700 .95rem inherit;cursor:pointer;transition:transform .18s,box-shadow .18s; }
+.auth-google-btn:hover { transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.18); }
+.google-g { display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:#fff;color:#4285f4;font-size:1.05rem;font-weight:900; }
+.auth-divider { display:flex;align-items:center;gap:.8rem;color:#8291a9;font-size:.78rem;margin:1.1rem 0; }
+.auth-divider:before,.auth-divider:after { content:"";height:1px;flex:1;background:#34445e; }
+.auth-form { display:flex;flex-direction:column;gap:.5rem; }
+.auth-form label,.account-form-group label,.code-entry-panel label,.vip-setting-fields label { color:#d9e3f2;font-size:.8rem;font-weight:800; }
+.auth-form input,.account-page input,.account-page select { width:100%;min-width:0;border:1px solid #3a4b65;border-radius:11px;background:#0b1627;color:#f4f7fb;padding:.78rem .9rem;font:inherit;outline:none; }
+.auth-form input:focus,.account-page input:focus,.account-page select:focus { border-color:#35c99a;box-shadow:0 0 0 3px rgba(53,201,154,.12); }
+.auth-actions { display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:.55rem; }
+.auth-actions .btn { margin-top:0; }
+.text-button,.guest-btn { border:0;background:none;color:#6eddbb;font:700 .8rem inherit;cursor:pointer;padding:.55rem .1rem;text-align:left; }
+.auth-message { min-height:1.2rem;color:#ff9da9;font-size:.8rem;margin:.35rem 0; }
+.auth-bottom { display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:.8rem;padding-top:1rem;border-top:1px solid #34445e; }
+.auth-bottom > span { color:#8e9db4;font-size:.75rem; }
+.guest-btn { white-space:nowrap;font-size:.84rem; }
+.auth-privacy-note { color:#7788a2;font-size:.7rem;line-height:1.5;margin-top:.65rem; }
+.account-nav { border-color:#43536c !important;color:#d3deed !important; }
+.account-nav.locked { opacity:.56;filter:grayscale(1); }
+.account-page { max-width:1100px;margin:0 auto; }
+.account-hero-panel { display:flex;justify-content:space-between;align-items:center;gap:1rem; }
+.account-layout { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem; }
+.account-profile-card,.settings-card,.inventory-panel,.codes-panel-card,.vip-panel,.lifetime-admin-note { margin-bottom:0;min-width:0; }
+.account-profile-heading { display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem; }
+.account-avatar { width:54px;height:54px;flex:0 0 54px;display:grid;place-items:center;border:1px solid rgba(16,185,129,.35);border-radius:17px;background:var(--emerald-bg);color:#69e0b8;font-size:1.45rem;font-weight:900; }
+.account-profile-heading h3 { margin-bottom:.15rem; }
+.account-form-group { display:flex;flex-direction:column;gap:.45rem; }
+.account-inline-form { display:flex;gap:.55rem;align-items:center; }
+.account-inline-form input { flex:1; }
+.account-inline-form .btn { margin:0;white-space:nowrap; }
+.muted-note { color:#8999b0;font-size:.76rem;line-height:1.55;margin-top:.35rem; }
+.account-meta-row { display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.85rem 0;border-top:1px solid var(--border-color);margin-top:1rem;color:var(--text-muted);font-size:.82rem; }
+.account-meta-row strong { color:var(--text-main); }
+.account-signout { width:100%;margin-top:.3rem; }
+.account-setting-row,.vip-toggle-row { display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.95rem 0;border-top:1px solid var(--border-color); }
+.account-setting-row:first-of-type { margin-top:.6rem; }
+.account-setting-row > span:first-child,.vip-toggle-row > span:first-child { display:flex;flex-direction:column;gap:.18rem; }
+.account-setting-row strong,.vip-toggle-row strong { color:var(--text-main);font-size:.88rem; }
+.account-setting-row small,.vip-toggle-row small { color:var(--text-muted);font-size:.75rem; }
+.account-setting-row select { width:auto;max-width:180px; }
+.inventory-list { display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:.75rem;margin-top:1rem; }
+.inventory-empty { padding:1rem;border:1px dashed var(--border-color);border-radius:13px;color:var(--text-muted);font-size:.82rem;text-align:center; }
+.inventory-item { display:flex;align-items:center;gap:.85rem;min-width:0;padding:.85rem;border:1px solid rgba(245,185,65,.3);border-radius:15px;background:linear-gradient(145deg,rgba(88,65,23,.24),rgba(14,23,37,.92)); }
+.voucher-art { width:54px;height:46px;flex:0 0 54px;display:grid;place-items:center;position:relative;border:1px solid #e8bd58;border-radius:10px;background:linear-gradient(135deg,#fff1b9,#d9a83d 48%,#8d6420);color:#422c08;font-size:1.65rem;box-shadow:0 5px 15px rgba(215,166,62,.2); }
+.voucher-art:after { content:"VIP";position:absolute;right:4px;bottom:3px;font-size:.48rem;font-weight:1000;letter-spacing:.04em; }
+.inventory-item-copy { flex:1;min-width:0; }
+.inventory-item-copy strong { display:block;color:#f4d58e;font-size:.84rem; }
+.inventory-item-copy small { display:block;color:#b4a17d;font-size:.73rem;margin-top:.2rem; }
+.inventory-item .btn { padding:.55rem .72rem;margin:0;font-size:.75rem; }
+.codes-panel-card .panel-header { align-items:center; }
+.code-entry-panel { padding-top:1rem;border-top:1px solid var(--border-color);margin-top:.8rem; }
+.code-entry-panel .account-inline-form { margin-top:.45rem; }
+.account-feedback { min-height:1.1rem;font-size:.78rem;color:#73ddb8;margin-top:.55rem; }
+.account-feedback.error { color:#ff9da9; }
+.account-locked-panel { text-align:center;padding:2.4rem 1.5rem;filter:saturate(.65); }
+.account-locked-panel .locked-symbol { font-size:2.5rem;margin-bottom:.7rem;filter:grayscale(1); }
+.account-locked-panel p { max-width:520px;margin:.5rem auto 1.2rem; }
+.account-locked-panel .btn { margin:0 auto; }
+.vip-panel { border-color:rgba(235,183,70,.55);background:linear-gradient(145deg,rgba(87,63,20,.35),var(--bg-card) 68%); }
+.vip-panel-heading { display:flex;align-items:center;gap:.9rem; }
+.vip-emblem { width:48px;height:48px;display:grid;place-items:center;border-radius:15px;border:1px solid rgba(245,192,83,.5);background:linear-gradient(145deg,#f5d98b,#a67521);color:#3b290a;font-size:1.7rem; }
+.vip-eyebrow { color:#e7bd63; }
+.vip-panel-heading h3 { color:#f4d991; }
+.vip-timer-row { display:flex;justify-content:space-between;align-items:center;gap:1rem;margin:1.1rem 0;padding:1rem;border:1px solid rgba(235,183,70,.28);border-radius:13px;background:rgba(5,11,20,.38);color:#c2b18d;font-size:.82rem; }
+.vip-timer-row strong { color:#ffe09a;font-size:1.15rem;font-variant-numeric:tabular-nums; }
+.vip-lifetime-label { margin:1rem 0;padding:1rem;border:1px solid rgba(235,183,70,.28);border-radius:13px;color:#ffe09a;background:rgba(5,11,20,.38);font-weight:800; }
+.vip-panel input[type="checkbox"] { appearance:none;width:45px;height:25px;flex:0 0 45px;border-radius:999px;border:1px solid #53627a;background:#29384e;position:relative;cursor:pointer;transition:.2s; }
+.vip-panel input[type="checkbox"]:after { content:"";position:absolute;width:17px;height:17px;left:3px;top:3px;border-radius:50%;background:#bac6d6;transition:.2s; }
+.vip-panel input[type="checkbox"]:checked { background:#b98b34;border-color:#f0c45d; }
+.vip-panel input[type="checkbox"]:checked:after { left:23px;background:#fff3c6; }
+.vip-panel input[type="checkbox"]:disabled { opacity:.45;cursor:not-allowed; }
+.vip-setting-fields { display:flex;flex-direction:column;gap:.45rem;margin-top:.9rem; }
+.vip-setting-fields select { width:100%; }
+.vip-action-row { display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.2rem; }
+.vip-action-row .btn { margin:0; }
+.premium-setting { padding-top:.9rem;border-top:1px solid rgba(235,183,70,.2); }
+.lifetime-admin-note { grid-column:1/-1; }
+.lifetime-admin-note .account-meta-row { margin-top:.3rem; }
+body.light-theme { --bg-main:#edf2f8;--bg-card:#fff;--bg-card-dark:#e5edf6;--bg-input:#fff;--border-color:#d2dce8;--border-light:#b9c7d8;--text-main:#192638;--text-muted:#607189;--text-dim:#8190a5; }
+body.light-theme { background:#edf2f8;color:#192638; }
+body.light-theme header { background:rgba(255,255,255,.94); }
+body.light-theme .panel,body.light-theme .test-card,body.light-theme .home-stat,body.light-theme .stat-box,body.light-theme .review-card { background:#fff;color:#192638;border-color:#d2dce8; }
+body.light-theme h1,body.light-theme h2,body.light-theme h3,body.light-theme .home-title,body.light-theme .home-stat strong { color:#172337; }
+body.light-theme .home-hero { background:linear-gradient(135deg,#fff,#e7eff8); }
+body.light-theme .home-copy,body.light-theme .card-desc,body.light-theme .subtitle { color:#5e6e83; }
+body.light-theme .nav-tab-btn { background:#f1f5fa;color:#405169;border-color:#d2dce8; }
+body.light-theme .nav-tab-btn.active { color:#fff;background:#059669;border-color:#059669; }
+body.light-theme .account-page input,body.light-theme .account-page select { background:#f8fafc;color:#172337;border-color:#c8d4e2; }
+body.gold-mode { --emerald:#e9bb55;--emerald-dark:#a87720;--emerald-bg:rgba(226,177,66,.15);--blue:#dfb450;--blue-dark:#a87720;--blue-bg:rgba(226,177,66,.13);--border-color:#574522; }
+body.gold-mode header { border-color:#7a5c21;background:rgba(13,14,17,.96); }
+body.gold-mode .brand-icon,body.gold-mode .subject-icon,body.gold-mode .account-avatar { color:#f5d98b;background:rgba(202,155,48,.16);border-color:rgba(237,190,83,.42); }
+body.gold-mode .nav-tab-btn.active,body.gold-mode .card-open-hint,body.gold-mode .btn-emerald,body.gold-mode .btn-gradient { background:linear-gradient(110deg,#f4d98d,#b98426);border-color:#e6bd62;color:#33230a; }
+body.gold-mode .home-kicker,body.gold-mode .section-eyebrow,body.gold-mode .home-title span { color:#e4bd65; }
+body.gold-mode .home-hero { border-color:#816329;background:radial-gradient(circle at 90% 8%,rgba(212,164,62,.2),transparent 35%),linear-gradient(135deg,#282218,#121519); }
+body.gold-mode .panel,body.gold-mode .test-card,body.gold-mode .home-stat { border-color:#4d4026; }
+body.light-gold-mode { background:#f4f0e5 !important;color:#302814 !important;--bg-main:#f4f0e5;--bg-card:#fffdf8;--bg-card-dark:#f5edd9;--bg-input:#fffdf8;--border-color:#e4d5ae;--text-main:#302814;--text-muted:#746442;--text-dim:#99865c; }
+body.light-gold-mode header { background:rgba(255,252,243,.96);border-color:#dcc58b; }
+body.light-gold-mode .panel,body.light-gold-mode .test-card,body.light-gold-mode .home-stat { background:#fffdf8;color:#302814;border-color:#e4d5ae; }
+body.light-gold-mode h1,body.light-gold-mode h2,body.light-gold-mode h3,body.light-gold-mode .home-title { color:#302814; }
+body.light-gold-mode .home-hero { background:linear-gradient(135deg,#fffdf8,#eee2c1);border-color:#dcc58b; }
+body.light-gold-mode .nav-tab-btn { background:#fffaf0;color:#705821;border-color:#e4d5ae; }
+body.light-gold-mode .nav-tab-btn.active { background:linear-gradient(110deg,#f4d98d,#b98426);color:#33230a; }
+body.light-gold-mode .account-page input,body.light-gold-mode .account-page select { background:#fff;color:#302814;border-color:#dcc58b; }
+body.premium-mode .panel,body.premium-mode .test-card,body.premium-mode .home-stat { box-shadow:0 16px 36px rgba(167,124,36,.14);border-color:rgba(231,188,91,.48); }
+body.premium-mode .home-hero { background-image:radial-gradient(circle at 85% 15%,rgba(255,220,125,.24),transparent 32%),linear-gradient(125deg,#2b2415,#15191f); }
+body.premium-mode .vip-emblem { box-shadow:0 0 24px rgba(239,192,82,.25); }
+@media(max-width:760px){.account-layout{grid-template-columns:1fr}.account-hero-panel{align-items:flex-start}.auth-bottom{align-items:flex-start;flex-direction:column;gap:.35rem}.auth-actions{grid-template-columns:1fr}.account-inline-form{align-items:stretch;flex-direction:column}.account-inline-form .btn{width:100%}.inventory-item{flex-wrap:wrap}.inventory-item .btn{flex:1}.account-setting-row{align-items:flex-start;flex-direction:column}.account-setting-row select{max-width:none;width:100%}}
+
+
+/* Light mode must also recolour the isolated Wiskunde module, whose dark-mode
+   component styles intentionally use stronger selectors. */
+body.light-theme .math-app {
+  --bg:#edf2f8;--surface:#ffffff;--ink:#1a2940;--muted:#61738c;--line:#d7e0eb;
+  --blue:#4169e1;--blue2:#3159cf;--blue-soft:#edf2ff;--green:#0b9277;--green-soft:#e9f8f3;
+  --red:#c84460;--red-soft:#fff0f3;--shadow:0 10px 28px rgba(24,43,77,.07);
+  background:#edf2f8 !important;color:#1a2940 !important;
+}
+body.light-theme .math-app .topbar { background:rgba(255,255,255,.94) !important;border-color:#d7e0eb !important; }
+body.light-theme .math-app .brand-name,
+body.light-theme .math-app .hero h1,
+body.light-theme .math-app .section-head h2,
+body.light-theme .math-app .chapter-card h3,
+body.light-theme .math-app .quick-panel h3,
+body.light-theme .math-app .view-head h2,
+body.light-theme .math-app .question,
+body.light-theme .math-app .info-card h3,
+body.light-theme .math-app .result-box h2 { color:#1a2940 !important; }
+body.light-theme .math-app .brand-sub,
+body.light-theme .math-app .hero p,
+body.light-theme .math-app .section-head p,
+body.light-theme .math-app .chapter-card p,
+body.light-theme .math-app .quick-panel p,
+body.light-theme .math-app .view-head p,
+body.light-theme .math-app .muted-note,
+body.light-theme .math-app .practice-meta,
+body.light-theme .math-app .info-card p,
+body.light-theme .math-app .steps { color:#61738c !important; }
+body.light-theme .math-app .hero,
+body.light-theme .math-app .stat,
+body.light-theme .math-app .chapter-card,
+body.light-theme .math-app .quick-panel,
+body.light-theme .math-app .practice-card,
+body.light-theme .math-app .info-card,
+body.light-theme .math-app .video-link { background:#fff !important;border-color:#d7e0eb !important;color:#1a2940 !important;box-shadow:0 8px 24px rgba(24,43,77,.06) !important; }
+body.light-theme .math-app .hero { background:linear-gradient(112deg,#fff 0%,#f5f8ff 65%,#eaf0ff 100%) !important; }
+body.light-theme .math-app .hero-chip,
+body.light-theme .math-app .math-expression { background:#f0f4ff !important;border-color:#d9e3fb !important;color:#35559b !important; }
+body.light-theme .math-app .chapter-icon { background:#edf2ff !important;color:#4169e1 !important; }
+body.light-theme .math-app .chapter-tag,
+body.light-theme .math-app .grade-pill { background:#edf2ff !important;color:#3559cf !important;border-color:#dce5ff !important; }
+body.light-theme .math-app .back-link { color:#526780 !important; }
+body.light-theme .math-app .back-link:hover { background:#f0f4fa !important;color:#3159cf !important; }
+body.light-theme .math-app .btn-light { background:#f1f4fa !important;color:#52647d !important;border-color:#dce4ef !important; }
+body.light-theme .math-app .answer { background:#fff !important;color:#354761 !important;border-color:#dce4ef !important; }
+body.light-theme .math-app .answer:hover:not(:disabled) { background:#f6f8ff !important; }
+body.light-theme .math-app .answer .letter { background:#f0f3f9 !important;color:#7b8aa2 !important; }
+body.light-theme .math-app .answer.correct { background:#effaf6 !important;color:#087e6a !important;border-color:#75cfb3 !important; }
+body.light-theme .math-app .answer.wrong { background:#fff5f6 !important;color:#bd3c57 !important;border-color:#f0a4b3 !important; }
+body.light-theme .math-app .feedback { background:#f7f9fd !important;color:#3d506a !important;border-color:#dfe6ef !important; }
+body.light-theme .math-app .feedback.good { background:#effaf6 !important;color:#087e6a !important;border-color:#d0f1e5 !important; }
+body.light-theme .math-app .feedback.bad { background:#fff7f7 !important;color:#a43b50 !important;border-color:#f8dce2 !important; }
+body.light-theme .math-app .formula { background:#f2f5ff !important;color:#294fae !important;border-color:#dce5ff !important; }
+body.light-theme .math-app .progress { background:#edf1f7 !important; }
+body.light-theme .math-app .result-ring { background:#f7f9ff !important;color:#3159cf !important; }
+body.light-theme .math-app .summary-accordion { background:#fff !important;border-color:#d7e0eb !important; }
+body.light-theme .math-app .summary-accordion > summary { color:#263a58 !important; }
+body.light-theme .math-app .summary-accordion[open] > summary { background:#f2f6fd !important;border-color:#d7e0eb !important; }
+body.light-theme .math-app .summary-content,
+body.light-theme .math-app .summary-content h4,
+body.light-theme .math-app .summary-content b { color:#3f526c !important; }
+body.light-theme .math-app .math-generator-panel,
+body.light-theme .math-app .math-generator-note { background:#fff !important;color:#3d506a !important;border-color:#d7e0eb !important; }
+body.light-theme .math-app .math-generator-fields label,
+body.light-theme .math-app .math-generator-note strong { color:#263a58 !important; }
+body.light-theme .math-app .math-generator-fields select { background:#fff !important;color:#263a58 !important;border-color:#d7e0eb !important; }
+body.light-theme .math-app .toast { background:#fff !important;color:#263a58 !important;border-color:#dfc57e !important; }
+body.light-theme { color-scheme:light; }
+body.light-gold-mode { color-scheme:light; }
+
+
+/* Light Gold variant for the Wiskunde app. */
+body.light-gold-mode .math-app {
+  --bg:#f4f0e5;--surface:#fffdf8;--ink:#302814;--muted:#746442;--line:#e4d5ae;
+  --blue:#a87720;--blue2:#8a641d;--blue-soft:#f8efd9;--green:#8a6a24;--green-soft:#f6efd9;
+  --red:#a64c42;--red-soft:#fff1eb;--shadow:0 10px 28px rgba(115,84,28,.08);
+  background:#f4f0e5 !important;color:#302814 !important;
+}
+body.light-gold-mode .math-app .topbar { background:rgba(255,252,243,.96) !important;border-color:#dcc58b !important; }
+body.light-gold-mode .math-app .brand-name,
+body.light-gold-mode .math-app .hero h1,
+body.light-gold-mode .math-app .section-head h2,
+body.light-gold-mode .math-app .chapter-card h3,
+body.light-gold-mode .math-app .quick-panel h3,
+body.light-gold-mode .math-app .view-head h2,
+body.light-gold-mode .math-app .question,
+body.light-gold-mode .math-app .info-card h3,
+body.light-gold-mode .math-app .result-box h2 { color:#302814 !important; }
+body.light-gold-mode .math-app .brand-sub,
+body.light-gold-mode .math-app .hero p,
+body.light-gold-mode .math-app .section-head p,
+body.light-gold-mode .math-app .chapter-card p,
+body.light-gold-mode .math-app .quick-panel p,
+body.light-gold-mode .math-app .view-head p,
+body.light-gold-mode .math-app .muted-note,
+body.light-gold-mode .math-app .practice-meta,
+body.light-gold-mode .math-app .info-card p,
+body.light-gold-mode .math-app .steps { color:#746442 !important; }
+body.light-gold-mode .math-app .hero,
+body.light-gold-mode .math-app .stat,
+body.light-gold-mode .math-app .chapter-card,
+body.light-gold-mode .math-app .quick-panel,
+body.light-gold-mode .math-app .practice-card,
+body.light-gold-mode .math-app .info-card,
+body.light-gold-mode .math-app .video-link { background:#fffdf8 !important;border-color:#e4d5ae !important;color:#302814 !important;box-shadow:0 8px 24px rgba(115,84,28,.06) !important; }
+body.light-gold-mode .math-app .hero { background:linear-gradient(112deg,#fffdf8 0%,#f8f0df 68%,#eee2c1 100%) !important; }
+body.light-gold-mode .math-app .hero-chip,
+body.light-gold-mode .math-app .math-expression,
+body.light-gold-mode .math-app .chapter-icon,
+body.light-gold-mode .math-app .chapter-tag,
+body.light-gold-mode .math-app .grade-pill { background:#f7eed7 !important;color:#76551c !important;border-color:#e4d5ae !important; }
+body.light-gold-mode .math-app .back-link { color:#705821 !important; }
+body.light-gold-mode .math-app .back-link:hover { background:#f7efdE !important;color:#4d3810 !important; }
+body.light-gold-mode .math-app .btn-light { background:#fbf5e7 !important;color:#705821 !important;border-color:#e4d5ae !important; }
+body.light-gold-mode .math-app .answer { background:#fffdf8 !important;color:#514322 !important;border-color:#e4d5ae !important; }
+body.light-gold-mode .math-app .answer:hover:not(:disabled) { background:#fbf5e7 !important; }
+body.light-gold-mode .math-app .answer .letter { background:#f7eed7 !important;color:#76551c !important; }
+body.light-gold-mode .math-app .answer.correct { background:#f2f7e9 !important;color:#4d6c31 !important;border-color:#cbd9a9 !important; }
+body.light-gold-mode .math-app .answer.wrong { background:#fff2ef !important;color:#a64c42 !important;border-color:#e7bbb4 !important; }
+body.light-gold-mode .math-app .feedback { background:#fbf7ed !important;color:#514322 !important;border-color:#e4d5ae !important; }
+body.light-gold-mode .math-app .feedback.good { background:#f2f7e9 !important;color:#4d6c31 !important;border-color:#cbd9a9 !important; }
+body.light-gold-mode .math-app .feedback.bad { background:#fff2ef !important;color:#a64c42 !important;border-color:#e7bbb4 !important; }
+body.light-gold-mode .math-app .formula { background:#fbf4e2 !important;color:#8a641d !important;border-color:#e4d5ae !important; }
+body.light-gold-mode .math-app .progress { background:#eee4cc !important; }
+body.light-gold-mode .math-app .result-ring { background:#fffaf0 !important;color:#8a641d !important; }
+body.light-gold-mode .math-app .summary-accordion { background:#fffdf8 !important;border-color:#e4d5ae !important; }
+body.light-gold-mode .math-app .summary-accordion > summary { color:#514322 !important; }
+body.light-gold-mode .math-app .summary-accordion[open] > summary { background:#f8efd9 !important;border-color:#e4d5ae !important; }
+body.light-gold-mode .math-app .summary-content,
+body.light-gold-mode .math-app .summary-content h4,
+body.light-gold-mode .math-app .summary-content b { color:#514322 !important; }
+body.light-gold-mode .math-app .math-generator-panel,
+body.light-gold-mode .math-app .math-generator-note { background:#fffdf8 !important;color:#514322 !important;border-color:#e4d5ae !important; }
+body.light-gold-mode .math-app .math-generator-fields label,
+body.light-gold-mode .math-app .math-generator-note strong { color:#514322 !important; }
+body.light-gold-mode .math-app .math-generator-fields select { background:#fffdf8 !important;color:#514322 !important;border-color:#e4d5ae !important; }
+body.light-gold-mode .math-app .toast { background:#fffdf8 !important;color:#514322 !important;border-color:#d5b96f !important; }

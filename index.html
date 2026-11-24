@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StudyHub | Havo 2</title>
-    <meta name="theme-color" content="#0d1626">
+    <meta id="theme-color-meta" name="theme-color" content="#0d1626">
     <meta name="description" content="StudyHub: oefenen voor havo 2 met Aardrijkskunde en Wiskunde.">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,6 +15,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+
+    <!-- FIRST-RUN AUTHENTICATION GATE -->
+    <section id="auth-screen" class="auth-screen" aria-labelledby="auth-title">
+      <div class="auth-card">
+        <div class="auth-brand"><div class="brand-icon">🎓</div><div><div class="brand-title">StudyHub <span class="study-pill">HAVO 2</span></div><div class="brand-sub">Jouw digitale leeromgeving</div></div></div>
+        <div class="auth-welcome"><div class="section-eyebrow">WELCOME TO STUDYHUB</div><h1 id="auth-title">Leer slimmer.<br><span>Op jouw manier.</span></h1><p>Log in om je instellingen, inventory, codes en VIP-items op al je apparaten te bewaren.</p></div>
+        <button class="auth-google-btn" id="google-signin" type="button"><span class="google-g">G</span> Doorgaan met Google</button>
+        <div class="auth-divider"><span>of met e-mail</span></div>
+        <form id="email-auth-form" class="auth-form" autocomplete="on">
+          <label for="auth-email">E-mailadres</label><input id="auth-email" type="email" autocomplete="email" placeholder="jij@voorbeeld.nl" required>
+          <label for="auth-password">Wachtwoord</label><input id="auth-password" type="password" autocomplete="current-password" minlength="6" placeholder="Minimaal 6 tekens" required>
+          <div class="auth-actions"><button class="btn btn-emerald" id="email-signin" type="button">Inloggen</button><button class="btn btn-secondary" id="email-create" type="button">Account maken</button></div>
+          <button class="text-button" id="forgot-password" type="button">Wachtwoord vergeten?</button>
+        </form>
+        <p id="auth-error" class="auth-message" role="status" aria-live="polite"></p>
+        <div class="auth-bottom"><span>Alleen de accountfuncties vereisen een account.</span><button id="continue-guest" class="guest-btn" type="button">Verder als gast <span>→</span></button></div>
+        <p class="auth-privacy-note">Je kunt de leerstof ook als gast gebruiken. Je accountgegevens worden opgeslagen in Firebase.</p>
+      </div>
+    </section>
 
     <!-- HEADER -->
     <header>
@@ -30,6 +50,7 @@
             <nav>
                 <button class="nav-tab-btn active" id="nav-home" data-tab="home">⌂ Overzicht</button>
                 <button class="install-app-btn" id="install-app-btn" type="button" aria-label="Installeer StudyHub op je apparaat">⬇ Installeer app</button>
+                <button class="nav-tab-btn account-nav" id="account-button" type="button" data-tab="account">⚙ Account</button>
                 <button class="nav-tab-btn math-nav" id="nav-math" data-tab="math-overview">∑ Wiskunde</button>
                 <button class="nav-tab-btn math-nav" id="nav-math-mix" data-tab="math-mix">🎲 Oefenmix</button>
                 <button class="nav-tab-btn math-nav" id="nav-math-formulas" data-tab="math-formulas">📐 Formules</button>
@@ -658,12 +679,78 @@
 <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
         </section>
 
+
+        <!-- ACCOUNT, SETTINGS, INVENTORY AND VIP -->
+        <section id="section-account" class="hidden account-page">
+          <div class="panel account-hero-panel">
+            <div><div class="section-eyebrow">STUDYHUB ACCOUNT</div><h2>Account & instellingen</h2><p class="subtitle">Beheer je profiel, uiterlijk, codes, inventory en VIP-status.</p></div>
+            <button class="btn btn-secondary" id="account-back" type="button">← Terug</button>
+          </div>
+
+          <div id="account-guest-lock" class="panel account-locked-panel hidden">
+            <div class="locked-symbol">🔒</div><h3>Accountfuncties vergrendeld</h3><p class="subtitle">Log in om je gebruikersnaam, instellingen, inventory en codes te gebruiken. Als gast kun je wel gewoon blijven leren.</p>
+            <button class="btn btn-emerald" id="sign-in-from-account" type="button">Inloggen of account maken</button>
+          </div>
+
+          <div id="account-content" class="account-layout">
+            <div class="panel account-profile-card">
+              <div class="account-profile-heading"><div class="account-avatar" id="account-avatar">S</div><div><h3 id="account-display-name">StudyHub gebruiker</h3><p id="account-email-label" class="subtitle">—</p></div></div>
+              <div class="account-form-group"><label for="username-input">Gebruikersnaam</label><div class="account-inline-form"><input id="username-input" maxlength="24" minlength="2" placeholder="Kies een gebruikersnaam"><button class="btn btn-emerald" id="save-username" type="button">Opslaan</button></div><p class="muted-note">Je gebruikersnaam is zichtbaar in je eigen StudyHub-account.</p></div>
+              <div class="account-meta-row"><span>Ingelogd via</span><strong id="account-provider">Firebase</strong></div>
+              <button class="btn btn-secondary account-signout" id="sign-out" type="button">Uitloggen</button>
+            </div>
+
+            <div class="panel settings-card">
+              <div class="panel-header"><div><h3>⚙️ Weergave-instellingen</h3><p class="subtitle">Kies hoe StudyHub eruitziet.</p></div></div>
+              <label class="account-setting-row" for="theme-mode-select"><span><strong>Uiterlijk</strong><small>Dark mode of light mode</small></span><select id="theme-mode-select"><option value="dark">🌙 Dark mode</option><option value="light">☀️ Light mode</option></select></label>
+              <div class="account-setting-row"><span><strong>StudyHub-status</strong><small id="account-status-label">Gratis account</small></span><span class="tag tag-emerald" id="account-status-badge">FREE</span></div>
+            </div>
+
+            <div class="panel inventory-panel">
+              <div class="panel-header"><div><h3>🎒 Inventory</h3><p class="subtitle">Items die je op je account hebt ontvangen.</p></div><span class="tag tag-amber" id="inventory-count">0 items</span></div>
+              <div id="inventory-list" class="inventory-list"><p class="muted-note">Je inventory wordt geladen…</p></div>
+              <p id="lifetime-inventory-note" class="info-note hidden">Je hebt Lifetime VIP. Daarom heb je geen VIP-coupons nodig en is je inventory verborgen.</p>
+            </div>
+
+            <div class="panel codes-panel-card">
+              <div class="panel-header"><div><h3>🎟️ Codes</h3><p class="subtitle">Heb je een StudyHub-code gekregen? Wissel hem hier in.</p></div><button class="btn btn-secondary" id="toggle-code-panel" type="button" aria-expanded="false">Code invoeren</button></div>
+              <div id="code-entry-panel" class="code-entry-panel hidden"><label for="redeem-code-input">Code</label><div class="account-inline-form"><input id="redeem-code-input" type="text" maxlength="80" autocomplete="off" placeholder="STUDYHUB-XXXX-XXXX"><button class="btn btn-emerald" id="redeem-code-button" type="button">Inwisselen</button></div><p class="muted-note">Codes kunnen één keer per account worden gebruikt. Een coupon wordt toegevoegd aan je inventory.</p><p id="redeem-code-message" class="account-feedback" role="status" aria-live="polite"></p></div>
+              <p id="lifetime-code-note" class="muted-note hidden">Codes zijn uitgeschakeld voor Lifetime VIP-accounts.</p>
+            </div>
+
+            <div id="admin-code-panel" class="panel admin-code-panel hidden">
+              <div class="panel-header"><div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Alleen zichtbare beheerders kunnen hier veilige codes maken.</p></div><span class="tag tag-purple">ADMIN</span></div>
+              <div class="admin-code-grid">
+                <div class="account-form-group"><label for="admin-code-duration">Couponduur</label><select id="admin-code-duration"><option value="3600">1 uur</option><option value="21600">6 uur</option><option value="43200">12 uur</option><option value="86400">1 dag</option><option value="259200">3 dagen</option><option value="604800">7 dagen</option><option value="2592000">30 dagen</option></select></div>
+                <div class="account-form-group"><label for="admin-code-uses">Maximaal aantal accounts</label><input id="admin-code-uses" type="number" min="1" max="500" value="1"></div>
+              </div>
+              <button class="btn btn-amber" id="admin-create-code" type="button">✨ Maak VIP-Coupon-code</button>
+              <p id="admin-code-message" class="account-feedback" role="status" aria-live="polite"></p>
+              <div id="admin-code-result" class="admin-code-result hidden"><label for="admin-code-value">Nieuwe code — wordt maar één keer getoond</label><div class="account-inline-form"><input id="admin-code-value" type="text" readonly><button class="btn btn-secondary" id="admin-copy-code" type="button">Kopiëren</button></div></div>
+            </div>
+
+            <div id="vip-panel" class="panel vip-panel hidden">
+              <div class="vip-panel-heading"><div class="vip-emblem">✦</div><div><div class="section-eyebrow vip-eyebrow">STUDYHUB VIP</div><h3>VIP-menu</h3><p id="vip-status-text" class="subtitle">VIP is actief.</p></div><span class="tag tag-amber">VIP</span></div>
+              <div id="vip-timer-row" class="vip-timer-row"><span>Resterende tijd</span><strong id="vip-time-left">—</strong></div>
+              <div id="vip-lifetime-label" class="vip-lifetime-label hidden">♾️ Lifetime VIP · Geen timer nodig</div>
+              <label class="vip-toggle-row" for="gold-mode-toggle"><span><strong>Enable Gold Mode</strong><small>Geef StudyHub een gouden VIP-uitstraling.</small></span><input id="gold-mode-toggle" type="checkbox"></label>
+              <div class="vip-setting-fields"><label for="vip-theme-select">Gold-thema</label><select id="vip-theme-select"><option value="dark-gold">🌙 Dark Gold · zwart en goud</option><option value="light-gold">☀️ Light Gold · wit en goud</option></select></div>
+              <div class="vip-setting-fields premium-setting"><label class="vip-toggle-row" for="premium-mode-toggle"><span><strong>StudyHub Premium Experience</strong><small>Een extra verfijnde VIP-weergave en uitgebreide dashboarddetails.</small></span><input id="premium-mode-toggle" type="checkbox"></label><span class="muted-note">Premium Experience is een extra uiterlijk binnen StudyHub VIP; dit is geen betaalde aankoop.</span></div>
+              <div id="vip-action-row" class="vip-action-row"><button class="btn btn-secondary" id="pause-vip-button" type="button">⏸ VIP stoppen en tijd bewaren</button><button class="btn btn-emerald hidden" id="resume-vip-button" type="button">▶ VIP hervatten</button></div>
+            </div>
+
+            <div class="panel lifetime-admin-note">
+              <h3>Accountstatus</h3><p class="subtitle">Lifetime-VIP wordt door StudyHub-beheer ingesteld. Je kunt dit niet met een gewone code activeren.</p><p class="account-meta-row"><span>Lifetime-VIP</span><strong id="lifetime-vip-value">false</strong></p>
+            </div>
+          </div>
+        </section>
+
     </main>
 
     <footer>
         StudyHub • Havo 2 • Aardrijkskunde & Wiskunde
     </footer>
 
-    <script src="app.js" defer></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -1,3 +1,15 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import {
+  getAuth, setPersistence, browserLocalPersistence, GoogleAuthProvider,
+  signInWithPopup, signInWithRedirect, getRedirectResult,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendPasswordResetEmail, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot,
+  runTransaction, serverTimestamp, Timestamp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
 /* ==========================================================================
            1. DATA: BEGRIPPEN & 4 VOLLEDIGE OEFENTOETSEN
            ========================================================================== */
@@ -179,20 +191,26 @@
            ========================================================================== */
         function switchTab(tabName) {
             const isMathTab = tabName.startsWith('math-');
+            const isAccountTab = tabName === 'account';
 
-            if (tabName === 'home') {
-                document.body.classList.remove('subject-open', 'math-open');
-            } else if (isMathTab) {
-                document.body.classList.add('subject-open', 'math-open');
+            if (isAccountTab) {
+                if (window.studyHubCurrentTab !== 'account') window.studyHubReturnTab = window.studyHubCurrentTab || 'home';
             } else {
-                if (!document.body.classList.contains('subject-open') || document.body.classList.contains('math-open')) {
-                    showToast('Open eerst een vak via de startpagina.');
-                    return;
+                window.studyHubCurrentTab = tabName;
+                if (tabName === 'home') {
+                    document.body.classList.remove('subject-open', 'math-open');
+                } else if (isMathTab) {
+                    document.body.classList.add('subject-open', 'math-open');
+                } else {
+                    if (!document.body.classList.contains('subject-open') || document.body.classList.contains('math-open')) {
+                        showToast('Open eerst een vak via de startpagina.');
+                        return;
+                    }
+                    document.body.classList.remove('math-open');
                 }
-                document.body.classList.remove('math-open');
             }
 
-            const sections = ['home', 'tests', 'generator', 'quiz', 'grading', 'results', 'learn', 'summary', 'math'];
+            const sections = ['home', 'tests', 'generator', 'quiz', 'grading', 'results', 'learn', 'summary', 'math', 'account'];
             sections.forEach(id => {
                 const el = document.getElementById(`section-${id}`);
                 if (el) el.classList.add('hidden');
@@ -1077,3 +1095,717 @@ updateProgress();
 window.showMathView=showMathView;
 window.startStudyHubMathPractice=startPractice;
 })();
+
+/* ======================================================================
+   FIREBASE AUTH + ACCOUNT / INVENTORY / VIP
+   ====================================================================== */
+const studyHubFirebaseConfig = {
+  apiKey: "AIzaSyB1fcdYvQvIksk2zn8-Dhudg4nH2vYFEdo",
+  authDomain: "kitacat-studyhub.firebaseapp.com",
+  projectId: "kitacat-studyhub",
+  storageBucket: "kitacat-studyhub.firebasestorage.app",
+  messagingSenderId: "737915107503",
+  appId: "1:737915107503:web:473dc775207dfc4349bc5a",
+  measurementId: "G-QBRNQQKZ44"
+};
+
+const studyHubFirebaseApp = initializeApp(studyHubFirebaseConfig);
+const studyHubAuth = getAuth(studyHubFirebaseApp);
+const studyHubDb = getFirestore(studyHubFirebaseApp);
+const studyHubGoogleProvider = new GoogleAuthProvider();
+studyHubGoogleProvider.setCustomParameters({ prompt: "select_account" });
+
+let studyHubUser = null;
+let studyHubProfile = null;
+let studyHubInventory = [];
+let studyHubVipState = null;
+let stopProfileListener = null;
+let stopInventoryListener = null;
+let stopVipListener = null;
+let vipTimerHandle = null;
+let expiryToastKey = "";
+
+const $id = (id) => document.getElementById(id);
+const userDocRef = (uid) => doc(studyHubDb, "users", uid);
+const inventoryCollectionRef = (uid) => collection(studyHubDb, "users", uid, "inventory");
+const vipDocRef = (uid) => doc(studyHubDb, "users", uid, "vip", "current");
+const redemptionDocRef = (uid, codeHash) => doc(studyHubDb, "users", uid, "redemptions", codeHash);
+
+function setAuthMessage(message, isError = true) {
+  const target = $id("auth-error");
+  if (!target) return;
+  target.textContent = message || "";
+  target.style.color = isError ? "#ff9da9" : "#73ddb8";
+}
+
+function setCodeMessage(message, isError = false) {
+  const target = $id("redeem-code-message");
+  if (!target) return;
+  target.textContent = message || "";
+  target.classList.toggle("error", isError);
+}
+
+function friendlyFirebaseError(error) {
+  const code = error?.code || "";
+  const messages = {
+    "auth/invalid-email": "Dit e-mailadres lijkt niet geldig.",
+    "auth/user-not-found": "Geen account gevonden met dit e-mailadres.",
+    "auth/wrong-password": "Het wachtwoord klopt niet.",
+    "auth/invalid-credential": "E-mailadres of wachtwoord klopt niet.",
+    "auth/email-already-in-use": "Er bestaat al een account met dit e-mailadres. Probeer in te loggen.",
+    "auth/weak-password": "Kies een sterker wachtwoord van minimaal 6 tekens.",
+    "auth/popup-closed-by-user": "Het Google-inlogvenster is gesloten.",
+    "auth/popup-blocked": "Je browser blokkeerde het Google-inlogvenster. Probeer het opnieuw.",
+    "auth/unauthorized-domain": "Dit domein staat nog niet in Firebase Authentication → Settings → Authorized domains.",
+    "auth/operation-not-allowed": "Deze inlogmethode staat nog niet aan. Schakel Google of E-mail/wachtwoord in bij Firebase Authentication.",
+    "auth/account-exists-with-different-credential": "Er bestaat al een account met dit e-mailadres via een andere inlogmethode.",
+    "auth/too-many-requests": "Te veel pogingen achter elkaar. Probeer het later opnieuw.",
+    "auth/network-request-failed": "Geen verbinding. Controleer je internet en probeer opnieuw."
+  };
+  return messages[code] || error?.message || "Er ging iets mis. Probeer het opnieuw.";
+}
+
+function showLoginOverlay() {
+  const screen = $id("auth-screen");
+  if (!screen) return;
+  screen.hidden = false;
+  screen.classList.add("auth-overlay");
+  setAuthMessage("");
+}
+
+function showAppShell(mode) {
+  document.body.classList.add("app-ready");
+  document.body.classList.toggle("guest-mode", mode === "guest");
+  const screen = $id("auth-screen");
+  if (screen) {
+    screen.hidden = true;
+    screen.classList.remove("auth-overlay");
+  }
+  renderAccountState();
+}
+
+function continueAsGuest() {
+  localStorage.setItem("studyhub-guest-mode", "1");
+  studyHubUser = null;
+  studyHubProfile = null;
+  studyHubInventory = [];
+  studyHubVipState = null;
+  stopUserListeners();
+  showAppShell("guest");
+  showToast("Je gebruikt StudyHub als gast. Accountfuncties blijven vergrendeld.");
+}
+
+function stopUserListeners() {
+  if (stopProfileListener) stopProfileListener();
+  if (stopInventoryListener) stopInventoryListener();
+  if (stopVipListener) stopVipListener();
+  stopProfileListener = stopInventoryListener = stopVipListener = null;
+  if (vipTimerHandle) clearInterval(vipTimerHandle);
+  vipTimerHandle = null;
+}
+
+function makeDefaultUsername(user) {
+  const raw = (user.displayName || user.email?.split("@")[0] || "StudyHub leerling").trim();
+  return raw.replace(/[<>]/g, "").slice(0, 24) || "StudyHub leerling";
+}
+
+async function ensureStudyHubProfile(user) {
+  const ref = userDocRef(user.uid);
+  await runTransaction(studyHubDb, async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists()) {
+      transaction.set(ref, {
+        username: makeDefaultUsername(user),
+        themeMode: "dark",
+        vipTheme: "dark-gold",
+        goldModeEnabled: false,
+        premiumMode: false,
+        "Lifetime-VIP": false,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    }
+  });
+}
+
+function startUserListeners(user) {
+  stopUserListeners();
+  const profileRef = userDocRef(user.uid);
+  stopProfileListener = onSnapshot(profileRef, (snapshot) => {
+    studyHubProfile = snapshot.exists() ? snapshot.data() : null;
+    renderAccountState();
+  }, (error) => showToast(`Account laden mislukt: ${friendlyFirebaseError(error)}`));
+
+  stopInventoryListener = onSnapshot(inventoryCollectionRef(user.uid), (snapshot) => {
+    studyHubInventory = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+    renderAccountState();
+  }, (error) => showToast(`Inventory laden mislukt: ${friendlyFirebaseError(error)}`));
+
+  stopVipListener = onSnapshot(vipDocRef(user.uid), (snapshot) => {
+    studyHubVipState = snapshot.exists() ? snapshot.data() : null;
+    expiryToastKey = "";
+    renderAccountState();
+  }, (error) => showToast(`VIP-status laden mislukt: ${friendlyFirebaseError(error)}`));
+
+  if (vipTimerHandle) clearInterval(vipTimerHandle);
+  vipTimerHandle = setInterval(refreshVipTimer, 1000);
+}
+
+function vipLifetime() {
+  return studyHubProfile?.["Lifetime-VIP"] === true;
+}
+
+function activeVipNow() {
+  if (vipLifetime()) return true;
+  return studyHubVipState?.status === "active" &&
+    studyHubVipState?.expiresAt?.toMillis?.() > Date.now();
+}
+
+function vipStillOwned() {
+  if (vipLifetime()) return true;
+  if (activeVipNow()) return true;
+  return studyHubVipState?.status === "paused" && Number(studyHubVipState.remainingSeconds) > 0;
+}
+
+function formatStudyHubTime(seconds) {
+  const value = Math.max(0, Math.ceil(Number(seconds) || 0));
+  const days = Math.floor(value / 86400);
+  const hours = Math.floor((value % 86400) / 3600);
+  const minutes = Math.floor((value % 3600) / 60);
+  const secs = value % 60;
+  const parts = [];
+  if (days) parts.push(`${days}d`);
+  if (hours || days) parts.push(`${hours}u`);
+  if (minutes || hours || days) parts.push(`${minutes}m`);
+  parts.push(`${secs}s`);
+  return parts.join(" ");
+}
+
+function applyStudyHubAppearance() {
+  const profile = studyHubProfile || {};
+  const lifetime = profile["Lifetime-VIP"] === true;
+  const active = lifetime || (
+    studyHubVipState?.status === "active" &&
+    studyHubVipState?.expiresAt?.toMillis?.() > Date.now()
+  );
+  const gold = active && profile.goldModeEnabled === true;
+  document.body.classList.toggle("light-theme", !gold && profile.themeMode === "light");
+  document.body.classList.toggle("gold-mode", gold);
+  document.body.classList.toggle("light-gold-mode", gold && profile.vipTheme === "light-gold");
+  document.body.classList.toggle("premium-mode", gold && profile.premiumMode === true);
+  const themeColor = $id("theme-color-meta");
+  if (themeColor) themeColor.content = gold ? (profile.vipTheme === "light-gold" ? "#f4f0e5" : "#15130e") : (profile.themeMode === "light" ? "#edf2f8" : "#0d1626");
+}
+
+function renderAccountState() {
+  const loggedIn = Boolean(studyHubUser && studyHubProfile);
+  const guestLock = $id("account-guest-lock");
+  const content = $id("account-content");
+  const accountButton = $id("account-button");
+
+  if (guestLock) guestLock.classList.toggle("hidden", loggedIn);
+  if (content) content.classList.toggle("hidden", !loggedIn);
+  if (accountButton) {
+    accountButton.classList.toggle("locked", !studyHubUser);
+    accountButton.textContent = studyHubUser ? `⚙ ${studyHubProfile?.username || "Account"}` : "🔒 Account";
+  }
+
+  if (!loggedIn) {
+    applyStudyHubAppearance();
+    return;
+  }
+
+  const profile = studyHubProfile;
+  const username = String(profile.username || makeDefaultUsername(studyHubUser));
+  $id("account-display-name").textContent = username;
+  $id("account-email-label").textContent = studyHubUser.email || "Google-account";
+  $id("username-input").value = username;
+  $id("account-avatar").textContent = username.slice(0, 1).toUpperCase();
+  $id("account-provider").textContent = studyHubUser.providerData.map(p => p.providerId === "google.com" ? "Google" : "E-mail").join(" + ") || "Firebase";
+  $id("theme-mode-select").value = profile.themeMode === "light" ? "light" : "dark";
+
+  const lifetime = vipLifetime();
+  const owned = vipStillOwned();
+  const activeOrLifetime = lifetime || activeVipNow();
+  const statusLabel = $id("account-status-label");
+  const statusBadge = $id("account-status-badge");
+  if (statusLabel) statusLabel.textContent = lifetime ? "Lifetime VIP-account" : (activeOrLifetime ? "VIP is actief" : (owned ? "VIP is gepauzeerd" : "Gratis account"));
+  if (statusBadge) {
+    statusBadge.textContent = lifetime ? "LIFETIME VIP" : (activeOrLifetime ? "VIP" : (owned ? "VIP PAUSED" : "FREE"));
+    statusBadge.className = `tag ${activeOrLifetime || owned ? "tag-amber" : "tag-emerald"}`;
+  }
+  const inventoryPanel = document.querySelector(".inventory-panel");
+  const codePanel = document.querySelector(".codes-panel-card");
+  if (inventoryPanel) inventoryPanel.classList.toggle("hidden", lifetime);
+  if (codePanel) codePanel.classList.toggle("hidden", lifetime);
+  $id("lifetime-inventory-note").classList.toggle("hidden", !lifetime);
+  $id("lifetime-code-note").classList.toggle("hidden", !lifetime);
+  $id("lifetime-vip-value").textContent = lifetime ? "true" : "false";
+
+  const count = studyHubInventory.reduce((sum, item) => sum + Math.max(0, Number(item.quantity) || 0), 0);
+  $id("inventory-count").textContent = `${count} ${count === 1 ? "item" : "items"}`;
+  renderInventory();
+  renderVipPanel();
+  applyStudyHubAppearance();
+}
+
+function renderInventory() {
+  const container = $id("inventory-list");
+  if (!container) return;
+  container.replaceChildren();
+  const items = studyHubInventory
+    .filter(item => item.type === "VIP-Coupon" && Number(item.quantity) > 0)
+    .sort((a,b) => Number(a.durationSeconds) - Number(b.durationSeconds));
+
+  if (items.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "inventory-empty";
+    empty.textContent = "Je inventory is nog leeg. Wissel een VIP-code in om een voucher te ontvangen.";
+    container.appendChild(empty);
+    return;
+  }
+
+  for (const item of items) {
+    const card = document.createElement("article");
+    card.className = "inventory-item";
+    const art = document.createElement("div");
+    art.className = "voucher-art";
+    art.setAttribute("aria-label", "Gouden VIP-voucher");
+    art.textContent = "🎟️";
+    const copy = document.createElement("div");
+    copy.className = "inventory-item-copy";
+    const name = document.createElement("strong");
+    name.textContent = "VIP-Coupon";
+    const detail = document.createElement("small");
+    detail.textContent = `${formatStudyHubTime(item.durationSeconds)} · ${item.quantity}×`;
+    copy.append(name, detail);
+    const useButton = document.createElement("button");
+    useButton.type = "button";
+    useButton.className = "btn btn-amber";
+    useButton.textContent = "Gebruiken";
+    useButton.disabled = vipLifetime() || (studyHubVipState && (
+      (studyHubVipState.status === "active" && studyHubVipState.expiresAt?.toMillis?.() > Date.now()) ||
+      studyHubVipState.status === "paused"
+    ));
+    useButton.addEventListener("click", () => activateVipCoupon(item.id));
+    card.append(art, copy, useButton);
+    container.appendChild(card);
+  }
+}
+
+function renderVipPanel() {
+  const panel = $id("vip-panel");
+  if (!panel) return;
+  const lifetime = vipLifetime();
+  const session = studyHubVipState;
+  const available = vipStillOwned();
+  panel.classList.toggle("hidden", !available);
+  $id("vip-timer-row").classList.toggle("hidden", lifetime);
+  $id("vip-lifetime-label").classList.toggle("hidden", !lifetime);
+  if (!available) return;
+
+  if (lifetime) {
+    $id("vip-status-text").textContent = "Lifetime VIP is permanent ingeschakeld.";
+    $id("gold-mode-toggle").disabled = false;
+    $id("vip-theme-select").disabled = false;
+    $id("premium-mode-toggle").disabled = false;
+    $id("pause-vip-button").classList.add("hidden");
+    $id("resume-vip-button").classList.add("hidden");
+  } else if (session?.status === "paused") {
+    $id("vip-status-text").textContent = "VIP is gepauzeerd. Je resterende tijd wordt bewaard.";
+    $id("vip-time-left").textContent = formatStudyHubTime(session.remainingSeconds);
+    $id("gold-mode-toggle").disabled = true;
+    $id("vip-theme-select").disabled = true;
+    $id("premium-mode-toggle").disabled = true;
+    $id("pause-vip-button").classList.add("hidden");
+    $id("resume-vip-button").classList.remove("hidden");
+  } else {
+    $id("vip-status-text").textContent = "VIP is actief. Geniet van je extra thema-opties.";
+    $id("gold-mode-toggle").disabled = false;
+    $id("vip-theme-select").disabled = false;
+    $id("premium-mode-toggle").disabled = false;
+    $id("pause-vip-button").classList.remove("hidden");
+    $id("resume-vip-button").classList.add("hidden");
+    refreshVipTimer();
+  }
+  $id("gold-mode-toggle").checked = studyHubProfile?.goldModeEnabled === true;
+  $id("vip-theme-select").value = studyHubProfile?.vipTheme === "light-gold" ? "light-gold" : "dark-gold";
+  $id("premium-mode-toggle").checked = studyHubProfile?.premiumMode === true;
+}
+
+async function refreshVipTimer() {
+  if (!studyHubUser || vipLifetime() || studyHubVipState?.status !== "active") return;
+  const expiry = studyHubVipState.expiresAt?.toMillis?.();
+  if (!expiry) return;
+  const secondsLeft = Math.ceil((expiry - Date.now()) / 1000);
+  if (secondsLeft > 0) {
+    const timer = $id("vip-time-left");
+    if (timer && !$id("vip-panel").classList.contains("hidden")) timer.textContent = formatStudyHubTime(secondsLeft);
+    return;
+  }
+
+  const expiredKey = `${studyHubUser.uid}:${studyHubVipState.useId || expiry}`;
+  if (expiryToastKey === expiredKey) return;
+  expiryToastKey = expiredKey;
+  showToast("⏰ Je VIP-Coupon is verlopen! Je normale StudyHub-instellingen zijn hersteld.");
+  try {
+    await updateDoc(userDocRef(studyHubUser.uid), {
+      goldModeEnabled: false,
+      premiumMode: false,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.warn("VIP theme reset failed:", error);
+  }
+  renderAccountState();
+}
+
+async function saveStudyHubUsername() {
+  if (!studyHubUser) return;
+  const input = $id("username-input");
+  const username = String(input.value || "").trim();
+  if (username.length < 2 || username.length > 24) {
+    showToast("Je gebruikersnaam moet 2 tot 24 tekens lang zijn.");
+    return;
+  }
+  if (/[<>]/.test(username)) {
+    showToast("Gebruik geen HTML-tekens in je gebruikersnaam.");
+    return;
+  }
+  try {
+    await updateDoc(userDocRef(studyHubUser.uid), { username, updatedAt: serverTimestamp() });
+    showToast("Gebruikersnaam opgeslagen! ✨");
+  } catch (error) {
+    showToast(`Opslaan mislukt: ${friendlyFirebaseError(error)}`);
+  }
+}
+
+async function saveProfilePreference(field, value) {
+  if (!studyHubUser || !studyHubProfile) return;
+  try {
+    await updateDoc(userDocRef(studyHubUser.uid), { [field]: value, updatedAt: serverTimestamp() });
+  } catch (error) {
+    showToast(`Instelling opslaan mislukt: ${friendlyFirebaseError(error)}`);
+    renderAccountState();
+  }
+}
+
+function sha256Hex(value) {
+  return crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)).then(buffer =>
+    [...new Uint8Array(buffer)].map(byte => byte.toString(16).padStart(2, "0")).join("")
+  );
+}
+
+async function redeemStudyHubCode() {
+  if (!studyHubUser || !studyHubProfile) return;
+  if (vipLifetime()) {
+    setCodeMessage("Lifetime VIP-accounts kunnen geen coupons via codes ontvangen.", true);
+    return;
+  }
+  const field = $id("redeem-code-input");
+  const code = String(field.value || "").trim().toUpperCase().replace(/\s+/g, "");
+  if (code.length < 12) {
+    setCodeMessage("Deze code lijkt te kort. Controleer of je de volledige code hebt ingevuld.", true);
+    return;
+  }
+
+  const button = $id("redeem-code-button");
+  button.disabled = true;
+  setCodeMessage("Code controleren…");
+  try {
+    const codeHash = await sha256Hex(code);
+    const codeRef = doc(studyHubDb, "codes", codeHash);
+    const redemptionRef = redemptionDocRef(studyHubUser.uid, codeHash);
+
+    await runTransaction(studyHubDb, async (transaction) => {
+      const profileRef = userDocRef(studyHubUser.uid);
+      const [profileSnap, codeSnap, redemptionSnap] = await Promise.all([
+        transaction.get(profileRef), transaction.get(codeRef), transaction.get(redemptionRef)
+      ]);
+      if (!profileSnap.exists()) throw new Error("Je gebruikersprofiel is niet gevonden.");
+      if (profileSnap.data()["Lifetime-VIP"] === true) throw new Error("Lifetime VIP heeft geen coupons nodig.");
+      if (!codeSnap.exists()) throw new Error("Deze code bestaat niet of is ongeldig.");
+      if (redemptionSnap.exists()) throw new Error("Je hebt deze code al eens gebruikt.");
+
+      const codeData = codeSnap.data();
+      if (codeData.active !== true || codeData.type !== "VIP-Coupon") throw new Error("Deze code is niet actief of heeft een ongeldig type.");
+      const durationSeconds = Number(codeData.durationSeconds);
+      const maxRedemptions = Number(codeData.maxRedemptions);
+      const redeemedCount = Number(codeData.redeemedCount || 0);
+      if (!Number.isInteger(durationSeconds) || durationSeconds < 1 || durationSeconds > 31536000) throw new Error("Deze coupon heeft een ongeldige tijdsduur.");
+      if (!Number.isInteger(maxRedemptions) || redeemedCount >= maxRedemptions) throw new Error("Deze code is al maximaal ingewisseld.");
+      if (codeData.expiresAt?.toMillis && codeData.expiresAt.toMillis() <= Date.now()) throw new Error("Deze code is verlopen.");
+
+      const itemId = `vip-coupon-${durationSeconds}`;
+      const inventoryRef = doc(studyHubDb, "users", studyHubUser.uid, "inventory", itemId);
+      const inventorySnap = await transaction.get(inventoryRef);
+
+      transaction.update(codeRef, {
+        redeemedCount: redeemedCount + 1,
+        updatedAt: serverTimestamp()
+      });
+      transaction.set(redemptionRef, {
+        type: "VIP-Coupon",
+        durationSeconds,
+        inventoryItemId: itemId,
+        redeemedAt: serverTimestamp()
+      });
+      if (inventorySnap.exists()) {
+        const oldItem = inventorySnap.data();
+        if (oldItem.type !== "VIP-Coupon" || Number(oldItem.durationSeconds) !== durationSeconds) throw new Error("Inventory-item heeft een ongeldige structuur.");
+        transaction.update(inventoryRef, {
+          quantity: Number(oldItem.quantity || 0) + 1,
+          lastRedemptionHash: codeHash,
+          lastRedemptionAt: serverTimestamp()
+        });
+      } else {
+        transaction.set(inventoryRef, {
+          type: "VIP-Coupon",
+          durationSeconds,
+          quantity: 1,
+          createdAt: serverTimestamp(),
+          lastRedemptionHash: codeHash,
+          lastRedemptionAt: serverTimestamp(),
+          lastUseId: ""
+        });
+      }
+    });
+
+    field.value = "";
+    setCodeMessage("Gelukt! Je VIP-Coupon is toegevoegd aan je inventory. ✨", false);
+    showToast("VIP-Coupon ontvangen! 🎟️");
+  } catch (error) {
+    console.error("Code redemption failed:", error);
+    setCodeMessage(error.message || friendlyFirebaseError(error), true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function activateVipCoupon(itemId) {
+  if (!studyHubUser || vipLifetime()) return;
+  const inventoryRef = doc(studyHubDb, "users", studyHubUser.uid, "inventory", itemId);
+  const vipRef = vipDocRef(studyHubUser.uid);
+  const useId = crypto.randomUUID();
+  try {
+    await runTransaction(studyHubDb, async (transaction) => {
+      const [profileSnap, itemSnap, vipSnap] = await Promise.all([
+        transaction.get(userDocRef(studyHubUser.uid)), transaction.get(inventoryRef), transaction.get(vipRef)
+      ]);
+      if (!profileSnap.exists() || profileSnap.data()["Lifetime-VIP"] === true) throw new Error("Deze coupon kan niet op dit account worden gebruikt.");
+      if (!itemSnap.exists() || Number(itemSnap.data().quantity) < 1) throw new Error("Je hebt geen coupon van deze duur meer.");
+      const oldVip = vipSnap.exists() ? vipSnap.data() : null;
+      if (oldVip && oldVip.status === "paused" && Number(oldVip.remainingSeconds) > 0) throw new Error("Hervat eerst je gepauzeerde VIP-tijd.");
+      if (oldVip && oldVip.status === "active" && oldVip.expiresAt?.toMillis?.() > Date.now()) throw new Error("Er loopt al VIP-tijd. Pauzeer of wacht tot deze verloopt.");
+
+      const item = itemSnap.data();
+      const durationSeconds = Number(item.durationSeconds);
+      if (!Number.isInteger(durationSeconds) || durationSeconds < 1) throw new Error("Deze coupon bevat een ongeldige tijdsduur.");
+      const expiresAt = Timestamp.fromMillis(Date.now() + durationSeconds * 1000);
+      transaction.update(inventoryRef, {
+        quantity: Number(item.quantity) - 1,
+        lastUseId: useId
+      });
+      transaction.set(vipRef, {
+        status: "active",
+        durationSeconds,
+        remainingSeconds: 0,
+        expiresAt,
+        startedAt: serverTimestamp(),
+        sourceItemId: itemId,
+        useId,
+        updatedAt: serverTimestamp()
+      });
+    });
+    showToast("VIP-Coupon geactiveerd! Je VIP-tijd loopt nu. ✨");
+  } catch (error) {
+    showToast(error.message || friendlyFirebaseError(error));
+  } finally {
+    renderInventory();
+  }
+}
+
+async function pauseVipTimer() {
+  if (!studyHubUser || vipLifetime()) return;
+  const ref = vipDocRef(studyHubUser.uid);
+  try {
+    await runTransaction(studyHubDb, async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists()) throw new Error("Er is geen actieve VIP-sessie.");
+      const session = snapshot.data();
+      if (session.status !== "active" || !session.expiresAt?.toMillis) throw new Error("Er loopt geen actieve VIP-timer.");
+      const remaining = Math.max(0, Math.floor((session.expiresAt.toMillis() - Date.now()) / 1000) - 1);
+      if (remaining < 1) throw new Error("Je VIP-tijd is al afgelopen.");
+      transaction.update(ref, {
+        status: "paused",
+        remainingSeconds: remaining,
+        expiresAt: null,
+        updatedAt: serverTimestamp()
+      });
+    });
+    await saveProfilePreference("goldModeEnabled", false);
+    await saveProfilePreference("premiumMode", false);
+    showToast("VIP gestopt. Je resterende tijd is bewaard. ⏸");
+  } catch (error) {
+    showToast(error.message || friendlyFirebaseError(error));
+  }
+}
+
+async function resumeVipTimer() {
+  if (!studyHubUser || vipLifetime()) return;
+  const ref = vipDocRef(studyHubUser.uid);
+  try {
+    await runTransaction(studyHubDb, async (transaction) => {
+      const snapshot = await transaction.get(ref);
+      if (!snapshot.exists()) throw new Error("Er is geen gepauzeerde VIP-sessie.");
+      const session = snapshot.data();
+      const remaining = Number(session.remainingSeconds);
+      if (session.status !== "paused" || !Number.isInteger(remaining) || remaining < 1) throw new Error("Er is geen VIP-tijd om te hervatten.");
+      transaction.update(ref, {
+        status: "active",
+        expiresAt: Timestamp.fromMillis(Date.now() + remaining * 1000),
+        startedAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    });
+    showToast("VIP is hervat! De timer loopt weer. ▶");
+  } catch (error) {
+    showToast(error.message || friendlyFirebaseError(error));
+  }
+}
+
+async function handleEmailSignIn(createAccount) {
+  const email = String($id("auth-email").value || "").trim();
+  const password = String($id("auth-password").value || "");
+  if (!email || !password) {
+    setAuthMessage("Vul je e-mailadres en wachtwoord in.");
+    return;
+  }
+  try {
+    setAuthMessage(createAccount ? "Account wordt aangemaakt…" : "Je wordt ingelogd…", false);
+    await setPersistence(studyHubAuth, browserLocalPersistence);
+    if (createAccount) await createUserWithEmailAndPassword(studyHubAuth, email, password);
+    else await signInWithEmailAndPassword(studyHubAuth, email, password);
+    setAuthMessage("Gelukt! Je wordt doorgestuurd…", false);
+  } catch (error) {
+    setAuthMessage(friendlyFirebaseError(error));
+  }
+}
+
+async function handleGoogleSignIn() {
+  try {
+    setAuthMessage("Google-inloggen wordt geopend…", false);
+    await setPersistence(studyHubAuth, browserLocalPersistence);
+    const mobileBrowser = /iphone|ipad|ipod|android/i.test(navigator.userAgent || "");
+    if (mobileBrowser) {
+      await signInWithRedirect(studyHubAuth, studyHubGoogleProvider);
+      return;
+    }
+    await signInWithPopup(studyHubAuth, studyHubGoogleProvider);
+  } catch (error) {
+    if (error?.code === "auth/popup-blocked") {
+      try {
+        await signInWithRedirect(studyHubAuth, studyHubGoogleProvider);
+        return;
+      } catch (redirectError) {
+        setAuthMessage(friendlyFirebaseError(redirectError));
+        return;
+      }
+    }
+    setAuthMessage(friendlyFirebaseError(error));
+  }
+}
+
+async function handlePasswordReset() {
+  const email = String($id("auth-email").value || "").trim();
+  if (!email) {
+    setAuthMessage("Vul eerst je e-mailadres in.");
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(studyHubAuth, email);
+    setAuthMessage("Als dit e-mailadres een account heeft, is een resetmail verstuurd.", false);
+  } catch (error) {
+    setAuthMessage(friendlyFirebaseError(error));
+  }
+}
+
+function openCodePanel() {
+  const panel = $id("code-entry-panel");
+  const button = $id("toggle-code-panel");
+  const open = panel.classList.contains("hidden");
+  panel.classList.toggle("hidden", !open);
+  button.setAttribute("aria-expanded", String(open));
+  button.textContent = open ? "Code verbergen" : "Code invoeren";
+}
+
+function initialiseStudyHubAccounts() {
+  // Restore local auth persistence before showing the first-run choice.
+  setPersistence(studyHubAuth, browserLocalPersistence).catch(console.warn);
+  window.studyHubCurrentTab = "home";
+
+  $id("continue-guest")?.addEventListener("click", continueAsGuest);
+  $id("sign-in-from-account")?.addEventListener("click", showLoginOverlay);
+  $id("google-signin")?.addEventListener("click", handleGoogleSignIn);
+  $id("email-signin")?.addEventListener("click", () => handleEmailSignIn(false));
+  $id("email-create")?.addEventListener("click", () => handleEmailSignIn(true));
+  $id("forgot-password")?.addEventListener("click", handlePasswordReset);
+  $id("email-auth-form")?.addEventListener("submit", (event) => { event.preventDefault(); handleEmailSignIn(false); });
+
+  $id("account-button")?.addEventListener("click", () => switchTab("account"));
+  $id("account-back")?.addEventListener("click", () => switchTab(window.studyHubReturnTab || "home"));
+  $id("sign-out")?.addEventListener("click", async () => {
+    try {
+      localStorage.removeItem("studyhub-guest-mode");
+      await signOut(studyHubAuth);
+    } catch (error) {
+      showToast(friendlyFirebaseError(error));
+    }
+  });
+  $id("save-username")?.addEventListener("click", saveStudyHubUsername);
+  $id("theme-mode-select")?.addEventListener("change", (event) => saveProfilePreference("themeMode", event.target.value));
+  $id("toggle-code-panel")?.addEventListener("click", openCodePanel);
+  $id("redeem-code-button")?.addEventListener("click", redeemStudyHubCode);
+  $id("redeem-code-input")?.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); redeemStudyHubCode(); } });
+  $id("gold-mode-toggle")?.addEventListener("change", (event) => saveProfilePreference("goldModeEnabled", event.target.checked));
+  $id("vip-theme-select")?.addEventListener("change", (event) => saveProfilePreference("vipTheme", event.target.value));
+  $id("premium-mode-toggle")?.addEventListener("change", (event) => saveProfilePreference("premiumMode", event.target.checked));
+  $id("pause-vip-button")?.addEventListener("click", pauseVipTimer);
+  $id("resume-vip-button")?.addEventListener("click", resumeVipTimer);
+
+  onAuthStateChanged(studyHubAuth, async (user) => {
+    if (user) {
+      studyHubUser = user;
+      localStorage.removeItem("studyhub-guest-mode");
+      try {
+        await ensureStudyHubProfile(user);
+        startUserListeners(user);
+        showAppShell("user");
+      } catch (error) {
+        console.error("StudyHub profile initialisation failed:", error);
+        setAuthMessage(`Inloggen lukte, maar je profiel kon niet worden geladen: ${friendlyFirebaseError(error)}`);
+        showAppShell("user");
+      }
+    } else {
+      studyHubUser = null;
+      studyHubProfile = null;
+      studyHubInventory = [];
+      studyHubVipState = null;
+      stopUserListeners();
+      if (localStorage.getItem("studyhub-guest-mode") === "1") {
+        showAppShell("guest");
+      } else {
+        document.body.classList.remove("app-ready", "guest-mode", "light-theme", "gold-mode", "light-gold-mode", "premium-mode");
+        const screen = $id("auth-screen");
+        if (screen) { screen.hidden = false; screen.classList.remove("auth-overlay"); }
+        renderAccountState();
+      }
+    }
+  });
+
+  getRedirectResult(studyHubAuth).catch((error) => {
+    if (error?.code && error.code !== "auth/no-auth-event") setAuthMessage(friendlyFirebaseError(error));
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initialiseStudyHubAccounts, { once: true });

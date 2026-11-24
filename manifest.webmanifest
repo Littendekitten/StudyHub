@@ -2,30 +2,25 @@
   "id": "./",
   "name": "StudyHub - Havo 2",
   "short_name": "StudyHub",
-  "description": "Oefen voor havo 2 met Aardrijkskunde en Wiskunde.",
-  "lang": "nl-NL",
-  "start_url": "./index.html",
+  "description": "Oefen slimmer met StudyHub voor havo 2.",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
   "orientation": "portrait-primary",
   "background_color": "#0d1626",
   "theme_color": "#0d1626",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
