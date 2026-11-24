@@ -137,19 +137,35 @@ import {
         let studyHubDeferredInstallPrompt = null;
 
         function isStudyHubInstalled() {
-            return window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+            return Boolean(
+                window.matchMedia?.('(display-mode: standalone)').matches ||
+                window.matchMedia?.('(display-mode: minimal-ui)').matches ||
+                navigator.standalone === true
+            );
+        }
+
+        // Toon de installatieknop uitsluitend op de Hub-homepagina en alleen
+        // zolang StudyHub niet al als PWA is geïnstalleerd.
+        function updateInstallButtonVisibility(tabName = window.studyHubCurrentTab || 'home') {
+            const button = document.getElementById('install-app-btn');
+            if (!button) return;
+            const isHubHome = tabName === 'home' &&
+                !document.body.classList.contains('subject-open') &&
+                !document.body.classList.contains('math-open');
+            button.hidden = !isHubHome || isStudyHubInstalled();
+            button.setAttribute('aria-hidden', String(button.hidden));
         }
 
         // Chrome en Edge op Android/desktop geven dit event als StudyHub installeerbaar is.
         window.addEventListener('beforeinstallprompt', event => {
             event.preventDefault();
             studyHubDeferredInstallPrompt = event;
+            updateInstallButtonVisibility();
         });
 
         window.addEventListener('appinstalled', () => {
             studyHubDeferredInstallPrompt = null;
-            const button = document.getElementById('install-app-btn');
-            if (button) button.hidden = true;
+            updateInstallButtonVisibility();
             showToast('StudyHub is geïnstalleerd! Je vindt de app nu op je startscherm.');
         });
 
@@ -244,6 +260,7 @@ import {
             });
 
             if (tabName === 'learn') renderFlashcards();
+            updateInstallButtonVisibility(tabName);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -769,7 +786,7 @@ import {
            ========================================================================== */
         document.addEventListener('DOMContentLoaded', () => {
             const installButton = document.getElementById('install-app-btn');
-            if (isStudyHubInstalled() && installButton) installButton.hidden = true;
+            updateInstallButtonVisibility('home');
             installButton?.addEventListener('click', installStudyHub);
 
             document.getElementById('brand-logo')?.addEventListener('click', () => switchTab('home'));
@@ -1111,7 +1128,7 @@ const studyHubFirebaseConfig = {
 
 // Replace this with the exact public URL Render assigns to the StudyHub API.
 // Example: https://studyhub-vip-api.onrender.com
-const STUDYHUB_API_BASE_URL = "https://YOUR-RENDER-SERVICE.onrender.com";
+const STUDYHUB_API_BASE_URL = "https://studyhub-vip-api.onrender.com";
 
 const studyHubFirebaseApp = initializeApp(studyHubFirebaseConfig);
 const studyHubAuth = getAuth(studyHubFirebaseApp);
@@ -1186,6 +1203,7 @@ function showAppShell(mode) {
     screen.classList.remove("auth-overlay");
   }
   renderAccountState();
+  updateInstallButtonVisibility(window.studyHubCurrentTab || 'home');
 }
 
 function continueAsGuest() {
@@ -1489,9 +1507,29 @@ async function saveStudyHubUsername() {
 async function saveProfilePreference(field, value) {
   if (!studyHubUser || !studyHubProfile) return;
   try {
-    await updateDoc(userDocRef(studyHubUser.uid), { [field]: value, updatedAt: serverTimestamp() });
+    const updates = { [field]: value, updatedAt: serverTimestamp() };
+    // Premium is een extra laag op Gold Mode. Gold uitschakelen zet Premium ook uit.
+    if (field === "goldModeEnabled" && value === false) updates.premiumMode = false;
+    await updateDoc(userDocRef(studyHubUser.uid), updates);
   } catch (error) {
     showToast(`Instelling opslaan mislukt: ${friendlyFirebaseError(error)}`);
+    renderAccountState();
+  }
+}
+
+async function savePremiumExperience(enabled) {
+  if (!studyHubUser || !studyHubProfile) return;
+  try {
+    const updates = {
+      premiumMode: Boolean(enabled),
+      updatedAt: serverTimestamp()
+    };
+    // Premium automatisch laten inschakelen met de volledige Gold-stijl,
+    // zodat de schakelaar nooit aan kan staan zonder zichtbaar resultaat.
+    if (enabled) updates.goldModeEnabled = true;
+    await updateDoc(userDocRef(studyHubUser.uid), updates);
+  } catch (error) {
+    showToast(`Premium-instelling opslaan mislukt: ${friendlyFirebaseError(error)}`);
     renderAccountState();
   }
 }
@@ -1816,7 +1854,7 @@ function initialiseStudyHubAccounts() {
   $id("redeem-code-input")?.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); redeemStudyHubCode(); } });
   $id("gold-mode-toggle")?.addEventListener("change", (event) => saveProfilePreference("goldModeEnabled", event.target.checked));
   $id("vip-theme-select")?.addEventListener("change", (event) => saveProfilePreference("vipTheme", event.target.value));
-  $id("premium-mode-toggle")?.addEventListener("change", (event) => saveProfilePreference("premiumMode", event.target.checked));
+  $id("premium-mode-toggle")?.addEventListener("change", (event) => savePremiumExperience(event.target.checked));
   $id("pause-vip-button")?.addEventListener("click", pauseVipTimer);
   $id("resume-vip-button")?.addEventListener("click", resumeVipTimer);
 

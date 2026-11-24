@@ -714,12 +714,12 @@
 
             <div class="panel codes-panel-card">
               <div class="panel-header"><div><h3>🎟️ Codes</h3><p class="subtitle">Heb je een StudyHub-code gekregen? Wissel hem hier in.</p></div><button class="btn btn-secondary" id="toggle-code-panel" type="button" aria-expanded="false">Code invoeren</button></div>
-              <div id="code-entry-panel" class="code-entry-panel hidden"><label for="redeem-code-input">Code</label><div class="account-inline-form"><input id="redeem-code-input" type="text" maxlength="80" autocomplete="off" placeholder="STUDYHUB-XXXX-XXXX"><button class="btn btn-emerald" id="redeem-code-button" type="button">Inwisselen</button></div><p class="muted-note">Codes kunnen één keer per account worden gebruikt. Een coupon wordt toegevoegd aan je inventory.</p><p id="redeem-code-message" class="account-feedback" role="status" aria-live="polite"></p></div>
+              <div id="code-entry-panel" class="code-entry-panel hidden"><label for="redeem-code-input">Code</label><div class="account-inline-form"><input id="redeem-code-input" type="text" maxlength="80" autocomplete="off" placeholder="SHVIP-PLAK-HIER-JE-CODE"><button class="btn btn-emerald" id="redeem-code-button" type="button">Inwisselen</button></div><p class="muted-note">Codes kunnen één keer per account worden gebruikt. Een coupon wordt toegevoegd aan je inventory.</p><p id="redeem-code-message" class="account-feedback" role="status" aria-live="polite"></p></div>
               <p id="lifetime-code-note" class="muted-note hidden">Codes zijn uitgeschakeld voor Lifetime VIP-accounts.</p>
             </div>
 
             <div id="admin-code-panel" class="panel admin-code-panel hidden">
-              <div class="panel-header"><div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Alleen zichtbare beheerders kunnen hier veilige codes maken.</p></div><span class="tag tag-purple">ADMIN</span></div>
+              <div class="panel-header"><div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Maak VIP-codes die je veilig met klasgenoten kunt delen. Codes worden gehasht opgeslagen.</p></div><span class="tag tag-purple">ADMIN</span></div>
               <div class="admin-code-grid">
                 <div class="account-form-group"><label for="admin-code-duration">Couponduur</label><select id="admin-code-duration"><option value="3600">1 uur</option><option value="21600">6 uur</option><option value="43200">12 uur</option><option value="86400">1 dag</option><option value="259200">3 dagen</option><option value="604800">7 dagen</option><option value="2592000">30 dagen</option></select></div>
                 <div class="account-form-group"><label for="admin-code-uses">Maximaal aantal accounts</label><input id="admin-code-uses" type="number" min="1" max="500" value="1"></div>
@@ -735,7 +735,16 @@
               <div id="vip-lifetime-label" class="vip-lifetime-label hidden">♾️ Lifetime VIP · Geen timer nodig</div>
               <label class="vip-toggle-row" for="gold-mode-toggle"><span><strong>Enable Gold Mode</strong><small>Geef StudyHub een gouden VIP-uitstraling.</small></span><input id="gold-mode-toggle" type="checkbox"></label>
               <div class="vip-setting-fields"><label for="vip-theme-select">Gold-thema</label><select id="vip-theme-select"><option value="dark-gold">🌙 Dark Gold · zwart en goud</option><option value="light-gold">☀️ Light Gold · wit en goud</option></select></div>
-              <div class="vip-setting-fields premium-setting"><label class="vip-toggle-row" for="premium-mode-toggle"><span><strong>StudyHub Premium Experience</strong><small>Een extra verfijnde VIP-weergave en uitgebreide dashboarddetails.</small></span><input id="premium-mode-toggle" type="checkbox"></label><span class="muted-note">Premium Experience is een extra uiterlijk binnen StudyHub VIP; dit is geen betaalde aankoop.</span></div>
+              <div class="vip-premium-showcase">
+                <div class="vip-premium-mark" aria-hidden="true">✦</div>
+                <div class="vip-premium-copy">
+                  <span class="vip-premium-kicker">THE SIGNATURE LOOK</span>
+                  <h4>StudyHub Premium Experience</h4>
+                  <p>Een luxere StudyHub-uitstraling met metallic goudaccenten, diepere kaarten, subtiele glans en een exclusieve dashboardstijl.</p>
+                  <div class="vip-premium-perks"><span>✦ Premium kaarten</span><span>✦ Gouden details</span><span>✦ Extra diepte</span></div>
+                </div>
+              </div>
+              <div class="vip-setting-fields premium-setting"><label class="vip-toggle-row" for="premium-mode-toggle"><span><strong>Enable Premium Experience</strong><small>Activeer de volledige Premium-vormgeving.</small></span><input id="premium-mode-toggle" type="checkbox"></label><span class="muted-note">Dit is een extra uiterlijk binnen StudyHub VIP, geen betaalde aankoop.</span></div>
               <div id="vip-action-row" class="vip-action-row"><button class="btn btn-secondary" id="pause-vip-button" type="button">⏸ VIP stoppen en tijd bewaren</button><button class="btn btn-emerald hidden" id="resume-vip-button" type="button">▶ VIP hervatten</button></div>
             </div>
 

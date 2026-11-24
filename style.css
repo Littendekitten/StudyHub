@@ -1683,3 +1683,360 @@ body.light-gold-mode .math-app .math-generator-fields label,
 body.light-gold-mode .math-app .math-generator-note strong { color:#514322 !important; }
 body.light-gold-mode .math-app .math-generator-fields select { background:#fffdf8 !important;color:#514322 !important;border-color:#e4d5ae !important; }
 body.light-gold-mode .math-app .toast { background:#fffdf8 !important;color:#514322 !important;border-color:#d5b96f !important; }
+
+
+/* =====================================================================
+   STUDYHUB VIP GOLD — strong gold identity across the entire experience
+   ===================================================================== */
+body.gold-mode {
+  --bg-main:#0b0906;
+  --bg-card:#19150d;
+  --bg-card-dark:#100d08;
+  --bg-input:#120f09;
+  --border-color:#72551f;
+  --border-light:#9a7430;
+  --text-main:#fff5d9;
+  --text-muted:#d6c18d;
+  --text-dim:#ab925d;
+  --emerald:#f1cb68;
+  --emerald-dark:#b78322;
+  --emerald-bg:rgba(225,177,70,.16);
+  --blue:#e9c46b;
+  --blue-dark:#b78322;
+  --blue-bg:rgba(225,177,70,.14);
+  --purple:#e3c37c;
+  --purple-dark:#a77a27;
+  --purple-bg:rgba(225,177,70,.12);
+  --amber:#ffd875;
+  --amber-dark:#a97920;
+  --amber-bg:rgba(255,205,91,.15);
+  --brand:#d5a843;
+  --brand-dark:#956719;
+  --brand-soft:rgba(213,168,67,.16);
+  color-scheme:dark;
+  background:#0b0906 !important;
+  background-image:radial-gradient(ellipse at 12% 0%,rgba(224,177,73,.13),transparent 34%),radial-gradient(ellipse at 95% 16%,rgba(151,104,25,.10),transparent 30%) !important;
+}
+body.gold-mode header {
+  background:rgba(12,10,7,.97) !important;
+  border-bottom-color:#73531e !important;
+  box-shadow:0 8px 32px rgba(0,0,0,.42),0 1px 0 rgba(247,206,113,.12) !important;
+}
+body.gold-mode .brand-icon,
+body.gold-mode .subject-icon,
+body.gold-mode .account-avatar,
+body.gold-mode .math-app .stat-icon,
+body.gold-mode .math-app .chapter-icon {
+  color:#ffe5a0 !important;
+  background:linear-gradient(145deg,rgba(255,218,132,.22),rgba(153,103,21,.18)) !important;
+  border:1px solid rgba(236,190,83,.55) !important;
+  box-shadow:inset 0 1px 0 rgba(255,244,203,.16),0 5px 20px rgba(212,161,50,.12) !important;
+}
+body.gold-mode .brand-title,
+body.gold-mode .home-title,
+body.gold-mode .home-section-title,
+body.gold-mode .home-stat strong,
+body.gold-mode h2,
+body.gold-mode h3,
+body.gold-mode .math-app .hero h1,
+body.gold-mode .math-app .section-head h2,
+body.gold-mode .math-app .view-head h2,
+body.gold-mode .math-app .chapter-card h3,
+body.gold-mode .math-app .quick-panel h3,
+body.gold-mode .math-app .info-card h3,
+body.gold-mode .math-app .result-box h2 { color:#fff1c7 !important; }
+body.gold-mode .brand-sub,
+body.gold-mode .subtitle,
+body.gold-mode .home-copy,
+body.gold-mode .card-desc,
+body.gold-mode .home-stat span,
+body.gold-mode .math-app .hero p,
+body.gold-mode .math-app .chapter-card p,
+body.gold-mode .math-app .info-card p,
+body.gold-mode .math-app .info-card li,
+body.gold-mode .math-app .muted-note { color:#c8b483 !important; }
+body.gold-mode .study-pill,
+body.gold-mode .tag-amber,
+body.gold-mode .math-app .chapter-tag {
+  color:#ffe4a0 !important;
+  background:rgba(200,151,48,.18) !important;
+  border-color:rgba(235,191,91,.38) !important;
+}
+body.gold-mode .panel,
+body.gold-mode .test-card,
+body.gold-mode .home-stat,
+body.gold-mode .flashcard-front,
+body.gold-mode .flashcard-back,
+body.gold-mode .diagram-box,
+body.gold-mode .review-card,
+body.gold-mode .stat-box,
+body.gold-mode .math-app .stat,
+body.gold-mode .math-app .chapter-card,
+body.gold-mode .math-app .quick-panel,
+body.gold-mode .math-app .practice-card,
+body.gold-mode .math-app .info-card,
+body.gold-mode .math-app .video-link {
+  color:#fff1c7 !important;
+  background:linear-gradient(145deg,#211a0e 0%,#151109 72%,#100d08 100%) !important;
+  border-color:rgba(207,159,57,.52) !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.31),inset 0 1px 0 rgba(255,226,158,.055),0 0 0 1px rgba(194,145,42,.07) !important;
+}
+body.gold-mode .home-hero,
+body.gold-mode .math-app .hero {
+  background:radial-gradient(circle at 84% 14%,rgba(255,213,111,.24),transparent 31%),linear-gradient(122deg,#30230f 0%,#1a150c 54%,#100e09 100%) !important;
+  border:1px solid rgba(239,195,91,.68) !important;
+  box-shadow:0 18px 48px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,226,158,.13),0 0 34px rgba(210,157,49,.10) !important;
+}
+body.gold-mode .home-title span,
+body.gold-mode .home-kicker,
+body.gold-mode .section-eyebrow,
+body.gold-mode .math-app .eyebrow,
+body.gold-mode .math-app .hero h1 span { color:#f4cf78 !important; }
+body.gold-mode .nav-tab-btn,
+body.gold-mode .install-app-btn {
+  color:#f3dfb1 !important;
+  background:linear-gradient(145deg,#211a0e,#151109) !important;
+  border-color:#695022 !important;
+}
+body.gold-mode .nav-tab-btn.active,
+body.gold-mode .card-open-hint,
+body.gold-mode .btn-emerald,
+body.gold-mode .btn-gradient,
+body.gold-mode .btn-amber,
+body.gold-mode .math-app .btn-primary {
+  color:#2a1b06 !important;
+  background:linear-gradient(115deg,#fff0b7 0%,#e8bd58 34%,#bd872b 68%,#f3d681 100%) !important;
+  border:1px solid #f5d98a !important;
+  box-shadow:0 7px 20px rgba(199,146,38,.24),inset 0 1px 0 rgba(255,255,255,.48) !important;
+  font-weight:900 !important;
+}
+body.gold-mode .btn-secondary,
+body.gold-mode .math-app .btn-light {
+  background:linear-gradient(145deg,#2a2112,#191309) !important;
+  color:#f2d99e !important;
+  border-color:#765a28 !important;
+}
+body.gold-mode .subject-card-link:hover,
+body.gold-mode .math-app .chapter-card:hover,
+body.gold-mode .math-app .chapter-card:focus-visible {
+  border-color:#f5d177 !important;
+  box-shadow:0 0 0 2px rgba(247,204,105,.24),0 18px 40px rgba(0,0,0,.38),0 0 28px rgba(221,169,56,.17) !important;
+}
+body.gold-mode select,
+body.gold-mode input[type="text"],
+body.gold-mode input[type="email"],
+body.gold-mode input[type="password"],
+body.gold-mode input[type="number"],
+body.gold-mode textarea,
+body.gold-mode .math-app .math-expression,
+body.gold-mode .math-app .answer {
+  color:#fff0c7 !important;
+  background:#110e08 !important;
+  border-color:#6f5425 !important;
+}
+body.gold-mode .mc-option,
+body.gold-mode .q-pill,
+body.gold-mode .math-app .answer { background:#171208 !important;color:#f5e4bd !important;border-color:#5c4823 !important; }
+body.gold-mode .mc-option:hover,
+body.gold-mode .math-app .answer:hover:not(:disabled) { background:#2a200e !important;border-color:#d0a448 !important; }
+body.gold-mode .mc-option.selected,
+body.gold-mode .math-app .answer.correct { background:rgba(196,151,52,.2) !important;border-color:#e1bc63 !important;color:#ffe7a6 !important; }
+body.gold-mode .progress-track,
+body.gold-mode .math-app .progress { background:#171106 !important;border:1px solid #4a3819 !important; }
+body.gold-mode .progress-fill,
+body.gold-mode .math-app .progress>span { background:linear-gradient(90deg,#a6751e,#f5d277,#fff0b7) !important; }
+body.gold-mode .grade-circle,
+body.gold-mode .math-app .result-ring { border-color:#e3b84e !important;background:radial-gradient(circle,#2c210e,#100d08) !important;color:#ffe7a6 !important;box-shadow:0 0 0 5px rgba(222,174,70,.10),0 0 34px rgba(211,160,51,.17) !important; }
+body.gold-mode .timer-badge { background:rgba(216,165,57,.16) !important;color:#ffe29b !important;border-color:#bd8d35 !important; }
+body.gold-mode .flashcard-back { border-color:#dfb44f !important; }
+body.gold-mode table.geo-table th { background:#34260f !important;color:#f6d889 !important; }
+body.gold-mode table.geo-table th,body.gold-mode table.geo-table td { border-color:#6a5123 !important; }
+body.gold-mode table.geo-table td { color:#eadbb6 !important; }
+body.gold-mode .toast,.gold-mode .math-app .toast { background:#21190c !important;color:#fff1c7 !important;border:1px solid #98712a !important;box-shadow:0 14px 36px rgba(0,0,0,.42) !important; }
+body.gold-mode .vip-panel,
+body.gold-mode .admin-code-panel,
+body.gold-mode .inventory-panel,
+body.gold-mode .codes-panel-card {
+  border:1px solid rgba(244,202,103,.72) !important;
+  background:radial-gradient(circle at 95% 0%,rgba(249,208,111,.20),transparent 32%),linear-gradient(145deg,#2a210f,#171208 66%,#100d08) !important;
+  box-shadow:0 16px 40px rgba(0,0,0,.38),0 0 30px rgba(202,151,48,.11),inset 0 1px 0 rgba(255,230,167,.12) !important;
+}
+body.gold-mode .vip-panel-heading h3,
+body.gold-mode .vip-panel-heading .vip-eyebrow,
+body.gold-mode .vip-status-text { color:#ffe3a0 !important; }
+body.gold-mode .vip-emblem,
+body.gold-mode .vip-premium-mark {
+  background:linear-gradient(135deg,#fff2bd 0%,#e4b94f 44%,#805817 100%) !important;
+  color:#392607 !important;
+  border:1px solid #ffe29b !important;
+  box-shadow:0 0 0 4px rgba(224,178,75,.12),0 9px 28px rgba(202,151,48,.27) !important;
+}
+body.gold-mode .vip-timer-row,
+body.gold-mode .vip-lifetime-label { background:rgba(9,7,4,.62) !important;border-color:#98712d !important;color:#e8d09a !important; }
+body.gold-mode .vip-timer-row strong { color:#ffe9a8 !important;text-shadow:0 0 16px rgba(245,202,104,.18); }
+body.gold-mode .inventory-item { background:linear-gradient(120deg,rgba(255,228,153,.16),rgba(93,62,12,.22) 40%,rgba(13,10,5,.88)) !important;border-color:#bd9140 !important;box-shadow:inset 0 1px 0 rgba(255,237,180,.13),0 8px 22px rgba(0,0,0,.22) !important; }
+body.gold-mode .inventory-item-copy strong { color:#ffe7a6 !important; }
+body.gold-mode .inventory-item-copy small { color:#d5bd85 !important; }
+body.gold-mode .voucher-art { transform:rotate(-3deg);box-shadow:0 0 0 3px rgba(221,175,78,.12),0 8px 25px rgba(224,174,66,.28) !important; }
+
+/* The Light Gold palette keeps the gold identity while switching to cream. */
+body.light-gold-mode {
+  --bg-main:#f2ead6;--bg-card:#fffaf0;--bg-card-dark:#f6edd9;--bg-input:#fffdf7;
+  --border-color:#d8bd7d;--border-light:#c49e4b;
+  --text-main:#34270f;--text-muted:#75603a;--text-dim:#9a7f4d;
+  --emerald:#a9781e;--emerald-dark:#805713;--emerald-bg:rgba(190,143,43,.14);
+  --blue:#a9781e;--blue-dark:#805713;--blue-bg:rgba(190,143,43,.13);
+  --purple:#8b6928;--purple-dark:#70501b;--purple-bg:rgba(190,143,43,.12);
+  --amber:#a9781e;--amber-dark:#805713;--amber-bg:rgba(190,143,43,.15);
+  color-scheme:light;background:#f2ead6 !important;
+  background-image:radial-gradient(ellipse at 10% 0%,rgba(213,170,83,.20),transparent 34%),radial-gradient(ellipse at 95% 20%,rgba(169,120,30,.10),transparent 30%) !important;
+}
+body.light-gold-mode header { background:rgba(255,250,239,.96) !important;border-color:#d8bd7d !important;box-shadow:0 7px 24px rgba(105,75,23,.12) !important; }
+body.light-gold-mode .brand-title,body.light-gold-mode h2,body.light-gold-mode h3,body.light-gold-mode .home-title,body.light-gold-mode .home-section-title,body.light-gold-mode .home-stat strong { color:#34270f !important; }
+body.light-gold-mode .brand-sub,body.light-gold-mode .subtitle,body.light-gold-mode .home-copy,body.light-gold-mode .card-desc,body.light-gold-mode .home-stat span { color:#79633c !important; }
+body.light-gold-mode .panel,body.light-gold-mode .test-card,body.light-gold-mode .home-stat,body.light-gold-mode .flashcard-front,body.light-gold-mode .flashcard-back,body.light-gold-mode .diagram-box,body.light-gold-mode .review-card,body.light-gold-mode .stat-box,body.light-gold-mode .math-app .stat,body.light-gold-mode .math-app .chapter-card,body.light-gold-mode .math-app .quick-panel,body.light-gold-mode .math-app .practice-card,body.light-gold-mode .math-app .info-card,body.light-gold-mode .math-app .video-link { background:linear-gradient(145deg,#fffdf7,#f7efdD) !important;color:#34270f !important;border-color:#d9be80 !important;box-shadow:0 10px 28px rgba(107,76,22,.09),inset 0 1px 0 #fff !important; }
+body.light-gold-mode .home-hero,body.light-gold-mode .math-app .hero { background:radial-gradient(circle at 88% 10%,rgba(217,174,82,.20),transparent 30%),linear-gradient(120deg,#fffdf7,#f0e3c2) !important;border-color:#c9a65b !important; }
+body.light-gold-mode .home-title span,body.light-gold-mode .home-kicker,body.light-gold-mode .section-eyebrow,body.light-gold-mode .math-app .eyebrow,body.light-gold-mode .math-app .hero h1 span { color:#98701e !important; }
+body.light-gold-mode .nav-tab-btn { background:#fff9e9 !important;color:#72531a !important;border-color:#d9be80 !important; }
+body.light-gold-mode .nav-tab-btn.active,body.light-gold-mode .card-open-hint,body.light-gold-mode .btn-emerald,body.light-gold-mode .btn-gradient,body.light-gold-mode .btn-amber,body.light-gold-mode .math-app .btn-primary { background:linear-gradient(115deg,#fff0b7,#e4bd58 38%,#b78322 70%,#f2d47f) !important;color:#302006 !important;border-color:#bd913e !important;box-shadow:0 7px 20px rgba(165,116,26,.18) !important; }
+body.light-gold-mode select,body.light-gold-mode input,body.light-gold-mode textarea,body.light-gold-mode .math-app .answer { background:#fffdf7 !important;color:#34270f !important;border-color:#d2b46f !important; }
+body.light-gold-mode .vip-panel,body.light-gold-mode .admin-code-panel,body.light-gold-mode .inventory-panel,body.light-gold-mode .codes-panel-card { background:radial-gradient(circle at 95% 0%,rgba(215,169,73,.19),transparent 33%),linear-gradient(145deg,#fff9e9,#f1e2bc) !important;border:1px solid #c39b4d !important;box-shadow:0 15px 35px rgba(135,96,28,.14) !important; }
+body.light-gold-mode .vip-panel-heading h3,body.light-gold-mode .vip-premium-copy h4 { color:#4b3510 !important; }
+body.light-gold-mode .vip-timer-row,body.light-gold-mode .vip-lifetime-label { background:rgba(255,248,225,.83) !important;border-color:#c9a65b !important;color:#71531a !important; }
+body.light-gold-mode .vip-timer-row strong { color:#815b12 !important; }
+body.light-gold-mode .inventory-item { background:linear-gradient(120deg,#fff4cf,#f3dfab,#fff9e8) !important;border-color:#c39b4d !important; }
+body.light-gold-mode .inventory-item-copy strong { color:#63420d !important; }
+body.light-gold-mode .inventory-item-copy small { color:#80652f !important; }
+
+/* Premium Experience — richer, more noticeable styling than regular Gold. */
+.vip-premium-showcase {
+  position:relative;display:flex;align-items:center;gap:1rem;overflow:hidden;
+  margin-top:1.1rem;padding:1.1rem;border-radius:18px;
+  border:1px solid rgba(255,220,133,.52);
+  background:radial-gradient(circle at 90% 0%,rgba(255,219,130,.26),transparent 35%),linear-gradient(125deg,#3a2a10,#211809 55%,#100e09);
+  box-shadow:inset 0 1px 0 rgba(255,245,211,.16),0 14px 32px rgba(0,0,0,.22);
+}
+.vip-premium-mark { width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center;border-radius:16px;font-size:1.8rem; }
+.vip-premium-copy { min-width:0; }
+.vip-premium-kicker { display:block;color:#f1ca71;font-size:.62rem;font-weight:950;letter-spacing:.18em;margin-bottom:.22rem; }
+.vip-premium-copy h4 { color:#fff0bf;font-size:1.05rem;letter-spacing:-.025em;margin:0 0 .3rem; }
+.vip-premium-copy p { color:#d5c08d;font-size:.78rem;line-height:1.55;margin:0;max-width:620px; }
+.vip-premium-perks { display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem; }
+.vip-premium-perks span { padding:.32rem .56rem;border:1px solid rgba(248,213,133,.28);border-radius:99px;background:rgba(255,226,158,.09);color:#f4d88f;font-size:.65rem;font-weight:800; }
+.premium-setting { margin-top:.9rem;padding-top:.9rem;border-top:1px solid rgba(227,184,86,.33); }
+body.premium-mode .panel,body.premium-mode .test-card,body.premium-mode .home-stat,body.premium-mode .math-app .chapter-card,body.premium-mode .math-app .practice-card,body.premium-mode .math-app .info-card,body.premium-mode .math-app .quick-panel { position:relative;box-shadow:0 18px 42px rgba(0,0,0,.36),0 0 0 1px rgba(244,206,117,.18),0 0 28px rgba(222,171,64,.13) !important;border-color:rgba(245,211,133,.62) !important; }
+body.premium-mode .home-hero,body.premium-mode .math-app .hero { background-image:radial-gradient(circle at 86% 12%,rgba(255,229,159,.30),transparent 27%),radial-gradient(circle at 4% 100%,rgba(201,147,42,.16),transparent 30%),linear-gradient(125deg,#3a2b12,#1b160d 58%,#100d08) !important;border:1px solid rgba(255,220,130,.78) !important; }
+body.premium-mode .nav-tab-btn.active,body.premium-mode .btn-emerald,body.premium-mode .btn-gradient,body.premium-mode .btn-amber,body.premium-mode .math-app .btn-primary { box-shadow:0 9px 26px rgba(220,171,65,.34),inset 0 1px 0 rgba(255,255,255,.62) !important;filter:saturate(1.12); }
+body.premium-mode .vip-emblem { box-shadow:0 0 0 5px rgba(243,202,102,.13),0 0 34px rgba(239,190,74,.42),0 9px 30px rgba(0,0,0,.24) !important; }
+body.premium-mode .vip-panel { border:1px solid #f5d58b !important;box-shadow:0 20px 48px rgba(0,0,0,.43),0 0 42px rgba(226,177,68,.21),inset 0 1px 0 rgba(255,237,181,.2) !important; }
+body.premium-mode .vip-premium-showcase { border-color:#ffe3a1;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 30px rgba(234,186,80,.23),0 15px 36px rgba(0,0,0,.28); }
+body.premium-mode .vip-premium-mark { animation:studyhubPremiumPulse 3.5s ease-in-out infinite; }
+@keyframes studyhubPremiumPulse { 0%,100%{box-shadow:0 0 0 4px rgba(224,178,75,.12),0 8px 22px rgba(202,151,48,.22)}50%{box-shadow:0 0 0 7px rgba(255,226,151,.17),0 8px 30px rgba(238,190,75,.38)} }
+body.light-gold-mode.premium-mode .vip-premium-showcase { background:radial-gradient(circle at 90% 0%,rgba(230,189,96,.28),transparent 35%),linear-gradient(125deg,#fff1c7,#f1dfb3 60%,#fff9e9) !important;border-color:#bd913e !important; }
+body.light-gold-mode.premium-mode .vip-premium-copy h4 { color:#51360b !important; }
+body.light-gold-mode.premium-mode .vip-premium-copy p { color:#745b2a !important; }
+body.light-gold-mode.premium-mode .vip-premium-kicker { color:#926719 !important; }
+body.light-gold-mode.premium-mode .vip-premium-perks span { color:#775315 !important;border-color:#c9a65b;background:rgba(183,130,31,.08); }
+
+/* =====================================================================
+   MOBILE FIRST FINISH — navigation, forms, cards and practice screens
+   ===================================================================== */
+html { overflow-x:hidden;scroll-padding-top:110px;-webkit-text-size-adjust:100%; }
+body { overflow-x:hidden;min-width:320px; }
+button,select,input,textarea { font:inherit; }
+button,.btn,.nav-tab-btn,.install-app-btn,.math-app .btn,.math-app .answer,.mc-option { touch-action:manipulation; }
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible { outline:3px solid rgba(109,140,255,.55);outline-offset:2px; }
+img,svg,video,canvas { max-width:100%; }
+#main,main { min-width:0;width:100%; }
+.home-page,.account-page,.math-app,#section-tests,#section-generator,#section-quiz,#section-grading,#section-results,#section-learn,#section-summary { min-width:0; }
+@media (max-width:760px) {
+  .header-inner { display:flex;flex-direction:column;align-items:stretch;gap:.65rem;padding:.65rem .8rem !important; }
+  .brand { min-width:0;max-width:100%; }
+  .brand-title { font-size:1.05rem; }
+  .brand-sub { font-size:.69rem; }
+  header nav { width:100%;max-width:100%;display:flex;flex-wrap:nowrap;align-items:center;gap:.42rem;overflow-x:auto;overflow-y:hidden;padding:0 0 .28rem;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain; }
+  header nav::-webkit-scrollbar { display:none; }
+  header nav > button { flex:0 0 auto;min-height:44px;padding:.62rem .78rem;font-size:.78rem;white-space:nowrap; }
+  .install-app-btn { min-height:44px; }
+  main { padding:1rem .85rem 2rem !important; }
+  .panel,.test-card { padding:1rem !important;border-radius:15px !important; }
+  .home-hero { grid-template-columns:minmax(0,1fr) !important;padding:1.15rem !important;gap:.6rem !important; }
+  .home-title { font-size:clamp(1.9rem,9vw,2.55rem) !important;overflow-wrap:anywhere; }
+  .home-copy { font-size:.9rem; }
+  .home-visual { min-height:110px !important; }
+  .home-stats { grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:.55rem !important;margin: .85rem 0 1.2rem !important; }
+  .home-stat { min-width:0;padding:.75rem !important; }
+  .home-stat strong { font-size:1.15rem !important; }
+  .home-stat span { font-size:.72rem !important; }
+  .grid-tests,.grid-2,.grid-3,.grid-2,.flashcard-grid { grid-template-columns:minmax(0,1fr) !important; }
+  .subject-card { min-height:unset !important; }
+  .home-section-heading { align-items:flex-start !important;flex-direction:column;gap:.25rem; }
+  .quiz-top-bar,.quiz-footer,.panel-header { align-items:flex-start;flex-wrap:wrap; }
+  .quiz-footer { display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));gap:.55rem !important; }
+  .quiz-footer .btn { width:100%;min-height:44px;margin:0 !important; }
+  .q-nav-pills { gap:.35rem; }
+  .q-pill { width:36px;height:36px; }
+  .question-text { font-size:1.02rem !important;overflow-wrap:anywhere; }
+  .mc-option { align-items:flex-start;min-height:48px;padding:.78rem !important;font-size:.86rem !important; }
+  .stats-row { grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:.55rem !important; }
+  .grade-circle { width:112px !important;height:112px !important; }
+  .account-layout { grid-template-columns:minmax(0,1fr) !important;gap:.75rem; }
+  .account-hero-panel { align-items:stretch !important;flex-direction:column; }
+  .account-hero-panel > .btn { width:100%; }
+  .account-profile-heading { min-width:0;align-items:flex-start; }
+  .account-profile-heading > div:last-child { min-width:0;overflow-wrap:anywhere; }
+  .account-inline-form { align-items:stretch !important;flex-direction:column; }
+  .account-inline-form input,.account-inline-form .btn { width:100% !important;min-height:44px; }
+  .account-setting-row,.vip-toggle-row { align-items:flex-start !important;flex-direction:column;gap:.6rem; }
+  .account-setting-row select,.vip-setting-fields select { width:100% !important;max-width:none !important;min-height:44px; }
+  .inventory-list { grid-template-columns:minmax(0,1fr) !important; }
+  .inventory-item { align-items:center;flex-wrap:wrap; }
+  .inventory-item-copy { flex:1 1 calc(100% - 75px); }
+  .inventory-item .btn { flex:1 1 100%;min-height:44px; }
+  .vip-panel-heading { align-items:flex-start;flex-wrap:wrap; }
+  .vip-panel-heading > div:nth-child(2) { flex:1 1 calc(100% - 70px);min-width:0; }
+  .vip-timer-row { align-items:flex-start;flex-direction:column;gap:.3rem; }
+  .vip-action-row { display:grid;grid-template-columns:minmax(0,1fr); }
+  .vip-action-row .btn,.admin-code-panel > .btn { width:100%;min-height:46px; }
+  .vip-premium-showcase { align-items:flex-start;padding:.9rem;gap:.7rem; }
+  .vip-premium-mark { width:42px;height:42px;flex-basis:42px; }
+  .vip-premium-perks { gap:.35rem; }
+  .vip-premium-perks span { font-size:.61rem; }
+  .admin-code-grid { grid-template-columns:minmax(0,1fr) !important; }
+  .admin-code-result { min-width:0; }
+  .admin-code-result input { min-width:0; }
+  .math-app { width:100%;padding:14px 0 38px !important; }
+  .math-app .hero { grid-template-columns:minmax(0,1fr) !important;padding:1.1rem !important; }
+  .math-app .hero-art { min-height:95px !important; }
+  .math-app .math-symbol { width:76px;height:76px;font-size:2.2rem; }
+  .math-app .stats { grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:.55rem !important;margin:12px 0 22px !important; }
+  .math-app .stat { min-width:0;padding:.72rem !important; }
+  .math-app .chapter-grid,.math-app .content-grid { grid-template-columns:minmax(0,1fr) !important;gap:.7rem !important; }
+  .math-app .chapter-card,.math-app .practice-card,.math-app .info-card { min-width:0;padding:1rem !important; }
+  .math-app .view-head,.math-app .section-head { align-items:stretch !important;flex-direction:column; }
+  .math-app .practice-actions { flex-wrap:wrap; }
+  .math-app .practice-actions .btn { flex:1 1 100%;min-height:44px; }
+  .math-app .math-generator-fields { grid-template-columns:minmax(0,1fr) !important; }
+  .math-app .math-generator-panel { padding:1rem !important; }
+  .math-app .math-generator-panel select,.math-app .math-generator-panel button { width:100%;min-height:44px; }
+  .math-app .answer { min-height:48px;padding:.78rem !important; }
+  .math-app .toast { right:12px !important;left:12px !important;bottom:calc(12px + env(safe-area-inset-bottom)) !important; }
+  .diagram-box,.panel:has(table.geo-table) { max-width:100%;overflow-x:auto; }
+  table.geo-table { min-width:500px; }
+  footer { padding:1rem .8rem calc(1rem + env(safe-area-inset-bottom)); }
+}
+@media (max-width:420px) {
+  .header-inner { padding:.55rem .65rem !important; }
+  .brand-icon { width:36px;height:36px;flex:0 0 36px; }
+  .brand-title { font-size:.98rem; }
+  .brand-sub { display:none; }
+  header nav > button { padding:.58rem .68rem;font-size:.74rem; }
+  main { padding:.8rem .65rem 1.5rem !important; }
+  .home-stats,.math-app .stats,.stats-row { grid-template-columns:minmax(0,1fr) !important; }
+  .vip-premium-showcase { flex-direction:column; }
+  .auth-screen { padding:.7rem;align-items:start; }
+  .auth-card { border-radius:18px;padding:1.05rem; }
+}
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after { scroll-behavior:auto !important;animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; }
+}
