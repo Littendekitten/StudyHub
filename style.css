@@ -1002,3 +1002,179 @@
 .math-app .grade-pill {display:none}
 .math-app {padding:20px 14px 55px}
 }
+
+/* =====================================================================
+   STUDYHUB DARK MODE — shared visual language for every subject
+   ===================================================================== */
+:root {
+    color-scheme: dark;
+    --bg-main: #0b1220;
+    --bg-card: #151f32;
+    --bg-card-dark: #0a1120;
+    --bg-input: #0d1728;
+    --border-color: #2b3950;
+    --border-light: #40516b;
+    --text-main: #f1f5f9;
+    --text-muted: #a5b2c5;
+    --text-dim: #718198;
+    --emerald: #34d399;
+    --emerald-dark: #059669;
+    --emerald-bg: rgba(52, 211, 153, .12);
+    --blue: #6d8cff;
+    --blue-dark: #496df0;
+    --blue-bg: rgba(109, 140, 255, .14);
+    --purple: #b69aff;
+    --purple-dark: #8b68e8;
+    --purple-bg: rgba(182, 154, 255, .13);
+    --amber: #fbbf24;
+    --amber-dark: #d99113;
+    --amber-bg: rgba(251, 191, 36, .13);
+    --rose: #fb7185;
+    --rose-bg: rgba(251, 113, 133, .13);
+    --brand: #6d8cff;
+    --brand-dark: #496df0;
+    --brand-soft: rgba(109, 140, 255, .14);
+}
+html, body { background: var(--bg-main) !important; color: var(--text-main) !important; }
+body { background-image: radial-gradient(ellipse at 12% 0%, rgba(65,105,225,.09), transparent 32%), radial-gradient(ellipse at 95% 18%, rgba(16,185,129,.045), transparent 28%); }
+header { background: rgba(13, 22, 38, .94) !important; border-bottom: 1px solid var(--border-color) !important; box-shadow: 0 6px 26px rgba(0,0,0,.22) !important; }
+.brand-title, .home-title, .home-section-title, .home-stat strong { color: #f8fafc !important; }
+.brand-sub, .home-stat span, .home-section-heading > p { color: var(--text-muted) !important; }
+.study-pill { background: rgba(109,140,255,.13) !important; border-color: rgba(109,140,255,.32) !important; color: #a9bbff !important; }
+.nav-tab-btn { color: #b8c5d8 !important; background: #172338 !important; border-color: #2c3a51 !important; }
+.nav-tab-btn:hover { color: #fff !important; background: #202f49 !important; border-color: #536b94 !important; }
+.nav-tab-btn.active { color: #fff !important; background: linear-gradient(135deg,#496df0,#627df5) !important; border-color: #6d8cff !important; box-shadow: 0 5px 16px rgba(73,109,240,.24) !important; }
+.panel, .test-card, .home-stat { background: #151f32 !important; border-color: var(--border-color) !important; color: var(--text-main); box-shadow: 0 10px 28px rgba(0,0,0,.18) !important; }
+.panel h2, .panel h3, .test-card h3, h2, h3 { color: #f1f5f9 !important; }
+.subtitle, .card-desc { color: #a5b2c5 !important; }
+.home-hero { background: linear-gradient(115deg,#172338 0%,#121e32 64%,#18284a 100%) !important; border-color: #2b3c5b !important; box-shadow: 0 14px 36px rgba(0,0,0,.22) !important; }
+.home-title span { color: #8da6ff !important; }
+.home-kicker, .section-eyebrow { color: #8da6ff !important; }
+.home-copy { color: #b6c3d6 !important; }
+.home-visual { border-color: #30466e !important; background: radial-gradient(circle at 50% 50%,#223458,#111d31 70%) !important; }
+.visual-orbit { border-color: rgba(141,166,255,.28) !important; }
+.visual-float { background: #1c2b44 !important; border-color: #354967 !important; box-shadow: 0 8px 18px rgba(0,0,0,.26) !important; }
+.home-hero-meta span { background: #1a2941 !important; border-color: #344766 !important; color: #c3cfe0 !important; }
+.subject-card, .subject-card.featured { background: #151f32 !important; border-color: #2b3950 !important; }
+.subject-card-link { color: var(--text-main) !important; }
+.subject-card-link:hover, .subject-card-link:focus-visible { border-color: #6d8cff !important; box-shadow: 0 0 0 3px rgba(109,140,255,.12), 0 14px 30px rgba(0,0,0,.3) !important; }
+.geo-icon { background: rgba(52,211,153,.14) !important; }
+.math-icon { color: #a9bbff !important; background: rgba(109,140,255,.16) !important; }
+.physics-icon { background: rgba(182,154,255,.14) !important; }
+.subject-level { color: #91a0b8 !important; }
+.card-open-hint { background: linear-gradient(90deg,#496df0,#6b86f4) !important; color: #fff !important; }
+.math-open-hint { background: linear-gradient(90deg,#3f61d6,#687ff0) !important; }
+.coming-soon { opacity: .72; background: #111b2d !important; border-color: #34425a !important; }
+.coming-soon-label { color: #9aa9c0 !important; background: #1a2840 !important; }
+.tag-emerald { color: #65e6bb !important; background: rgba(52,211,153,.12) !important; border-color: rgba(52,211,153,.27) !important; }
+.tag-blue { color: #a9bbff !important; background: rgba(109,140,255,.13) !important; border-color: rgba(109,140,255,.3) !important; }
+.tag-purple { color: #c7b3ff !important; background: rgba(182,154,255,.13) !important; border-color: rgba(182,154,255,.28) !important; }
+.tag-amber { color: #fbd477 !important; background: rgba(251,191,36,.12) !important; border-color: rgba(251,191,36,.28) !important; }
+.btn-secondary { color: #d5deeb !important; background: #202e45 !important; border-color: #3a4b65 !important; }
+.btn-secondary:hover:not(:disabled) { background: #2a3b57 !important; color: #fff !important; }
+.btn-emerald, .btn-gradient { background: linear-gradient(100deg,#496df0,#657ff3) !important; color: #fff !important; }
+.btn-blue { background: #3978de !important; color: #fff !important; }
+.btn-purple { background: #7958cf !important; color: #fff !important; }
+select, input[type="text"], textarea { background: #0d1728 !important; color: #edf3fb !important; border-color: #35445e !important; }
+select:focus, input[type="text"]:focus, textarea:focus { border-color: #7892ff !important; }
+.question-text { color: #f1f5f9 !important; }
+.mc-option { color: #dce5f2 !important; background: #101b2d !important; border-color: #34435b !important; }
+.mc-option:hover { background: #1a2941 !important; border-color: #627dbf !important; }
+.mc-option.selected { background: rgba(109,140,255,.15) !important; color: #c2d0ff !important; border-color: #7892ff !important; }
+.mc-letter { background: #263650 !important; color: #bac8dc !important; }
+.mc-option.selected .mc-letter { background: #5d7df0 !important; color: white !important; }
+.q-pill { background: #101b2d !important; color: #9cacbf !important; border-color: #34435b !important; }
+.q-pill.answered { background: rgba(52,211,153,.12) !important; color: #65e6bb !important; border-color: #279b7a !important; }
+.q-pill.current { background: #5d7df0 !important; color: #fff !important; border-color: #8da6ff !important; }
+.progress-track { background: #0b1526 !important; }
+.progress-fill { background: linear-gradient(90deg,#5577f1,#8ca4ff) !important; }
+.timer-badge { background: rgba(251,191,36,.12) !important; color: #fbd477 !important; border-color: #9b7629 !important; }
+.grade-circle { background: #101b2d !important; border-color: #5577f1 !important; box-shadow: 0 0 28px rgba(86,119,241,.16) !important; }
+.grade-number { color: #f8fafc !important; }
+.stat-box { background: #101b2d !important; border-color: #34435b !important; }
+.stat-val { color: #f1f5f9 !important; }
+.stat-lbl { color: #9cacbf !important; }
+.review-card, .user-answer-box { background: #101b2d !important; border-color: #34435b !important; }
+.user-answer-box { color: #d0daea !important; }
+.flashcard-front { background: #172338 !important; border-color: #34435b !important; }
+.flashcard-back { background: #101b2d !important; border-color: #5577f1 !important; }
+.fc-term, .fc-def { color: #eef3fb !important; }
+.diagram-box { background: #101b2d !important; border-color: #34435b !important; }
+table.geo-table th { background: #1b2b44 !important; color: #a9bbff !important; }
+table.geo-table td { color: #d0daea !important; }
+table.geo-table th, table.geo-table td { border-color: #34435b !important; }
+.toast { background: #172338 !important; color: #f1f5f9 !important; border-color: #856b32 !important; }
+footer { color: #8191a9 !important; border-top-color: #29384f !important; }
+
+/* Math section follows the same dark card and button language as Geography. */
+.math-app {
+    --bg: #0b1220;
+    --surface: #151f32;
+    --ink: #f1f5f9;
+    --muted: #a5b2c5;
+    --line: #2b3950;
+    --blue: #6d8cff;
+    --blue2: #496df0;
+    --blue-soft: rgba(109,140,255,.14);
+    --green: #34d399;
+    --green-soft: rgba(52,211,153,.12);
+    --red: #fb7185;
+    --red-soft: rgba(251,113,133,.12);
+    --shadow: 0 10px 28px rgba(0,0,0,.2);
+    max-width: 1200px;
+    padding: 24px 0 56px;
+    margin: 0 auto;
+    background: transparent !important;
+    color: var(--ink) !important;
+}
+.math-app .hero { background: linear-gradient(115deg,#172338 0%,#121e32 64%,#18284a 100%) !important; border-color: #2b3c5b !important; box-shadow: var(--shadow) !important; border-radius: 18px; }
+.math-app .hero h1, .math-app .section-head h2, .math-app .view-head h2, .math-app .quick-panel h3, .math-app .info-card h3, .math-app .result-box h2 { color: #f1f5f9 !important; }
+.math-app .hero h1 span { color: #8da6ff !important; }
+.math-app .hero p, .math-app .section-head p, .math-app .view-head p, .math-app .quick-panel p, .math-app .info-card p, .math-app .info-card li { color: #a5b2c5 !important; }
+.math-app .eyebrow { color: #8da6ff !important; }
+.math-app .math-symbol { background: linear-gradient(145deg,#617ff0,#344fc1) !important; }
+.math-app .hero-chip { background: #1d2b43 !important; border-color: #394b69 !important; color: #d6e0f0 !important; box-shadow: 0 8px 17px rgba(0,0,0,.24) !important; }
+.math-app .stat, .math-app .chapter-card, .math-app .quick-panel, .math-app .practice-card, .math-app .info-card, .math-app .video-link { background: #151f32 !important; border-color: #2b3950 !important; color: #e7eef8 !important; box-shadow: 0 8px 24px rgba(0,0,0,.18) !important; }
+.math-app .stat strong, .math-app .chapter-card h3 { color: #f1f5f9 !important; }
+.math-app .stat span:last-child, .math-app .chapter-card p, .math-app .chapter-footer small, .math-app .muted-note { color: #9eacc1 !important; }
+.math-app .stat-icon, .math-app .chapter-icon { background: rgba(109,140,255,.15) !important; color: #a9bbff !important; }
+.math-app .chapter-tag { color: #aebbd0 !important; background: #202e45 !important; border-color: #3a4b65 !important; }
+.math-app .chapter-footer { color: #9bb0ff !important; }
+.math-app .chapter-grid { grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 18px; }
+.math-app .chapter-card { min-height: 230px; display: flex; flex-direction: column; justify-content: space-between; border-radius: 18px; }
+.math-app .chapter-card:hover, .math-app .chapter-card:focus-visible { border-color: #718cff !important; box-shadow: 0 0 0 3px rgba(109,140,255,.1), 0 14px 30px rgba(0,0,0,.26) !important; }
+.math-app .quick-panel { border-radius: 18px; }
+.math-app .btn-primary { background: linear-gradient(100deg,#496df0,#657ff3) !important; color: #fff !important; box-shadow: 0 6px 14px rgba(73,109,240,.25) !important; }
+.math-app .btn-primary:hover { background: linear-gradient(100deg,#5a7bf5,#7790ff) !important; }
+.math-app .btn-light { background: #202e45 !important; color: #d5deeb !important; border: 1px solid #3a4b65 !important; }
+.math-app .btn-light:hover { background: #2a3b57 !important; color: #fff !important; }
+.math-app .practice-meta { color: #a5b2c5 !important; }
+.math-app .progress { background: #0b1526 !important; }
+.math-app .progress > span { background: linear-gradient(90deg,#5577f1,#8ca4ff) !important; }
+.math-app .question { color: #f1f5f9 !important; }
+.math-app .answer { background: #101b2d !important; border-color: #34435b !important; color: #dce5f2 !important; }
+.math-app .answer:hover:not(:disabled) { background: #1a2941 !important; border-color: #627dbf !important; }
+.math-app .answer .letter { background: #263650 !important; color: #bac8dc !important; }
+.math-app .answer.correct { border-color: #279b7a !important; background: rgba(52,211,153,.13) !important; color: #75e8c0 !important; }
+.math-app .answer.correct .letter { background: #17654f !important; color: #fff !important; }
+.math-app .answer.wrong { border-color: #a6465a !important; background: rgba(251,113,133,.12) !important; color: #ff9cad !important; }
+.math-app .answer.wrong .letter { background: #633041 !important; color: #fff !important; }
+.math-app .feedback.good { background: rgba(52,211,153,.1) !important; border-color: rgba(52,211,153,.35) !important; color: #9aefd2 !important; }
+.math-app .feedback.bad { background: rgba(251,113,133,.1) !important; border-color: rgba(251,113,133,.32) !important; color: #ffb2bf !important; }
+.math-app .result-ring { background: #101b2d !important; color: #a9bbff !important; border-color: #405baf !important; }
+.math-app .formula { background: rgba(109,140,255,.13) !important; border: 1px solid rgba(109,140,255,.25) !important; color: #bdcaff !important; }
+.math-app .video-link { color: #dce5f2 !important; }
+.math-app .video-link:hover { border-color: #718cff !important; color: #a9bbff !important; }
+.math-app .video-link span { color: #9eacc1 !important; }
+.math-app .toast { background: #172338 !important; color: #f1f5f9 !important; border: 1px solid #3a4b65 !important; }
+body.math-open .nav-tab-btn.math-nav { display: inline-flex; }
+body.math-open .nav-tab-btn.subject-nav { display: none; }
+body.subject-open:not(.math-open) .nav-tab-btn.subject-nav { display: inline-flex; }
+body.subject-open:not(.math-open) .nav-tab-btn.math-nav { display: none; }
+@media (max-width: 760px) {
+    .math-app { padding: 18px 0 44px; }
+    .math-app .chapter-grid { grid-template-columns: 1fr; }
+    .header-inner { align-items: flex-start; }
+    header nav { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; }
+    header nav .nav-tab-btn { white-space: nowrap; }
+}

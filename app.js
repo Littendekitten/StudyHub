@@ -152,14 +152,22 @@
                     'math-formulas': 'formulaView',
                     'math-videos': 'videosView'
                 };
-                if (typeof window.showMathView === 'function') window.showMathView(mathViews[tabName] || 'overviewView');
+                if (tabName === 'math-mix' && typeof window.startStudyHubMathPractice === 'function') {
+                    window.startStudyHubMathPractice('mix');
+                } else if (typeof window.showMathView === 'function') {
+                    window.showMathView(mathViews[tabName] || 'overviewView');
+                }
             } else {
                 const target = document.getElementById(`section-${tabName}`);
                 if (target) target.classList.remove('hidden');
             }
 
             document.querySelectorAll('.nav-tab-btn').forEach(btn => {
-                const active = isMathTab ? btn.getAttribute('data-tab') === 'math-overview' : btn.getAttribute('data-tab') === tabName;
+                const candidate = btn.getAttribute('data-tab');
+                const activeMathTab = tabName === 'math-formulas' || tabName === 'math-videos' || tabName === 'math-mix'
+                    ? tabName
+                    : 'math-overview';
+                const active = isMathTab ? candidate === activeMathTab : candidate === tabName;
                 btn.classList.toggle('active', active);
             });
 
@@ -711,7 +719,12 @@ function finishPractice(){ $math('questionCard').classList.add('hidden');$math('
 function updateProgress(){try{const p=JSON.parse(localStorage.getItem('studyhub-math-progress')||'{"answered":0,"correct":0}');$math('progressStat').textContent=`${p.answered||0} vragen`;}catch(e){}}
 function toast(msg){$math('toast').textContent=msg;$math('toast').classList.remove('hidden');setTimeout(()=>$math('toast').classList.add('hidden'),2400);}
 document.querySelectorAll('#section-math [data-chapter]').forEach(btn=>btn.addEventListener('click',event=>{event.preventDefault();startPractice(btn.dataset.chapter);}));
-document.querySelectorAll('#section-math [data-view]').forEach(btn=>btn.addEventListener('click',()=>showMathView(btn.dataset.view)));
+document.querySelectorAll('#section-math [data-view]').forEach(btn=>btn.addEventListener('click',()=>{
+  const target=btn.dataset.view;
+  if(target==='formulaView') switchTab('math-formulas');
+  else if(target==='videosView') switchTab('math-videos');
+  else switchTab('math-overview');
+}));
 $math('mixedPractice').addEventListener('click',()=>startPractice('mix'));
 $math('backToOverview').addEventListener('click',()=>showMathView('overviewView'));
 $math('quitPractice').addEventListener('click',()=>showMathView('overviewView'));
@@ -720,4 +733,5 @@ $math('retryChapter').addEventListener('click',()=>startPractice(currentChapter)
 $math('resultOverview').addEventListener('click',()=>showMathView('overviewView'));
 updateProgress();
 window.showMathView = showMathView;
+window.startStudyHubMathPractice = startPractice;
 })();
