@@ -1197,3 +1197,22 @@ body.subject-open:not(.math-open) .nav-tab-btn.math-nav { display: none; }
 .math-app .math-generator-loading .spinner { width:34px; height:34px; border:3px solid rgba(245,158,11,.18); border-top-color:#f0b44f; border-radius:50%; animation:spin .8s linear infinite; margin:0 auto; }
 .math-app .math-generator-footnote { margin:13px 0 0; color:#9eacc1; font-size:.78rem; text-align:center; }
 @media(max-width:640px){.math-app .math-generator-fields{grid-template-columns:1fr}.math-app .math-generator-panel{padding:20px 16px}}
+
+
+/* StudyHub PWA install button */
+.install-app-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+    min-height: 38px; padding: .55rem .9rem; border-radius: 11px;
+    border: 1px solid rgba(109,140,255,.5);
+    background: linear-gradient(135deg,#496df0,#627df5); color: #fff;
+    box-shadow: 0 5px 15px rgba(73,109,240,.2);
+    font: inherit; font-size: .84rem; font-weight: 800; cursor: pointer;
+    white-space: nowrap; transition: transform .18s ease, filter .18s ease;
+}
+.install-app-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.install-app-btn:focus-visible { outline: 3px solid rgba(109,140,255,.42); outline-offset: 2px; }
+.install-app-btn:disabled { opacity: .75; cursor: default; transform: none; }
+@media (max-width: 760px) {
+    .install-app-btn { flex: 0 0 auto; }
+}
+.install-app-btn[hidden] { display: none !important; }

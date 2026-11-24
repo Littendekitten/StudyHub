@@ -120,6 +120,61 @@
         }
 
         /* ==========================================================================
+           STUDYHUB INSTALLEREN — PWA / TOEVOEGEN AAN STARTSCHERM
+           ========================================================================== */
+        let studyHubDeferredInstallPrompt = null;
+
+        function isStudyHubInstalled() {
+            return window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+        }
+
+        // Chrome en Edge op Android/desktop geven dit event als StudyHub installeerbaar is.
+        window.addEventListener('beforeinstallprompt', event => {
+            event.preventDefault();
+            studyHubDeferredInstallPrompt = event;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            studyHubDeferredInstallPrompt = null;
+            const button = document.getElementById('install-app-btn');
+            if (button) button.hidden = true;
+            showToast('StudyHub is geïnstalleerd! Je vindt de app nu op je startscherm.');
+        });
+
+        async function installStudyHub() {
+            const button = document.getElementById('install-app-btn');
+            if (isStudyHubInstalled()) {
+                if (button) button.hidden = true;
+                showToast('StudyHub is al geïnstalleerd op dit apparaat.');
+                return;
+            }
+
+            if (studyHubDeferredInstallPrompt) {
+                const installEvent = studyHubDeferredInstallPrompt;
+                studyHubDeferredInstallPrompt = null;
+                await installEvent.prompt();
+                const choice = await installEvent.userChoice;
+                if (choice?.outcome === 'accepted') {
+                    if (button) button.hidden = true;
+                    showToast('Top! StudyHub wordt aan je apparaat toegevoegd.');
+                }
+                return;
+            }
+
+            const userAgent = navigator.userAgent || '';
+            const isIOS = /iphone|ipad|ipod/i.test(userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+            if (isIOS) {
+                showToast(`StudyHub toevoegen op iPhone/iPad: open deze site in Safari, tik op Deel en kies ‘Zet op beginscherm’.`);
+            } else if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+                showToast('Om StudyHub te installeren moet de website via een beveiligde HTTPS-link geopend zijn, bijvoorbeeld via GitHub Pages.');
+            } else {
+                showToast('Installeren nog niet beschikbaar? Open het browsermenu (⋮) en kies ‘App installeren’ of ‘Toevoegen aan startscherm’.');
+            }
+        }
+
+        /* ==========================================================================
            3. TAB NAVIGATION
            ========================================================================== */
         function switchTab(tabName) {
@@ -596,6 +651,10 @@
            9. INITIALIZE ALL EVENT LISTENERS SAFELY
            ========================================================================== */
         document.addEventListener('DOMContentLoaded', () => {
+            const installButton = document.getElementById('install-app-btn');
+            if (isStudyHubInstalled() && installButton) installButton.hidden = true;
+            installButton?.addEventListener('click', installStudyHub);
+
             document.getElementById('brand-logo')?.addEventListener('click', () => switchTab('home'));
 
             document.querySelectorAll('.nav-tab-btn').forEach(btn => {
