@@ -1178,3 +1178,22 @@ body.subject-open:not(.math-open) .nav-tab-btn.math-nav { display: none; }
     header nav { width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 3px; }
     header nav .nav-tab-btn { white-space: nowrap; }
 }
+
+/* Wiskunde oefentoets-generator: dezelfde formulieropbouw als Aardrijkskunde. */
+.math-app .math-generator-panel { background:#151f32 !important; border:1px solid #2b3950 !important; color:#e7eef8 !important; box-shadow:0 10px 28px rgba(0,0,0,.2) !important; }
+.math-app .math-generator-panel .panel-header { margin-bottom:22px; }
+.math-app .math-generator-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:20px 0 16px; }
+.math-app .math-generator-fields label { display:block; color:#dce5f2; font-size:.86rem; font-weight:750; margin-bottom:7px; }
+.math-app .math-generator-fields select { width:100%; min-height:44px; background:#0f192b !important; color:#e7eef8 !important; border:1px solid #34435b !important; border-radius:11px; padding:10px 12px; font:inherit; }
+.math-app .math-generator-fields select:focus { outline:2px solid rgba(109,140,255,.45); border-color:#718cff !important; }
+.math-app .math-generator-note { margin:14px 0 18px; padding:13px 15px; background:rgba(109,140,255,.09); border:1px solid rgba(109,140,255,.24); border-radius:12px; color:#b7c5da; font-size:.82rem; line-height:1.55; }
+.math-app .math-generator-note strong { display:block; color:#dce5f2; margin-bottom:3px; }
+.math-app .math-generator-panel .btn-amber { background:linear-gradient(100deg,#d99a2b,#f0b44f) !important; color:#172033 !important; border:0 !important; font-weight:850; }
+.math-app .math-generator-panel .btn-amber:hover:not(:disabled) { filter:brightness(1.08); }
+.math-app .math-generator-panel .btn-amber:disabled { opacity:.6; cursor:wait; }
+.math-app .math-generator-loading { text-align:center; padding:22px 0 8px; color:#edbd63; }
+.math-app .math-generator-loading p { margin:5px 0 2px; font-size:.9rem; font-weight:800; }
+.math-app .math-generator-loading span { color:#9eacc1; font-size:.78rem; }
+.math-app .math-generator-loading .spinner { width:34px; height:34px; border:3px solid rgba(245,158,11,.18); border-top-color:#f0b44f; border-radius:50%; animation:spin .8s linear infinite; margin:0 auto; }
+.math-app .math-generator-footnote { margin:13px 0 0; color:#9eacc1; font-size:.78rem; text-align:center; }
+@media(max-width:640px){.math-app .math-generator-fields{grid-template-columns:1fr}.math-app .math-generator-panel{padding:20px 16px}}

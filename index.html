@@ -491,13 +491,58 @@
     <a class="chapter-card" href="#practice" data-chapter="4"><div class="chapter-top"><span class="chapter-icon">√x</span><span class="chapter-tag">HOOFDSTUK 4</span></div><h3>Wortels</h3><p>Vierkantswortels, wortels optellen, vermenigvuldigen en vereenvoudigen.</p><div class="chapter-footer"><span>Start oefenen →</span><small>4.1 t/m 4.5</small></div></a>
     <a class="chapter-card" href="#practice" data-chapter="6"><div class="chapter-top"><span class="chapter-icon">▱</span><span class="chapter-tag">HOOFDSTUK 6</span></div><h3>De stelling van Pythagoras</h3><p>Rechthoekige driehoeken, zijden berekenen en Pythagoras in ruimtelijke figuren.</p><div class="chapter-footer"><span>Start oefenen →</span><small>6.1 t/m 6.6</small></div></a>
   </div>
-  <div class="quick-panel"><div><h3>Even alles door elkaar oefenen?</h3><p>Maak een korte mix met vragen uit alle vier de hoofdstukken.</p></div><button class="btn btn-primary" id="mixedPractice">Start oefenmix →</button></div>
+  <div class="quick-panel"><div><h3>Even alles door elkaar oefenen?</h3><p>Maak een korte mix met vragen uit alle vier de hoofdstukken.</p></div><button class="btn btn-primary" id="mixedPractice">Oefenmix samenstellen →</button></div>
   <div class="section-head"><div><div class="eyebrow">EXTRA HULP</div><h2>Regels en uitleg</h2></div><p>Herhaal de belangrijkste rekenregels.</p></div>
   <div class="content-grid">
     <article class="info-card"><h3>📐 Formulekaart</h3><p>Een handig overzicht met de regels die je bij deze hoofdstukken nodig hebt.</p><button class="btn btn-light" data-view="formulaView">Bekijk formulekaart</button></article>
-    <article class="info-card"><h3>▶️ Uitlegvideo's</h3><p>Video's over lineaire verbanden en lineaire formules uit het aangeleverde document.</p><button class="btn btn-light" data-view="videosView">Bekijk video's</button></article>
   </div>
   <p class="muted-note">De oefenvragen op StudyHub zijn nieuw opgesteld op basis van de onderwerpen uit je lesmateriaal. Ze zijn bedoeld om mee te oefenen, niet als officiële toets.</p>
+</section>
+
+<section id="mathMixView" class="hidden">
+  <div class="panel math-generator-panel" style="max-width:720px;margin:0 auto;">
+    <div class="panel-header">
+      <div>
+        <h2>✨ Wiskunde oefentoets-generator</h2>
+        <p class="subtitle">Kies je hoofdstuk en het aantal vragen. StudyHub stelt automatisch een nieuwe oefentoets voor je samen.</p>
+      </div>
+      <span class="tag tag-blue">HAVO 2 · Wiskunde</span>
+    </div>
+
+    <div class="math-generator-fields">
+      <div>
+        <label for="math-mix-topic">Kies het onderwerp:</label>
+        <select id="math-mix-topic">
+          <option value="all">Alle hoofdstukken · H1, H3, H4 en H6</option>
+          <option value="1">H1 · Lineaire formules</option>
+          <option value="3">H3 · Gelijkvormigheid</option>
+          <option value="4">H4 · Wortels</option>
+          <option value="6">H6 · De stelling van Pythagoras</option>
+        </select>
+      </div>
+      <div>
+        <label for="math-mix-count">Aantal vragen:</label>
+        <select id="math-mix-count">
+          <option value="6">6 vragen · Snelle check</option>
+          <option value="10" selected>10 vragen · Standaard oefentoets</option>
+          <option value="15">15 vragen · Uitgebreid</option>
+          <option value="20">20 vragen · Grote oefentoets</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="math-generator-note">
+      <strong>Hoe werkt de generator?</strong> De oefentoets wordt automatisch samengesteld uit de Wiskunde-vragenbank. Er is geen API-key nodig. Dit is dus een slimme offline generator en geen echte AI die nieuwe vragen bedenkt.
+    </div>
+
+    <button id="math-generate-mix" class="btn btn-amber btn-full">✨ Genereer mijn oefentoets</button>
+    <div id="math-generator-loading" class="hidden math-generator-loading" role="status" aria-live="polite">
+      <div class="spinner"></div>
+      <p>StudyHub stelt je oefentoets samen...</p>
+      <span>Je toets start automatisch.</span>
+    </div>
+    <p class="math-generator-footnote">Alle vragen worden direct nagekeken. Na elk antwoord krijg je uitleg.</p>
+  </div>
 </section>
 
 <section id="practiceView" class="hidden">

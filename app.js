@@ -149,12 +149,11 @@
                 const mathViews = {
                     'math-overview': 'overviewView',
                     'math-practice': 'practiceView',
+                    'math-mix': 'mathMixView',
                     'math-formulas': 'formulaView',
                     'math-videos': 'videosView'
                 };
-                if (tabName === 'math-mix' && typeof window.startStudyHubMathPractice === 'function') {
-                    window.startStudyHubMathPractice('mix');
-                } else if (typeof window.showMathView === 'function') {
+                if (typeof window.showMathView === 'function') {
                     window.showMathView(mathViews[tabName] || 'overviewView');
                 }
             } else {
@@ -710,14 +709,39 @@ const bank = {
 const chapterNames={1:'H1 · Lineaire formules',3:'H3 · Gelijkvormigheid',4:'H4 · Wortels',6:'H6 · De stelling van Pythagoras'};
 let currentChapter=null,currentQuestions=[],currentIndex=0,correctCount=0,answered=false;
 const $math = id => document.getElementById(id);
-function showMathView(id){['overviewView','practiceView','formulaView','videosView'].forEach(v=>$math(v).classList.toggle('hidden',v!==id));window.scrollTo({top:0,behavior:'smooth'});}
+function showMathView(id){['overviewView','mathMixView','practiceView','formulaView','videosView'].forEach(v=>$math(v).classList.toggle('hidden',v!==id));window.scrollTo({top:0,behavior:'smooth'});}
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function startPractice(chapter){currentChapter=chapter;currentQuestions=chapter==='mix'?shuffle(Object.values(bank).flat()).slice(0,12):shuffle(bank[chapter]);currentIndex=0;correctCount=0;answered=false;$math('practiceTitle').textContent=chapter==='mix'?'Oefenmix · Alle hoofdstukken':chapterNames[chapter];$math('practiceSubtitle').textContent=chapter==='mix'?'Een mix van vragen uit H1, H3, H4 en H6.':'Neem rustig de tijd. Na elk antwoord zie je meteen de uitleg.';$math('resultCard').classList.add('hidden');$math('questionCard').classList.remove('hidden');showMathView('practiceView');renderQuestion();}
+function startPractice(chapter, requestedCount=null, generated=false){
+  currentChapter=chapter;
+  const pool=chapter==='mix'?Object.values(bank).flat():(bank[chapter]||[]);
+  const defaultCount=chapter==='mix'?12:pool.length;
+  const count=Number.isFinite(requestedCount)?requestedCount:defaultCount;
+  currentQuestions=shuffle(pool).slice(0,Math.min(count,pool.length));
+  currentIndex=0;correctCount=0;answered=false;
+  $math('practiceTitle').textContent=generated?`Oefentoets · ${chapter==='mix'?'Alle hoofdstukken':chapterNames[chapter]}`:(chapter==='mix'?'Oefenmix · Alle hoofdstukken':chapterNames[chapter]);
+  $math('practiceSubtitle').textContent=generated?`Een willekeurige selectie van ${currentQuestions.length} vragen uit de ingebouwde vragenbank. Je krijgt na elk antwoord direct uitleg.`:(chapter==='mix'?'Een mix van vragen uit H1, H3, H4 en H6.':'Neem rustig de tijd. Na elk antwoord zie je meteen de uitleg.');
+  $math('resultCard').classList.add('hidden');$math('questionCard').classList.remove('hidden');showMathView('practiceView');renderQuestion();
+}
 function renderQuestion(){const q=currentQuestions[currentIndex];answered=false;$math('questionCounter').textContent=`Vraag ${currentIndex+1} van ${currentQuestions.length}`;$math('chapterLabel').textContent=currentChapter==='mix'?'GEMENGD':`HOOFDSTUK ${currentChapter}`;$math('questionProgress').style.width=`${(currentIndex/currentQuestions.length)*100}%`;$math('questionText').textContent=q.q;$math('feedback').className='hidden';$math('feedback').innerHTML='';$math('nextQuestion').disabled=true;$math('nextQuestion').textContent=currentIndex===currentQuestions.length-1?'Bekijk resultaat →':'Volgende vraag →';$math('answerList').innerHTML='';q.o.forEach((answer,i)=>{const btn=document.createElement('button');btn.className='answer';btn.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span>${answer}</span>`;btn.addEventListener('click',()=>chooseAnswer(i));$math('answerList').appendChild(btn);});}
 function chooseAnswer(choice){if(answered)return;answered=true;const q=currentQuestions[currentIndex];const buttons=[...$math('answerList').querySelectorAll('.answer')];buttons.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('correct');else if(i===choice)b.classList.add('wrong');});const good=choice===q.a;if(good)correctCount++;const f=$math('feedback');f.className=`feedback ${good?'good':'bad'}`;f.innerHTML=`<strong>${good?'✓ Helemaal goed!':'Nog niet helemaal.'}</strong>${q.e}`;$math('nextQuestion').disabled=false;$math('questionProgress').style.width=`${((currentIndex+1)/currentQuestions.length)*100}%`;}
 function finishPractice(){ $math('questionCard').classList.add('hidden');$math('resultCard').classList.remove('hidden');const total=currentQuestions.length,pct=Math.round(correctCount/total*100);$math('resultScore').textContent=`${correctCount}/${total}`;$math('resultTitle').textContent=pct>=80?'Heel sterk gedaan!':pct>=55?'Goed geoefend!':'Blijf oefenen, je komt er!';$math('resultMessage').textContent=`Je had ${correctCount} van de ${total} vragen goed (${pct}%). Bekijk de uitleg bij vragen die lastig waren en probeer het daarna nog eens.`;try{const old=JSON.parse(localStorage.getItem('studyhub-math-progress')||'{"answered":0,"correct":0}');old.answered+=total;old.correct+=correctCount;localStorage.setItem('studyhub-math-progress',JSON.stringify(old));updateProgress();}catch(e){}}
 function updateProgress(){try{const p=JSON.parse(localStorage.getItem('studyhub-math-progress')||'{"answered":0,"correct":0}');$math('progressStat').textContent=`${p.answered||0} vragen`;}catch(e){}}
 function toast(msg){$math('toast').textContent=msg;$math('toast').classList.remove('hidden');setTimeout(()=>$math('toast').classList.add('hidden'),2400);}
+function generateMathMix(){
+  const topic=$math('math-mix-topic').value;
+  const count=Number.parseInt($math('math-mix-count').value,10)||10;
+  const pool=topic==='all'?Object.values(bank).flat():(bank[Number(topic)]||[]);
+  if(!pool.length){toast('Voor dit onderwerp zijn nog geen vragen beschikbaar.');return;}
+  const button=$math('math-generate-mix');
+  const loading=$math('math-generator-loading');
+  button.disabled=true;loading.classList.remove('hidden');
+  window.setTimeout(()=>{
+    button.disabled=false;loading.classList.add('hidden');
+    const chapter=topic==='all'?'mix':Number(topic);
+    startPractice(chapter,count,true);
+    if(pool.length<count){toast(`Dit hoofdstuk bevat ${pool.length} vragen. Je krijgt alle beschikbare vragen.`);}
+  },350);
+}
 document.querySelectorAll('#section-math [data-chapter]').forEach(btn=>btn.addEventListener('click',event=>{event.preventDefault();startPractice(btn.dataset.chapter);}));
 document.querySelectorAll('#section-math [data-view]').forEach(btn=>btn.addEventListener('click',()=>{
   const target=btn.dataset.view;
@@ -725,12 +749,13 @@ document.querySelectorAll('#section-math [data-view]').forEach(btn=>btn.addEvent
   else if(target==='videosView') switchTab('math-videos');
   else switchTab('math-overview');
 }));
-$math('mixedPractice').addEventListener('click',()=>startPractice('mix'));
-$math('backToOverview').addEventListener('click',()=>showMathView('overviewView'));
-$math('quitPractice').addEventListener('click',()=>showMathView('overviewView'));
+$math('mixedPractice').addEventListener('click',()=>switchTab('math-mix'));
+$math('math-generate-mix').addEventListener('click',generateMathMix);
+$math('backToOverview').addEventListener('click',()=>switchTab('math-overview'));
+$math('quitPractice').addEventListener('click',()=>switchTab('math-overview'));
 $math('nextQuestion').addEventListener('click',()=>{if(!answered)return;if(currentIndex<currentQuestions.length-1){currentIndex++;renderQuestion();}else finishPractice();});
 $math('retryChapter').addEventListener('click',()=>startPractice(currentChapter));
-$math('resultOverview').addEventListener('click',()=>showMathView('overviewView'));
+$math('resultOverview').addEventListener('click',()=>switchTab('math-overview'));
 updateProgress();
 window.showMathView = showMathView;
 window.startStudyHubMathPractice = startPractice;
