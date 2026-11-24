@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyHub | Havo 2</title>
+    <style>
+        /* ==========================================================================
+           COMPLETE SELF-CONTAINED CSS (ZERO EXTERNAL DEPENDENCIES)
+           ========================================================================== */
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-dark: #0b1120;
+            --bg-input: #0f172a;
+            --border-color: #334155;
+            --border-light: #475569;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --emerald: #10b981;
+            --emerald-dark: #059669;
+            --emerald-bg: rgba(16, 185, 129, 0.12);
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --blue-bg: rgba(59, 130, 246, 0.12);
+            --purple: #a855f7;
+            --purple-dark: #9333ea;
+            --purple-bg: rgba(168, 85, 247, 0.12);
+            --amber: #f59e0b;
+            --amber-dark: #d97706;
+            --amber-bg: rgba(245, 158, 11, 0.12);
+            --rose: #f43f5e;
+            --rose-bg: rgba(244, 63, 94, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* StudyHub dashboard */
+        .home-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(230px, 0.8fr);
+            gap: 1.5rem;
+            align-items: center;
+            padding: clamp(1.5rem, 4vw, 2.5rem);
+            background: radial-gradient(circle at 90% 10%, rgba(16,185,129,.17), transparent 35%), linear-gradient(135deg, #1e293b, #111c30);
+            border-color: rgba(16,185,129,.28);
+        }
+        .home-kicker { color: var(--emerald); font-size: .75rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+        .home-title { font-size: clamp(2rem, 5vw, 3.15rem); line-height: 1.08; margin: .55rem 0 .8rem; color: #fff; font-weight: 900; }
+        .home-copy { max-width: 620px; color: #cbd5e1; font-size: 1rem; }
+        .home-visual { min-height: 190px; display: grid; place-items: center; border: 1px solid rgba(16,185,129,.25); border-radius: 18px; background: rgba(15,23,42,.6); }
+        .home-globe { font-size: 5.8rem; filter: drop-shadow(0 12px 22px rgba(16,185,129,.22)); }
+        .home-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.25rem 0 2rem; }
+        .home-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 15px; padding: 1rem 1.1rem; }
+        .home-stat strong { display: block; color: #fff; font-size: 1.4rem; }
+        .home-stat span { color: var(--text-muted); font-size: .8rem; }
+        .subject-card { min-height: 235px; }
+        .subject-icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 14px; background: var(--emerald-bg); font-size: 1.5rem; margin-bottom: 1rem; }
+        .coming-soon { opacity: .72; border-style: dashed; }
+        .home-section-title { margin: 0 0 .9rem; }
+        .nav-tab-btn.subject-nav { display: none; }
+        body.subject-open .nav-tab-btn.subject-nav { display: inline-flex; }
+        .subject-card-link { cursor: pointer; outline: none; }
+        .subject-card-link:hover, .subject-card-link:focus-visible {
+            border-color: var(--emerald);
+            box-shadow: 0 0 0 3px rgba(16,185,129,.14), 0 14px 30px rgba(0,0,0,.22);
+            transform: translateY(-3px);
+        }
+        .card-open-hint {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            margin-top: 1.25rem;
+            padding: .8rem 1rem;
+            border-radius: 12px;
+            color: #022c22;
+            background: linear-gradient(90deg, #10b981, #14b8a6);
+            font-size: .9rem;
+            font-weight: 800;
+        }
+        .info-note { background: rgba(59,130,246,.08); border: 1px solid rgba(59,130,246,.25); border-radius: 12px; padding: .85rem 1rem; color: #cbd5e1; font-size: .84rem; margin-top: 1rem; }
+        @media (max-width: 720px) {
+            .home-hero { grid-template-columns: 1fr; }
+            .home-visual { min-height: 130px; }
+            .home-globe { font-size: 4rem; }
+        }
+        @media (max-width: 520px) { .home-stats { grid-template-columns: 1fr; } }
+
+        /* Header & Navigation */
+        header {
+            background-color: rgba(30, 41, 59, 0.95);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(8px);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.85rem 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: var(--emerald-bg);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: var(--emerald);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+        }
+
+        .brand-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fff;
+        }
+
+        .study-pill {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--emerald-bg);
+            color: var(--emerald);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+        }
+
+        .brand-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .nav-tab-btn {
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            color: var(--text-muted);
+            padding: 0.55rem 0.95rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .nav-tab-btn:hover {
+            color: #fff;
+            border-color: var(--border-light);
+            background-color: #293548;
+        }
+
+        .nav-tab-btn.active {
+            background-color: var(--emerald-dark);
+            color: #fff;
+            border-color: var(--emerald);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.5rem 1.25rem 3rem;
+            flex-grow: 1;
+        }
+
+        /* Cards & Panels */
+        .panel {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Form Elements */
+        select, input[type="text"], textarea {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 12px;
+            padding: 0.65rem 0.9rem;
+            font-size: 0.9rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input[type="text"]:focus, textarea:focus {
+            border-color: var(--emerald);
+        }
+
+        textarea {
+            width: 100%;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        /* Grid Layouts */
+        .grid-tests {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+        }
+
+        /* Test Card */
+        .test-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .test-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--emerald);
+        }
+
+        .test-card.featured {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid rgba(16, 185, 129, 0.5);
+        }
+
+        .ribbon {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: var(--emerald);
+            color: #022c22;
+            font-size: 0.68rem;
+            font-weight: 900;
+            padding: 0.25rem 0.75rem;
+            border-bottom-left-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.85rem;
+            font-size: 0.78rem;
+        }
+
+        .tag {
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .tag-emerald { background: var(--emerald-bg); color: var(--emerald); border: 1px solid rgba(16,185,129,0.3); }
+        .tag-blue { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(59,130,246,0.3); }
+        .tag-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(168,85,247,0.3); }
+        .tag-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
+        .tag-rose { background: var(--rose-bg); color: var(--rose); border: 1px solid rgba(244,63,94,0.3); }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.6rem;
+            line-height: 1.5;
+        }
+
+        /* Buttons */
+        .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-full { width: 100%; margin-top: 1.25rem; }
+        .btn-emerald { background-color: var(--emerald-dark); color: #fff; }
+        .btn-emerald:hover:not(:disabled) { background-color: var(--emerald); color: #022c22; }
+        .btn-blue { background-color: var(--blue-dark); color: #fff; }
+        .btn-blue:hover:not(:disabled) { background-color: var(--blue); }
+        .btn-purple { background-color: var(--purple-dark); color: #fff; }
+        .btn-purple:hover:not(:disabled) { background-color: var(--purple); }
+        .btn-amber { background: linear-gradient(90deg, #f59e0b, #ea580c); color: #0f172a; font-weight: 800; }
+        .btn-amber:hover:not(:disabled) { filter: brightness(1.1); }
+        .btn-gradient { background: linear-gradient(90deg, #10b981, #14b8a6); color: #022c22; font-weight: 800; }
+        .btn-gradient:hover:not(:disabled) { filter: brightness(1.1); }
+        .btn-secondary { background-color: #334155; color: #f1f5f9; border: 1px solid var(--border-light); }
+        .btn-secondary:hover:not(:disabled) { background-color: #475569; }
+
+        /* Quiz Interface */
+        .quiz-top-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .timer-badge {
+            background-color: var(--bg-main);
+            border: 1px solid var(--amber);
+            color: var(--amber);
+            padding: 0.4rem 0.85rem;
+            border-radius: 10px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            font-size: 0.95rem;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 10px;
+            background-color: var(--bg-main);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--emerald), #2dd4bf);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Question Navigator Pills */
+        .q-nav-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .q-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-main);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .q-pill.answered {
+            background-color: rgba(16, 185, 129, 0.18);
+            border-color: var(--emerald);
+            color: var(--emerald);
+        }
+
+        .q-pill.current {
+            background-color: var(--emerald);
+            color: #022c22;
+            border-color: #fff;
+            transform: scale(1.08);
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 1rem 0 1.25rem;
+            line-height: 1.5;
+        }
+
+        .mc-option {
+            width: 100%;
+            text-align: left;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.65rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.15s;
+        }
+
+        .mc-option:hover {
+            border-color: var(--border-light);
+            background-color: #162033;
+        }
+
+        .mc-option.selected {
+            border-color: var(--emerald);
+            background-color: var(--emerald-bg);
+            color: #6ee7b7;
+        }
+
+        .mc-letter {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background-color: var(--bg-card);
+            color: var(--text-muted);
+            font-weight: 800;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .mc-option.selected .mc-letter {
+            background-color: var(--emerald);
+            color: #022c22;
+        }
+
+        .quiz-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border-color);
+            gap: 1rem;
+        }
+
+        /* Results & Grade Display */
+        .grade-hero {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        .grade-circle {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            background: var(--bg-main);
+            border: 4px solid var(--emerald);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
+        }
+
+        .grade-number {
+            font-size: 2.75rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #fff;
+        }
+
+        .grade-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+            margin: 1.5rem auto;
+        }
+
+        .stat-box {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 0.85rem;
+        }
+
+        .stat-val {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .stat-lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .review-card {
+            border-radius: 14px;
+            padding: 1.15rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-main);
+        }
+
+        .review-card.correct { border-color: rgba(16, 185, 129, 0.45); background: rgba(16, 185, 129, 0.05); }
+        .review-card.partial { border-color: rgba(245, 158, 11, 0.45); background: rgba(245, 158, 11, 0.05); }
+        .review-card.wrong { border-color: rgba(244, 63, 94, 0.45); background: rgba(244, 63, 94, 0.05); }
+
+        .user-answer-box {
+            background-color: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.7rem 0.9rem;
+            margin: 0.65rem 0;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+        }
+
+        .feedback-box {
+            margin-top: 0.65rem;
+            padding-top: 0.65rem;
+            border-top: 1px solid rgba(71, 85, 105, 0.4);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Flashcards (3D Flip) */
+        .flashcard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 1.15rem;
+        }
+
+        .flashcard {
+            height: 190px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 16px;
+            padding: 1.15rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+        }
+
+        .flashcard-front {
+            background-color: var(--bg-card);
+        }
+
+        .flashcard:hover .flashcard-front {
+            border-color: var(--emerald);
+        }
+
+        .flashcard-back {
+            background-color: var(--bg-card-dark);
+            border-color: var(--emerald);
+            transform: rotateY(180deg);
+        }
+
+        .fc-term {
+            font-size: 1.15rem;
+            font-weight: 800;
+            text-align: center;
+            color: #fff;
+            margin: auto 0;
+        }
+
+        .fc-def {
+            font-size: 0.86rem;
+            color: #e2e8f0;
+            line-height: 1.45;
+            overflow-y: auto;
+            margin: auto 0;
+        }
+
+        /* Visual Diagrams & Summary Tables */
+        .diagram-box {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .diagram-box svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        table.geo-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.75rem;
+            font-size: 0.86rem;
+        }
+
+        table.geo-table th, table.geo-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.65rem 0.85rem;
+            text-align: left;
+        }
+
+        table.geo-table th {
+            background-color: var(--bg-main);
+            color: var(--emerald);
+            font-weight: 700;
+        }
+
+        /* Spinner & Toast */
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid rgba(16, 185, 129, 0.2);
+            border-top-color: var(--emerald);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            z-index: 100;
+            max-width: 360px;
+            background-color: var(--bg-card);
+            border: 1px solid var(--amber);
+            color: #fff;
+            padding: 0.85rem 1rem;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            font-size: 0.84rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.25rem;
+            color: var(--text-dim);
+            font-size: 0.78rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        @media (max-width: 640px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .header-inner { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-inner">
+            <div class="brand" id="brand-logo">
+                <div class="brand-icon">🎓</div>
+                <div>
+                    <div class="brand-title">StudyHub <span class="study-pill">HAVO 2</span></div>
+                    <div class="brand-sub">Jouw digitale leeromgeving</div>
+                </div>
+            </div>
+
+            <nav>
+                <button class="nav-tab-btn active" id="nav-home" data-tab="home">⌂ Overzicht</button>
+                <button class="nav-tab-btn subject-nav" id="nav-tests" data-tab="tests">🌍 Aardrijkskunde</button>
+                <button class="nav-tab-btn subject-nav" id="nav-generator" data-tab="generator">🎲 Oefenmix</button>
+                <button class="nav-tab-btn subject-nav" id="nav-learn" data-tab="learn">🗂️ Begrippen</button>
+                <button class="nav-tab-btn subject-nav" id="nav-summary" data-tab="summary">📊 Uitleg</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- TOAST MESSAGE BOX -->
+    <div id="toast-message" class="toast hidden">
+        <span>⚠️</span>
+        <div id="toast-text" style="flex:1;"></div>
+        <button id="toast-close" style="background:none;border:none;color:#94a3b8;cursor:pointer;font-weight:bold;">✕</button>
+    </div>
+
+    <main>
+        <section id="section-home">
+            <div class="panel home-hero">
+                <div>
+                    <div class="home-kicker">StudyHub · Havo 2</div>
+                    <h1 class="home-title">Leren wordt een stuk<br>overzichtelijker.</h1>
+                    <p class="home-copy">Oefen voor school met toetsen, begrippen en duidelijke uitleg. Kies een vak en ga direct aan de slag.</p>
+                    <p class="info-note">Kies hieronder de Aardrijkskunde-kaart om het vak te openen.</p>
+                </div>
+                <div class="home-visual" aria-hidden="true"><div class="home-globe">🌍</div></div>
+            </div>
+
+            <div class="home-stats">
+                <div class="home-stat"><strong>1</strong><span>Vak beschikbaar</span></div>
+                <div class="home-stat"><strong>4</strong><span>Oefentoetsen</span></div>
+                <div class="home-stat"><strong>19</strong><span>Begrippen om te oefenen</span></div>
+            </div>
+
+            <h2 class="home-section-title">Jouw vakken</h2>
+            <div class="grid-tests">
+                <div class="test-card featured subject-card subject-card-link" role="button" tabindex="0" aria-label="Open het vak Aardrijkskunde" data-open-subject="aardrijkskunde">
+                    <div>
+                        <div class="subject-icon">🌍</div>
+                        <div class="card-meta"><span class="tag tag-emerald">Beschikbaar</span><span style="color:var(--text-muted);font-size:.78rem;">Havo 2</span></div>
+                        <h3>Aardrijkskunde</h3>
+                        <p class="card-desc">Hoofdstuk 1: Landschappen. Oefen gebergten, verwering, erosie, rivieren en kaartvaardigheden.</p>
+                    </div>
+                    <div class="card-open-hint"><span>Open vak</span><span aria-hidden="true">→</span></div>
+                </div>
+                <div class="test-card subject-card coming-soon">
+                    <div>
+                        <div class="subject-icon">⚛️</div>
+                        <div class="card-meta"><span class="tag tag-blue">Binnenkort</span></div>
+                        <h3>Natuurkunde</h3>
+                        <p class="card-desc">Een plek voor formules, berekeningen, oefenvragen en proefwerkvoorbereiding.</p>
+                    </div>
+                    <button class="btn btn-secondary btn-full" disabled>Komt later</button>
+                </div>
+                <div class="test-card subject-card coming-soon">
+                    <div>
+                        <div class="subject-icon">📚</div>
+                        <div class="card-meta"><span class="tag tag-purple">Binnenkort</span></div>
+                        <h3>Geschiedenis</h3>
+                        <p class="card-desc">Later kun je hier ook tijdvakken, personen en gebeurtenissen oefenen.</p>
+                    </div>
+                    <button class="btn btn-secondary btn-full" disabled>Komt later</button>
+                </div>
+            </div>
+        </section>
+        <!-- ======================================================================
+             SECTION 1: OEFENTOETSEN OVERZICHT
+             ====================================================================== -->
+        <section id="section-tests" class="hidden">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>Kies een oefentoets</h2>
+                        <p class="subtitle">Meerkeuzevragen worden direct nagekeken. Open vragen krijgen een automatische kernwoorden-score die je kunt vergelijken met het modelantwoord. Alles werkt lokaal in je browser; er is geen API-key nodig.</p>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <label for="timer-select" style="font-size:0.85rem;color:var(--text-muted);font-weight:600;">⏱️ Tijdslimiet:</label>
+                        <select id="timer-select">
+                            <option value="0">Geen tijdslimiet</option>
+                            <option value="15">15 minuten (Korte toets)</option>
+                            <option value="30">30 minuten (Proefwerk)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-tests">
+                <!-- Test 1 -->
+                <div class="test-card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="tag tag-emerald">§ 1.1 &amp; 1.2</span>
+                            <span style="color:var(--text-muted);">⭐ 10 Vragen (15 pt)</span>
+                        </div>
+                        <h3>Gebergtevorming &amp; Verwering</h3>
+                        <p class="card-desc">Platentektoniek, Pangea, ontstaan van de Himalaya, jong vs. oud gebergte, graniet vs. zandsteen, vorstverwering, chemische verwering &amp; kalksteengrotten.</p>
+                    </div>
+                    <button class="btn btn-emerald btn-full start-test-btn" data-test-index="0">Start Toets 1 →</button>
+                </div>
+
+                <!-- Test 2 -->
+                <div class="test-card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="tag tag-blue">§ 1.3 &amp; 1.4</span>
+                            <span style="color:var(--text-muted);">⭐ 10 Vragen (15 pt)</span>
+                        </div>
+                        <h3>Erosie, Rivieren &amp; Sedimentatie</h3>
+                        <p class="card-desc">Massabewegingen, V-dal vs. U-dal (gletsjers), boven-, midden- en benedenloop, sortering van stenen tot klei, delta's, estuaria en duinvorming.</p>
+                    </div>
+                    <button class="btn btn-blue btn-full start-test-btn" data-test-index="1">Start Toets 2 →</button>
+                </div>
+
+                <!-- Test 3 -->
+                <div class="test-card">
+                    <div>
+                        <div class="card-meta">
+                            <span class="tag tag-purple">Vaardigheden</span>
+                            <span style="color:var(--text-muted);">⭐ 8 Vragen (12 pt)</span>
+                        </div>
+                        <h3>Kaartvaardigheden &amp; Reliëf</h3>
+                        <p class="card-desc">Hoogtelijnen aflezen, steile vs. flauwe hellingen, hoogtezones (laagland t/m hooggebergte), schaduwtechniek en voorbeelden uit NL, België &amp; Zwitserland.</p>
+                    </div>
+                    <button class="btn btn-purple btn-full start-test-btn" data-test-index="2">Start Toets 3 →</button>
+                </div>
+
+                <!-- Test 4 -->
+                <div class="test-card featured">
+                    <div class="ribbon">Aanbevolen</div>
+                    <div>
+                        <div class="card-meta">
+                            <span class="tag tag-amber">Compleet H1</span>
+                            <span style="color:var(--text-muted);">⭐ 20 Vragen (30 pt)</span>
+                        </div>
+                        <h3>Grote Hoofdstuktoets H1</h3>
+                        <p class="card-desc">De complete proefwerkvoorbereiding met 20 gevarieerde vragen over alle paragrafen (§1.1 t/m 1.4) en kaartvaardigheden voor een officieel cijfer.</p>
+                    </div>
+                    <button class="btn btn-gradient btn-full start-test-btn" data-test-index="3">Start Eindtoets 🔥</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================================
+             SECTION 2: LOKALE OEFENMIX
+             ====================================================================== -->
+        <section id="section-generator" class="hidden">
+            <div class="panel" style="max-width:680px;margin:0 auto;">
+                <h2>🎲 Maak een oefenmix</h2>
+                <p class="subtitle">Stel een oefenmix samen uit de ingebouwde vragenbank. Kies een paragraaf, het aantal vragen en het vraagtype.</p>
+
+                <div style="margin-top:1.25rem;display:flex;flex-direction:column;gap:1rem;">
+                    <div>
+                        <label for="gen-topic" style="display:block;font-size:0.85rem;font-weight:700;margin-bottom:0.4rem;">Kies het onderwerp:</label>
+                        <select id="gen-topic" style="width:100%;">
+                            <option value="Heel Hoofdstuk 1: Landschappen (1.1 t/m 1.4 + Kaartvaardigheden)">Heel Hoofdstuk 1: Landschappen (Compleet)</option>
+                            <option value="Paragraaf 1.1: Gebergten ontstaan, gebergten verslijten (Platentektoniek, Himalaya, Graniet)">Paragraaf 1.1: Gebergten ontstaan &amp; verslijten</option>
+                            <option value="Paragraaf 1.2: Gesteente verandert (Mechanische en chemische verwering, grotten)">Paragraaf 1.2: Gesteente verandert (Verwering)</option>
+                            <option value="Paragraaf 1.3: Gesteente wordt verplaatst (Massabeweging, erosie, V-dal en U-dal)">Paragraaf 1.3: Gesteente wordt verplaatst (Erosie)</option>
+                            <option value="Paragraaf 1.4: Waar blijft al het grind, zand en klei (Rivierloop, delta, estuarium, duinen)">Paragraaf 1.4: Sedimentatie, Delta &amp; Estuarium</option>
+                            <option value="Kaartvaardigheden: Hoogtelijnen, reliëf, hoogtezones en dwarsdoorsneden">Kaartvaardigheden: Reliëf &amp; Hoogtelijnen</option>
+                        </select>
+                    </div>
+
+                    <div class="grid-2">
+                        <div>
+                            <label for="gen-count" style="display:block;font-size:0.85rem;font-weight:700;margin-bottom:0.4rem;">Aantal vragen:</label>
+                            <select id="gen-count" style="width:100%;">
+                                <option value="6">6 vragen (Snelle check)</option>
+                                <option value="10" selected>10 vragen (Standaard toets)</option>
+                                <option value="15">15 vragen (Uitgebreid)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="gen-type" style="display:block;font-size:0.85rem;font-weight:700;margin-bottom:0.4rem;">Soort vragen:</label>
+                            <select id="gen-type" style="width:100%;">
+                                <option value="mixed" selected>Gemengd</option>
+                                <option value="mc">Alleen meerkeuze</option>
+                                <option value="open">Alleen open vragen</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="btn-generate-mix" class="btn btn-amber btn-full">🎲 Maak mijn oefenmix</button>
+
+                    <div id="gen-loading" class="hidden" style="text-align:center;padding:1.5rem 0;">
+                        <div class="spinner"></div>
+                        <p style="font-weight:700;color:var(--amber);">StudyHub stelt een oefenmix samen...</p>
+                        <p style="font-size:0.8rem;color:var(--text-muted);">Je toets start automatisch.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================================
+             SECTION 3: ACTIEVE TOETS ENGINE
+             ====================================================================== -->
+        <section id="section-quiz" class="hidden">
+            <div class="panel" style="max-width:820px;margin:0 auto;">
+                <div class="quiz-top-bar">
+                    <div>
+                        <h2 id="quiz-main-title" style="font-size:1.25rem;">Oefentoets</h2>
+                        <span id="quiz-progress-text" style="font-size:0.85rem;color:var(--emerald);font-weight:700;">Vraag 1 van 10</span>
+                    </div>
+                    <div id="timer-display-box" class="timer-badge hidden">
+                        ⏱️ <span id="timer-text">15:00</span>
+                    </div>
+                </div>
+
+                <div class="progress-track">
+                    <div id="quiz-progress-bar" class="progress-fill"></div>
+                </div>
+
+                <!-- Quick Question Jump Pills -->
+                <div id="q-nav-pills" class="q-nav-pills"></div>
+
+                <!-- Question Card -->
+                <div style="background:var(--bg-card-dark);border:1px solid var(--border-color);border-radius:14px;padding:1.35rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
+                        <span id="q-paragraph" class="tag tag-blue">§ 1.1</span>
+                        <span id="q-points" style="font-size:0.82rem;font-weight:700;color:var(--amber);">⭐ 1 Punt</span>
+                    </div>
+
+                    <div id="q-text" class="question-text"></div>
+
+                    <div id="q-answer-container"></div>
+                </div>
+
+                <!-- Controls -->
+                <div class="quiz-footer">
+                    <button id="btn-prev" class="btn btn-secondary">← Vorige</button>
+                    <button id="btn-quit-quiz" class="btn btn-secondary" style="font-size:0.8rem;padding:0.55rem 0.9rem;">Stoppen</button>
+                    <button id="btn-next" class="btn btn-emerald">Volgende →</button>
+                    <button id="btn-finish" class="btn btn-gradient hidden">📤 Inleveren &amp; nakijken</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================================
+             SECTION 4: NAKIJKEN
+             ====================================================================== -->
+        <section id="section-grading" class="hidden">
+            <div class="panel" style="max-width:560px;margin:3rem auto;text-align:center;padding:3rem 1.5rem;">
+                <div class="spinner"></div>
+                <h2>Je antwoorden worden nagekeken...</h2>
+                <p id="grading-progress-text" class="subtitle" style="margin-top:0.5rem;">Je open antwoorden vergelijken met de kernbegrippen en modelantwoorden.</p>
+            </div>
+        </section>
+
+        <!-- ======================================================================
+             SECTION 5: RESULTATEN & CIJFERRAPPORT
+             ====================================================================== -->
+        <section id="section-results" class="hidden">
+            <div class="panel" style="max-width:860px;margin:0 auto;">
+                <div class="grade-hero">
+                    <div class="grade-circle" id="grade-circle">
+                        <div class="grade-number" id="final-grade">7.5</div>
+                        <div class="grade-label">Jouw Cijfer</div>
+                    </div>
+                    <span id="grade-badge" class="tag tag-emerald">Voldoende!</span>
+
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <div class="stat-val" id="result-points">12 / 15</div>
+                            <div class="stat-lbl">Behaalde Punten</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-val" id="result-percentage">80%</div>
+                            <div class="stat-lbl">Scorepercentage</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-val" id="result-status">Voldoende</div>
+                            <div class="stat-lbl">Beoordeling (55% grens)</div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:0.75rem;margin-top:1rem;">
+                        <button id="btn-restart-tests" class="btn btn-emerald">🔄 Andere Toets Maken</button>
+                        <button id="btn-retry-same" class="btn btn-secondary">🔁 Deze Toets Opnieuw</button>
+                        <button id="btn-review-learn" class="btn btn-secondary">🗂️ Begrippen Oefenen</button>
+                    </div>
+                </div>
+
+                <hr style="border:none;border-top:1px solid var(--border-color);margin:1.5rem 0;">
+
+                <div class="info-note">Let op: open antwoorden worden automatisch op kernwoorden gecontroleerd. Dit is een indicatie, geen docentbeoordeling. Vergelijk je antwoord altijd met het modelantwoord.</div>
+                <h3 style="margin-bottom:1rem;">📋 Uitgebreid Nakijkverslag per Vraag</h3>
+                <div id="review-container"></div>
+            </div>
+        </section>
+
+        <!-- ======================================================================
+             SECTION 6: BEGRIPPEN & FLASHCARDS
+             ====================================================================== -->
+        <section id="section-learn" class="hidden">
+            <div class="panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>🗂️ Begrippen &amp; Flashcards Oefenen</h2>
+                        <p class="subtitle">Klik op een kaart om de betekenis te bekijken (<span id="fc-count" style="color:var(--emerald);font-weight:800;">0</span> begrippen getoond).</p>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.6rem;">
+                        <select id="fc-filter">
+                            <option value="all">Alle Paragrafen (1.1 t/m 1.4 &amp; Kaart)</option>
+                            <option value="1.1">§ 1.1 Gebergten ontstaan &amp; verslijten</option>
+                            <option value="1.2">§ 1.2 Gesteente verandert (Verwering)</option>
+                            <option value="1.3">§ 1.3 Gesteente wordt verplaatst (Erosie)</option>
+                            <option value="1.4">§ 1.4 Waar blijft grind, zand en klei?</option>
+                            <option value="Kaart">Kaartvaardigheden &amp; Reliëf</option>
+                        </select>
+                        <input type="text" id="fc-search" placeholder="Zoek op begrip of woord...">
+                    </div>
+                </div>
+            </div>
+
+            <div id="flashcard-grid" class="flashcard-grid"></div>
+        </section>
+
+        <!-- ======================================================================
+             SECTION 7: VISUELE SCHEMA'S & SAMENVATTING
+             ====================================================================== -->
+        <section id="section-summary" class="hidden">
+            <div class="panel">
+                <h2>📊 Overzichtsschema's &amp; Visuele Uitleg (H1)</h2>
+                <p class="subtitle">De belangrijkste plaatjes en tabellen uit het boek op een rij voor snelle herhaling.</p>
+            </div>
+
+            <div class="grid-2">
+                <!-- Diagram 1: V-dal vs U-dal -->
+                <div class="panel">
+                    <h3>1. Rivierdal (V-dal) vs. Gletsjerdal (U-dal)</h3>
+                    <p class="subtitle" style="margin-bottom:1rem;">Een snelstromende rivier snijdt diep in de bodem (V-vorm). Een zware gletsjer schuurt zowel de bodem als de zijkanten breed uit (U-vorm).</p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 420 180" xmlns="http://www.w3.org/2000/svg">
+                            <!-- V-Dal -->
+                            <rect x="10" y="10" width="190" height="160" rx="10" fill="#1e293b"/>
+                            <polygon points="20,45 105,135 190,45 190,155 20,155" fill="#78350f"/>
+                            <polygon points="93,122 105,135 117,122" fill="#38bdf8"/>
+                            <text x="105" y="30" fill="#10b981" font-size="13" font-weight="bold" text-anchor="middle">V-dal (Riviererosie)</text>
+                            <text x="105" y="165" fill="#cbd5e1" font-size="11" text-anchor="middle">Steile wanden, smalle bodem</text>
+
+                            <!-- U-Dal -->
+                            <rect x="220" y="10" width="190" height="160" rx="10" fill="#1e293b"/>
+                            <path d="M 230,45 L 255,45 Q 265,135 315,135 Q 365,135 375,45 L 400,45 L 400,155 L 230,155 Z" fill="#78350f"/>
+                            <path d="M 272,126 Q 315,135 358,126 L 352,133 Q 315,138 278,133 Z" fill="#38bdf8"/>
+                            <text x="315" y="30" fill="#38bdf8" font-size="13" font-weight="bold" text-anchor="middle">U-dal (Gletsjererosie)</text>
+                            <text x="315" y="165" fill="#cbd5e1" font-size="11" text-anchor="middle">Brede vlakke dalbodem</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Diagram 2: Rivierloop -->
+                <div class="panel">
+                    <h3>2. De Loop van een Rivier (§ 1.4)</h3>
+                    <p class="subtitle" style="margin-bottom:1rem;">Stroomafwaarts neemt het hoogteverschil en de stroomsnelheid af. Daardoor worden de sedimenten steeds kleiner.</p>
+                    <div class="diagram-box">
+                        <svg viewBox="0 0 420 180" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="10" y="10" width="400" height="160" rx="10" fill="#1e293b"/>
+                            <!-- River curve -->
+                            <path d="M 35,35 Q 110,105 210,125 T 385,142" fill="none" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/>
+                            <!-- Sea -->
+                            <rect x="355" y="135" width="45" height="22" rx="4" fill="#0284c7"/>
+                            <text x="377" y="150" fill="#fff" font-size="10" font-weight="bold" text-anchor="middle">ZEE</text>
+
+                            <!-- Labels -->
+                            <text x="65" y="28" fill="#10b981" font-size="11" font-weight="bold" text-anchor="middle">1. Bovenloop</text>
+                            <text x="65" y="75" fill="#cbd5e1" font-size="10" text-anchor="middle">Veel erosie</text>
+                            <text x="65" y="88" fill="#f59e0b" font-size="10" font-weight="bold" text-anchor="middle">Stenen &amp; Grind</text>
+
+                            <text x="205" y="105" fill="#10b981" font-size="11" font-weight="bold" text-anchor="middle">2. Middenloop</text>
+                            <text x="205" y="148" fill="#f59e0b" font-size="10" font-weight="bold" text-anchor="middle">Zand</text>
+
+                            <text x="320" y="118" fill="#10b981" font-size="11" font-weight="bold" text-anchor="middle">3. Benedenloop</text>
+                            <text x="315" y="156" fill="#f59e0b" font-size="10" font-weight="bold" text-anchor="middle">Sedimentatie: Klei</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comparison Tables -->
+            <div class="grid-2">
+                <div class="panel">
+                    <h3>3. Gesteenten Vergelijken (§ 1.1 &amp; 1.4)</h3>
+                    <table class="geo-table">
+                        <thead>
+                            <tr>
+                                <th>Kenmerk</th>
+                                <th>Stollingsgesteente (Graniet)</th>
+                                <th>Sedimentgesteente (Zandsteen / Schalie / Kalksteen)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Ontstaan</strong></td>
+                                <td>Stollen van heet magma onder de grond</td>
+                                <td>Samenpersen van lagen sediment op zeebodem</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Uiterlijk</strong></td>
+                                <td>Gevlekt (kristallen), keihard</td>
+                                <td>Gelaagd (duidelijke lagen zichtbaar)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fossielen?</strong></td>
+                                <td><strong>Nooit</strong> (verbrandt in magma)</td>
+                                <td><strong>Vaak wel</strong> (schelpen/resten begraven)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="panel">
+                    <h3>4. Hoogtezones &amp; Gebergten (§ 1.1 &amp; Kaart)</h3>
+                    <table class="geo-table">
+                        <thead>
+                            <tr>
+                                <th>Hoogtezone</th>
+                                <th>Hoogte (m)</th>
+                                <th>Voorbeeld Europa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Laagland</strong></td>
+                                <td>0 – 200 m</td>
+                                <td>Nederland, Vlaanderen</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Heuvelland</strong></td>
+                                <td>200 – 500 m</td>
+                                <td>Zuid-Limburg, deel Ardennen</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Middelgebergte (Oud)</strong></td>
+                                <td>500 – 1500 m</td>
+                                <td>Ardennen, Schotse Hooglanden, Oeral</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hooggebergte (Jong)</strong></td>
+                                <td>&gt; 1500 m</td>
+                                <td>Alpen, Pyreneeën, Kaukasus, Himalaya</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        StudyHub • Havo 2 • Aardrijkskunde: Hoofdstuk 1 Landschappen
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           1. DATA: BEGRIPPEN & 4 VOLLEDIGE OEFENTOETSEN
+           ========================================================================== */
+        const flashcardsData = [
+            { id: 1, para: '1.1', term: 'Platentektoniek', def: 'Het bewegen van aardkorstplaten. Verantwoordelijk voor het ontstaan van gebergten en vulkanisme.' },
+            { id: 2, para: '1.1', term: 'Pangea', def: 'Het supercontinent dat miljoenen jaren geleden opbrak in losse aardkorstplaten.' },
+            { id: 3, para: '1.1', term: 'Himalaya ontstaan', def: 'Ontstaan door de botsing tussen de Indische plaat en de Euraziatische plaat (eerst vulkanisme, daarna gebergtevorming).' },
+            { id: 4, para: '1.1', term: 'Jong gebergte', def: 'Hoge, scherpe/spitse bergtoppen en diepe, steile dalen (bijv. Alpen, Himalaya, Pyreneeën, Apennijnen).' },
+            { id: 5, para: '1.1', term: 'Oud gebergte', def: 'Lage, afgeronde bergtoppen en ondiepe dalen door lange verwering/erosie (bijv. Ardennen, Oeral, Schotse Hooglanden).' },
+            { id: 6, para: '1.1', term: 'Stollingsgesteente', def: 'Ontstaat door het stollen van vloeibaar magma (bijv. Graniet). Gevlekt uiterlijk, keihard en bevat NOOIT fossielen.' },
+            { id: 7, para: '1.2', term: 'Verwering', def: 'Het afbreken/verbrokkelen van gesteente op één plek, zonder dat het materiaal meteen wordt vervoerd.' },
+            { id: 8, para: '1.2', term: 'Mechanische verwering', def: 'Gesteente brokkelt af zonder dat de samenstelling verandert (vorstverwering, opwarmen/afkoelen, plantenwortels).' },
+            { id: 9, para: '1.2', term: 'Chemische verwering', def: 'Gesteente verandert van samenstelling of lost op door reactie met water, zuurstof en zuren (karstgrotten in kalksteen).' },
+            { id: 10, para: '1.3', term: 'Erosie', def: 'De uitschurende werking van bewegend ijs, water of wind mét meegenomen verweringsmateriaal.' },
+            { id: 11, para: '1.3', term: 'Massabewegingen', def: 'Het langs een helling naar beneden bewegen (vallen, rollen, schuiven) van gesteente onder invloed van de zwaartekracht.' },
+            { id: 12, para: '1.3', term: 'V-dal vs. U-dal', def: 'Een V-dal is uitgesleten door een rivier. Een U-dal heeft een vlakke bodem en steile wanden en is uitgesleten door een gletsjer.' },
+            { id: 13, para: '1.4', term: 'Sedimentatie', def: 'Het neerleggen/afzetten van verweerd materiaal (grind, zand, klei) zodra de stroomsnelheid van water of wind afneemt.' },
+            { id: 14, para: '1.4', term: 'Boven- / Midden- / Benedenloop', def: 'Bovenloop = steil/veel erosie (stenen). Middenloop = minder steil (grind/zand). Benedenloop = vlak/sedimentatie (klei).' },
+            { id: 15, para: '1.4', term: 'Delta vs. Estuarium', def: 'Delta = vertakte riviermonding vol sediment. Estuarium = trechtervormige monding door groot verschil tussen eb en vloed (> 3 m).' },
+            { id: 16, para: '1.4', term: 'Sedimentgesteente', def: 'Samengeperste lagen sediment: zandsteen (uit zand), schalie (uit klei), kalksteen (uit schelpen). Gelaagd en bevat vaak fossielen.' },
+            { id: 17, para: 'Kaart', term: 'Reliëf', def: 'Hoogteverschillen in een landschap. Wordt op kaarten weergegeven met kleuren, hoogtelijnen, cijfers en schaduw.' },
+            { id: 18, para: 'Kaart', term: 'Hoogtelijnen', def: 'Lijnen op een topografische kaart die punten van gelijke hoogte verbinden. Hoe dichter bij elkaar, hoe steiler de helling.' },
+            { id: 19, para: 'Kaart', term: 'Hoogtezones', def: 'Laagland (0-200m), Heuvelland (200-500m), Middelgebergte (500-1500m), Hooggebergte (>1500m).' }
+        ];
+
+        const prebuiltTests = [
+            // Test 1: § 1.1 & 1.2
+            {
+                title: "Toets 1: Gebergtevorming & Verwering (§ 1.1 & 1.2)",
+                questions: [
+                    { id: 101, para: '1.1', points: 1, type: 'mc', question: 'Welk proces is verantwoordelijk voor het ontstaan van gebergten en het verschuiven van continenten?', options: ['Erosie', 'Platentektoniek', 'Sedimentatie', 'Massabeweging'], correct: 1, explanation: 'Platentektoniek is het bewegen en botsen van aardkorstplaten.' },
+                    { id: 102, para: '1.1', points: 2, type: 'open', question: 'Leg uit waarom je in het stollingsgesteente graniet NOOIT fossielen aantreft, maar in zandsteen wel.', modelAnswer: 'Graniet ontstaat uit gloeiend heet magma diep in de aarde waarin schelpen of organismen verbranden. Zandsteen is sedimentgesteente dat op de zeebodem ontstaat waar schelpen wel worden begraven.', keywords: ['magma', 'heet', 'zeebodem', 'sedimentgesteente', 'schelpen'] },
+                    { id: 103, para: '1.1', points: 1, type: 'mc', question: 'Welk gebergte is ontstaan door de botsing tussen de Indische plaat en de Euraziatische plaat?', options: ['De Alpen', 'De Pyreneeën', 'De Himalaya', 'De Oeral'], correct: 2, explanation: 'De Himalaya ontstond toen de Indische plaat tegen de Euraziatische plaat botste.' },
+                    { id: 104, para: '1.1', points: 2, type: 'open', question: 'Noem twee duidelijke uiterlijke kenmerken waaraan je een jong gebergte kunt onderscheiden van een oud gebergte.', modelAnswer: 'Een jong gebergte heeft hoge, spitse bergtoppen en diepe, steile dalen. Een oud gebergte heeft lage, afgeronde toppen en ondiepe dalen.', keywords: ['spitse', 'hoge', 'afgeronde', 'steile', 'diepe'] },
+                    { id: 105, para: '1.2', points: 1, type: 'mc', question: 'Wat zorgt bij vorstverwering ervoor dat een rots met scheuren uiteindelijk breekt?', options: ['Water dat in de scheur bevriest en uitzet', 'Zuur regenwater dat het gesteente oplost', 'Felle zonneschijn overdag', 'Zand dat door de wind tegen de rots waait'], correct: 0, explanation: 'Bevroren water zet uit en drukt de scheur steeds verder open.' },
+                    { id: 106, para: '1.2', points: 2, type: 'open', question: 'Leg het verschil uit tussen mechanische verwering en chemische verwering.', modelAnswer: 'Bij mechanische verwering verbrokkelt het gesteente zonder dat de samenstelling verandert. Bij chemische verwering verandert de samenstelling wel of lost het gesteente op.', keywords: ['samenstelling', 'verandert', 'oplossen', 'verbrokkelt'] },
+                    { id: 107, para: '1.2', points: 1, type: 'mc', question: 'In welk klimaat verloopt chemische verwering het snelst?', options: ['Koud en droog polair klimaat', 'Warm en vochtig tropisch klimaat', 'Droog woestijnklimaat', 'Hooggebergteklimaat'], correct: 1, explanation: 'Hoge temperaturen en veel vocht versnellen chemische verwering.' },
+                    { id: 108, para: '1.2', points: 2, type: 'open', question: 'Leg uit hoe ondergrondse grotten in kalksteengebieden (zoals de Belgische Ardennen) ontstaan.', modelAnswer: 'Regenwater wordt licht zuur door contact met plantenwortels en lucht. Dit zure water sijpelt door spleten naar beneden en lost het kalksteen langzaam op.', keywords: ['zuur', 'oplossen', 'sijpelt', 'kalksteen', 'plantenwortels'] },
+                    { id: 109, para: '1.1', points: 1, type: 'mc', question: 'Hoe noemen we het vloeibare gesteente dat vanuit de aardmantel omhoog komt?', options: ['Lava', 'Basalt', 'Magma', 'Schalie'], correct: 2, explanation: 'Onder de grond heet vloeibaar gesteente magma (waaruit graniet kan stollen).' },
+                    { id: 110, para: '1.2', points: 2, type: 'open', question: 'Leg uit waarom bij de eerste botsing tussen India en Azië vulkanisme ontstond en bij de tweede botsing gebergtevorming.', modelAnswer: 'Bij de eerste botsing dook de Indische plaat onder de Euraziatische plaat en smolt onder druk tot magma (vulkanisme). Bij de tweede botsing duwden beide platen elkaar omhoog (gebergtevorming).', keywords: ['onder', 'smolt', 'omhoog', 'duwden'] }
+                ]
+            },
+            // Test 2: § 1.3 & 1.4
+            {
+                title: "Toets 2: Erosie, Rivieren & Sedimentatie (§ 1.3 & 1.4)",
+                questions: [
+                    { id: 201, para: '1.3', points: 1, type: 'mc', question: 'Welke natuurkracht is de motor achter massabewegingen langs een berghelling?', options: ['Windkracht', 'Zwaartekracht', 'Zonnekracht', 'Magnetisme'], correct: 1, explanation: 'Door de zwaartekracht valt, rolt of glijdt los materiaal naar beneden.' },
+                    { id: 202, para: '1.3', points: 2, type: 'open', question: 'Beschrijf hoe een gletsjer een U-dal maakt.', modelAnswer: 'Een gletsjer beweegt langzaam door een dal naar beneden. Het gewicht van het ijs en het meegevoerde gesteente schuren zowel de bodem als de wanden breed en diep uit.', keywords: ['ijs', 'schuren', 'wanden', 'bodem', 'gewicht'] },
+                    { id: 203, para: '1.4', points: 1, type: 'mc', question: 'Waar in de rivierloop vind je voornamelijk grote stenen en grof grind?', options: ['Benedenloop', 'Middenloop', 'Bovenloop', 'Lagune'], correct: 2, explanation: 'In de steile bovenloop is de stroomsnelheid het hoogst.' },
+                    { id: 204, para: '1.4', points: 2, type: 'open', question: 'Waarom sedimenteert klei pas in het allerlaatste gedeelte van een rivier of in een lagune?', modelAnswer: 'Kleideeltjes zijn heel klein en licht. Ze zakken pas naar de bodem als het water bijna stilstaat (lage stroomsnelheid).', keywords: ['licht', 'klein', 'stroomsnelheid', 'stilstaat', 'lage'] },
+                    { id: 205, para: '1.4', points: 1, type: 'mc', question: 'Hoe noem je een trechtervormige riviermonding die ontstaat als het verschil tussen eb en vloed groter is dan 3 meter?', options: ['Delta', 'Estuarium', 'Lagune', 'Puinwaaier'], correct: 1, explanation: 'Bij een groot getijdenverschil schuurt de monding uit tot een estuarium.' },
+                    { id: 206, para: '1.4', points: 2, type: 'open', question: 'Noem de twee dingen die noodzakelijk zijn voor het ontstaan van duinen op het strand.', modelAnswer: '1) Wind die droog zand van het strand vervoert. 2) Obstakels op het strand (zoals hout of planten/helmgras) die de kracht van de wind breken zodat het zand blijft liggen.', keywords: ['wind', 'zand', 'obstakels', 'planten', 'breken'] },
+                    { id: 207, para: '1.3', points: 1, type: 'mc', question: 'Wat is het verschil tussen verwering en erosie?', options: ['Bij verwering wordt materiaal vervoerd, bij erosie niet', 'Bij verwering breekt gesteente op één plek af; bij erosie wordt het afgesleten en vervoerd', 'Verwering gebeurt door rivieren en erosie door de zon', 'Er is geen verschil'], correct: 1, explanation: 'Erosie omvat altijd transport door water, ijs of wind.' },
+                    { id: 208, para: '1.4', points: 2, type: 'open', question: 'Een rivier maakt een bocht. Aan de binnenbocht stroomt het water langzamer. Leg uit wat er met het zand gebeurt en hoe dat komt.', modelAnswer: 'Het zand wordt aan de binnenkant van de bocht afgezet (sedimentatie), omdat het water daar langzamer stroomt en dus minder zand kan vervoeren.', keywords: ['sedimentatie', 'afgezet', 'langzamer', 'vervoeren'] },
+                    { id: 209, para: '1.4', points: 1, type: 'mc', question: 'Welk sedimentgesteente ontstaat door het langdurig samenpersen van kleilagen?', options: ['Zandsteen', 'Schalie', 'Kalksteen', 'Graniet'], correct: 1, explanation: 'Samenpersing van klei vormt schalie.' },
+                    { id: 210, para: '1.3', points: 2, type: 'open', question: 'Heeft verwering invloed op erosie, of erosie op verwering? Leg je antwoord uit.', modelAnswer: 'Verwering heeft invloed op erosie: het gesteente dat door verwering loskomt, vormt het schuurmiddel waarmee rivieren en gletsjers het dal uitschuren (erosie).', keywords: ['verwering', 'schurende', 'loskomt', 'erosie'] }
+                ]
+            },
+            // Test 3: Kaartvaardigheden & Reliëf
+            {
+                title: "Toets 3: Kaartvaardigheden & Reliëf (Atlas & Hoogtelijnen)",
+                questions: [
+                    { id: 401, para: 'Kaart', points: 1, type: 'mc', question: 'Wat wordt bedoeld met het begrip "reliëf"?', options: ['De grondsoort aan het aardoppervlak', 'Hoogteverschillen in een landschap', 'De stroomsnelheid van een rivier', 'De hoeveelheid neerslag in de bergen'], correct: 1, explanation: 'Reliëf is een ander woord voor hoogteverschillen in een landschap.' },
+                    { id: 402, para: 'Kaart', points: 2, type: 'open', question: 'Op welke vier manieren kan het reliëf op een kaart worden weergegeven?', modelAnswer: 'Met hoogtekleuren, hoogtelijnen, hoogtecijfers en schaduw (reliëfschaduw).', keywords: ['kleuren', 'hoogtelijnen', 'cijfers', 'schaduw'] },
+                    { id: 403, para: 'Kaart', points: 1, type: 'mc', question: 'Hoe zie je op een topografische kaart met hoogtelijnen waar een berghelling het steilst is?', options: ['Waar de hoogtelijnen ver uit elkaar liggen', 'Waar de hoogtelijnen heel dicht op elkaar liggen', 'Waar de kleur blauwgroen is', 'Waar de lijnen stoppen'], correct: 1, explanation: 'Hoe dichter hoogtelijnen bij elkaar liggen, hoe sneller de hoogte verandert (steile helling).' },
+                    { id: 404, para: 'Kaart', points: 2, type: 'open', question: 'Zet Nederland, België en Zwitserland in de juiste volgorde van reliëf, beginnend bij het land met het MINSTE reliëf. Geef een korte toelichting.', modelAnswer: '1. Nederland (hoogste punt Vaalserberg 322 m), 2. België (Signal de Botrange 694 m), 3. Zwitserland (Dufourspitze 4634 m).', keywords: ['Nederland', 'België', 'Zwitserland'] },
+                    { id: 405, para: 'Kaart', points: 1, type: 'mc', question: 'Tussen welke hoogtes ligt een "middelgebergte"?', options: ['0 tot 200 meter', '200 tot 500 meter', '500 tot 1500 meter', 'Hoger dan 1500 meter'], correct: 2, explanation: 'Laagland (0-200m), Heuvelland (200-500m), Middelgebergte (500-1500m), Hooggebergte (>1500m).' },
+                    { id: 406, para: 'Kaart', points: 2, type: 'open', question: 'Wat is het verschil tussen een hooggebergte en een hoogvlakte?', modelAnswer: 'Beide liggen op grote hoogte, maar een hooggebergte heeft veel reliëf (hoge pieken en diepe dalen) terwijl een hoogvlakte juist weinig reliëf heeft (hooggelegen vlak gebied).', keywords: ['weinig reliëf', 'vlak', 'pieken', 'hooggelegen'] },
+                    { id: 407, para: 'Kaart', points: 1, type: 'mc', question: 'Tot welk landschapstype behoort Vlaanderen (het noorden van België)?', options: ['Laagland', 'Heuvelland', 'Middelgebergte', 'Hooggebergte'], correct: 0, explanation: 'Vlaanderen ligt onder de 200 meter en is dus laagland.' },
+                    { id: 408, para: 'Kaart', points: 2, type: 'open', question: 'Hoe bereken je de diepte van een dal op een overzichtskaart in de atlas?', modelAnswer: 'Je berekent het hoogteverschil tussen de ernaast gelegen bergtop en de bodem van het dal (bergtop min dalbodem).', keywords: ['verschil', 'bergtop', 'bodem', 'dal'] }
+                ]
+            },
+            // Test 4: Grote Hoofdstuktoets (20 vragen)
+            {
+                title: "Grote Hoofdstuktoets: H1 Landschappen (20 Vragen)",
+                questions: [
+                    { id: 301, para: '1.1', points: 1, type: 'mc', question: 'Op welke manier zijn volgens geologen de kleine aardkorstplaten ontstaan?', options: ['Door erosie van rivieren', 'Bij het opbreken van het supercontinent Pangea', 'Door het smelten van gletsjers', 'Door chemische verwering'], correct: 1, explanation: 'Het supercontinent Pangea brak op in kleinere aardkorstplaten.' },
+                    { id: 302, para: '1.1', points: 2, type: 'open', question: 'Leg uit hoe fossielen van zeedieren hoog in het Himalaya-gebergte terecht zijn gekomen.', modelAnswer: 'Tussen India en Azië lag vroeger een zee waarin sedimentlagen met schelpen werden afgezet. Door de botsing van de platen is de zeebodem geplooid en omhooggedrukt.', keywords: ['zeebodem', 'geplooid', 'omhooggedrukt', 'botsing'] },
+                    { id: 303, para: '1.1', points: 1, type: 'mc', question: 'Welk van de volgende Europese gebergten is een OUD gebergte?', options: ['Alpen', 'Pyreneeën', 'Ardennen', 'Kaukasus'], correct: 2, explanation: 'De Ardennen zijn een oud, afgesleten middelgebergte/heuvelland.' },
+                    { id: 304, para: '1.2', points: 2, type: 'open', question: 'Waarom komt mechanische verwering door opwarmen en afkoelen veel voor in woestijnen?', modelAnswer: 'In woestijnen zijn er grote temperatuurverschillen tussen de hete dag en koude nacht. Het gesteente zet overdag uit en krimpt s nachts, waardoor het barst.', keywords: ['temperatuurverschil', 'dag', 'nacht', 'uitzetten', 'krimpen'] },
+                    { id: 305, para: '1.2', points: 1, type: 'mc', question: 'Wat gebeurt er met water als het bevriest?', options: ['Het krimpt', 'Het zet uit', 'Het wordt zuur', 'Het verdampt'], correct: 1, explanation: 'Water zet uit wanneer het bevriest.' },
+                    { id: 306, para: '1.3', points: 2, type: 'open', question: 'Wat zijn massabewegingen en welke kracht is de motor hiervan?', modelAnswer: 'Massabewegingen zijn het langs een helling naar beneden vallen, rollen of schuiven van gesteente onder invloed van de zwaartekracht.', keywords: ['vallen', 'rollen', 'glijden', 'schuiven', 'zwaartekracht'] },
+                    { id: 307, para: '1.3', points: 1, type: 'mc', question: 'Onder welke klimaatomstandigheden breidt een gletsjer zich uit?', options: ['Koude winters en hete zomers', 'Milde winters (veel sneeuw) en koele zomers', 'Droge winters en warme zomers', 'Alleen in een woestijnklimaat'], correct: 1, explanation: 'In milde winters valt veel sneeuw en in koele zomers smelt het niet weg.' },
+                    { id: 308, para: '1.4', points: 2, type: 'open', question: 'Zet de vier sedimentsoorten in de juiste volgorde van bovenloop naar benedenloop: klei, stenen, zand, grind.', modelAnswer: '1. Stenen (bovenloop), 2. Grind, 3. Zand, 4. Klei (benedenloop).', keywords: ['stenen', 'grind', 'zand', 'klei'] },
+                    { id: 309, para: '1.4', points: 1, type: 'mc', question: 'Wat is de overeenkomst tussen duinen en zandbanken?', options: ['Ze liggen allebei midden in zee', 'Ze bestaan allebei uit gesedimenteerd zand', 'Ze ontstaan allebei door gletsjers', 'Ze bestaan allebei uit graniet'], correct: 1, explanation: 'Beide bestaan uit gesedimenteerd zand (duinen op het land, zandbanken voor de kust).' },
+                    { id: 310, para: '1.4', points: 2, type: 'open', question: 'Leg uit hoe een rivierdelta ontstaat bij de monding in zee.', modelAnswer: 'Zodra de rivier de zee instroomt, valt de stroomsnelheid weg. Het sediment zinkt naar de bodem, hoopt zich op en de rivier vertakt zich rondom het nieuwe land.', keywords: ['stroomsnelheid', 'sediment', 'vertakt', 'bodem'] },
+                    { id: 311, para: '1.1', points: 1, type: 'mc', question: 'Welk gesteente ontstaat uit het samenpersen van schelpen op de zeebodem?', options: ['Graniet', 'Kalksteen', 'Schalie', 'Zandsteen'], correct: 1, explanation: 'Samengeperste schelpenresten vormen kalksteen.' },
+                    { id: 312, para: '1.2', points: 2, type: 'open', question: 'Waarom ontstaan grotten wel in kalksteen en niet in graniet?', modelAnswer: 'Kalksteen kan oplossen in water en zuren (chemische verwering), terwijl keihard graniet niet oplost.', keywords: ['oplossen', 'zuur', 'water', 'graniet'] },
+                    { id: 313, para: '1.3', points: 1, type: 'mc', question: 'Welke van de drie natuurkrachten (water, ijs, wind) is NIET betrokken bij het uitslijten van een bergdal?', options: ['Water', 'IJs', 'Wind', 'Alle drie zijn betrokken'], correct: 2, explanation: 'Bergdalen worden uitgesleten door rivieren (water) en gletsjers (ijs).' },
+                    { id: 314, para: '1.4', points: 2, type: 'open', question: 'Wat is het verschil tussen een delta en een estuarium?', modelAnswer: 'Bij een delta sedimenteert het riviersediment voor de monding. Bij een estuarium is het verschil tussen eb en vloed groter dan 3 meter waardoor de monding uitschuurt tot een trechter.', keywords: ['sedimenteert', 'eb en vloed', '3 meter', 'trechter'] },
+                    { id: 315, para: 'Kaart', points: 1, type: 'mc', question: 'Op welke hoogte ligt het grootste deel van Nederland?', options: ['Lager dan 200 meter', 'Tussen 200 en 500 meter', 'Tussen 500 en 1500 meter', 'Hoger dan 1500 meter'], correct: 0, explanation: 'Nederland bestaat grotendeels uit laagland (lager dan 200 meter).' },
+                    { id: 316, para: '1.2', points: 2, type: 'open', question: 'Welke twee stoffen zorgen samen voor chemische verwering?', modelAnswer: 'Water (vocht) en zuurstof (samen met zuren).', keywords: ['water', 'zuurstof', 'vocht'] },
+                    { id: 317, para: '1.1', points: 1, type: 'mc', question: 'Waaruit blijkt dat graniet een keihard gesteente is?', options: ['Het lost snel op in regenwater', 'Het andere gesteente dat erboven ligt slijt wel weg, waardoor graniet blijft staan', 'Je kunt het met je nagel bekrassen', 'Het bestaat uit losse kleikorrels'], correct: 1, explanation: 'Zachtere bovenlagen slijten door erosie weg, terwijl het harde graniet overblijft.' },
+                    { id: 318, para: '1.4', points: 2, type: 'open', question: 'Waarom erodeert een rivier in een hooggebergte veel sterker dan in een heuvelland?', modelAnswer: 'In een hooggebergte zijn grotere hoogteverschillen. Daardoor stroomt de rivier sneller en is de schurende werking van stenen en zand veel groter.', keywords: ['hoogteverschillen', 'sneller', 'schurende'] },
+                    { id: 319, para: '1.3', points: 1, type: 'mc', question: 'Hoelang doet een rivier erover om een diep V-dal uit te schuren?', options: ['Tientallen jaren', 'Honderden jaren', 'Miljoenen jaren', 'Enkele maanden'], correct: 2, explanation: 'Erosie is een heel traag proces dat miljoenen jaren duurt.' },
+                    { id: 320, para: '1.4', points: 2, type: 'open', question: 'Wat wordt bedoeld met het begrip "sedimentatie"?', modelAnswer: 'Het neerleggen/afzetten van verweerd materiaal (zoals grind, zand of klei) door water, wind of ijs.', keywords: ['neerleggen', 'afzetten', 'materiaal'] }
+                ]
+            }
+        ];
+
+        /* ==========================================================================
+           2. APPLICATION STATE — VOLLEDIG LOKAAL, GEEN API NODIG
+           ========================================================================== */
+        let activeQuizQuestions = [];
+        let activeQuizTitle = "";
+        let lastBuiltInIndex = 0;
+        let currentQuizIndex = 0;
+        let userAnswers = {};
+        let timerInterval = null;
+        let timerSecondsLeft = 0;
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-message');
+            const textEl = document.getElementById('toast-text');
+            if (toast && textEl) {
+                textEl.innerText = msg;
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 6000);
+            }
+        }
+
+        /* ==========================================================================
+           3. TAB NAVIGATION
+           ========================================================================== */
+        function switchTab(tabName) {
+            if (tabName !== 'home' && !document.body.classList.contains('subject-open')) {
+                showToast('Klik eerst op de Aardrijkskunde-kaart om het vak te openen.');
+                return;
+            }
+            if (tabName === 'home') {
+                document.body.classList.remove('subject-open');
+            }
+            const sections = ['home', 'tests', 'generator', 'quiz', 'grading', 'results', 'learn', 'summary'];
+            sections.forEach(id => {
+                const el = document.getElementById(`section-${id}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            const target = document.getElementById(`section-${tabName}`);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                if (btn.getAttribute('data-tab') === tabName) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            if (tabName === 'learn') {
+                renderFlashcards();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openSubjectCard(subject) {
+            if (subject === 'aardrijkskunde') {
+                document.body.classList.add('subject-open');
+                switchTab('tests');
+            }
+        }
+
+        /* ==========================================================================
+           4. QUIZ ENGINE (START, RENDER, NAVIGATE)
+           ========================================================================== */
+        function startBuiltInQuiz(index) {
+            const test = prebuiltTests[index];
+            if (!test) return;
+            lastBuiltInIndex = index;
+            activeQuizQuestions = test.questions;
+            activeQuizTitle = test.title;
+            initQuizEngine();
+        }
+
+        function initQuizEngine() {
+            currentQuizIndex = 0;
+            userAnswers = {};
+
+            const titleEl = document.getElementById('quiz-main-title');
+            if (titleEl) titleEl.innerText = activeQuizTitle;
+
+            const timerSelect = document.getElementById('timer-select');
+            const timerMinutes = timerSelect ? parseInt(timerSelect.value, 10) : 0;
+            const timerBox = document.getElementById('timer-display-box');
+
+            if (timerInterval) clearInterval(timerInterval);
+
+            if (timerMinutes > 0 && timerBox) {
+                timerSecondsLeft = timerMinutes * 60;
+                timerBox.classList.remove('hidden');
+                updateTimerDisplay();
+                timerInterval = setInterval(() => {
+                    timerSecondsLeft--;
+                    updateTimerDisplay();
+                    if (timerSecondsLeft <= 0) {
+                        clearInterval(timerInterval);
+                        showToast("De tijd is om! Je antwoorden worden nu ingeleverd en nagekeken.");
+                        submitQuizForGrading();
+                    }
+                }, 1000);
+            } else if (timerBox) {
+                timerBox.classList.add('hidden');
+            }
+
+            switchTab('quiz');
+            renderQuestion(0);
+        }
+
+        function updateTimerDisplay() {
+            const timerText = document.getElementById('timer-text');
+            if (!timerText) return;
+            const mins = Math.floor(timerSecondsLeft / 60);
+            const secs = timerSecondsLeft % 60;
+            timerText.innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function renderQuestionPills() {
+            const pillsContainer = document.getElementById('q-nav-pills');
+            if (!pillsContainer) return;
+            pillsContainer.innerHTML = '';
+
+            activeQuizQuestions.forEach((q, idx) => {
+                const pill = document.createElement('button');
+                pill.type = 'button';
+                pill.className = 'q-pill';
+                if (idx === currentQuizIndex) pill.classList.add('current');
+
+                const ans = userAnswers[q.id];
+                const isAnswered = (q.type === 'mc' && ans?.mcChoice !== undefined) ||
+                                   (q.type === 'open' && ans?.openText && ans.openText.trim().length > 0);
+                if (isAnswered) pill.classList.add('answered');
+
+                pill.innerText = idx + 1;
+                pill.addEventListener('click', () => {
+                    currentQuizIndex = idx;
+                    renderQuestion(idx);
+                });
+                pillsContainer.appendChild(pill);
+            });
+        }
+
+        function renderQuestion(index) {
+            const q = activeQuizQuestions[index];
+            if (!q) return;
+            const total = activeQuizQuestions.length;
+
+            const progText = document.getElementById('quiz-progress-text');
+            const progBar = document.getElementById('quiz-progress-bar');
+            const qPara = document.getElementById('q-paragraph');
+            const qPts = document.getElementById('q-points');
+            const qText = document.getElementById('q-text');
+            const container = document.getElementById('q-answer-container');
+
+            if (progText) progText.innerText = `Vraag ${index + 1} van ${total}`;
+            if (progBar) progBar.style.width = `${((index + 1) / total) * 100}%`;
+            if (qPara) qPara.innerText = q.para === 'Kaart' ? 'Kaartvaardigheden' : `§ ${q.para}`;
+            if (qPts) qPts.innerText = `⭐ ${q.points} ${q.points === 1 ? 'Punt' : 'Punten'}`;
+            if (qText) qText.innerText = `${index + 1}. ${q.question}`;
+
+            renderQuestionPills();
+
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (q.type === 'mc') {
+                q.options.forEach((opt, i) => {
+                    const isSelected = userAnswers[q.id]?.mcChoice === i;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = `mc-option ${isSelected ? 'selected' : ''}`;
+                    btn.innerHTML = `
+                        <div style="display:flex;align-items:center;">
+                            <span class="mc-letter">${String.fromCharCode(65 + i)}</span>
+                            <span>${opt}</span>
+                        </div>
+                        <span>${isSelected ? '✅' : ''}</span>
+                    `;
+                    btn.addEventListener('click', () => {
+                        userAnswers[q.id] = { mcChoice: i };
+                        renderQuestion(currentQuizIndex);
+                    });
+                    container.appendChild(btn);
+                });
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.rows = 5;
+                textarea.placeholder = "Typ hier je uitgebreide antwoord in hele zinnen...";
+                textarea.value = userAnswers[q.id]?.openText || '';
+                textarea.addEventListener('input', (e) => {
+                    if (!userAnswers[q.id]) userAnswers[q.id] = {};
+                    userAnswers[q.id].openText = e.target.value;
+                    renderQuestionPills();
+                });
+                container.appendChild(textarea);
+            }
+
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const btnFinish = document.getElementById('btn-finish');
+
+            if (btnPrev) btnPrev.disabled = (index === 0);
+            if (index === total - 1) {
+                if (btnNext) btnNext.classList.add('hidden');
+                if (btnFinish) btnFinish.classList.remove('hidden');
+            } else {
+                if (btnNext) btnNext.classList.remove('hidden');
+                if (btnFinish) btnFinish.classList.add('hidden');
+            }
+        }
+
+        /* ==========================================================================
+           5. OPEN ANTWOORDEN — LOKALE KERNWOORDENCONTROLE
+           ========================================================================== */
+        function submitQuizForGrading() {
+            if (timerInterval) clearInterval(timerInterval);
+            switchTab('grading');
+
+            const openQuestions = activeQuizQuestions.filter(q => q.type === 'open');
+            const statusText = document.getElementById('grading-progress-text');
+            if (statusText) statusText.innerText = 'Open antwoorden vergelijken met kernbegrippen en modelantwoorden...';
+
+            openQuestions.forEach(q => {
+                const studentAnswer = userAnswers[q.id]?.openText || '';
+                if (!studentAnswer.trim()) {
+                    userAnswers[q.id] = {
+                        openText: '',
+                        localGrade: { points: 0, feedback: 'Geen antwoord ingevuld.' }
+                    };
+                    return;
+                }
+                userAnswers[q.id].localGrade = gradeWithFallback(q, studentAnswer);
+            });
+
+            calculateAndDisplayResults();
+        }
+
+        function gradeWithFallback(q, studentAnswer) {
+            const lower = studentAnswer.toLocaleLowerCase('nl-NL');
+            const kws = q.keywords || [];
+            const matched = kws.filter(k => lower.includes(k.toLocaleLowerCase('nl-NL')));
+            const ratio = kws.length ? matched.length / kws.length : (studentAnswer.trim().length >= 35 ? 1 : 0);
+            let pts = 0;
+
+            if (ratio >= 0.7) pts = q.points;
+            else if (ratio >= 0.3) pts = Math.max(1, Math.floor(q.points / 2));
+
+            let fb;
+            if (pts === q.points) {
+                fb = `Je noemt veel belangrijke kernbegrippen (${matched.join(', ')}). Lees het modelantwoord nog even na om te controleren of je uitleg compleet is.`;
+            } else if (pts > 0) {
+                fb = `Je noemt al een deel van de kernbegrippen (${matched.join(', ')}). Vergelijk je uitleg met het modelantwoord en vul ontbrekende stappen aan.`;
+            } else {
+                fb = 'Ik herken nog te weinig kernbegrippen in je antwoord. Gebruik het modelantwoord om te zien welke onderdelen ontbreken.';
+            }
+            return { points: pts, feedback: fb };
+        }
+
+        /* ==========================================================================
+           6. RESULTS & GRADE CALCULATION
+           ========================================================================== */
+        function calculateAndDisplayResults() {
+            let totalPossible = 0;
+            let totalObtained = 0;
+
+            activeQuizQuestions.forEach(q => {
+                totalPossible += q.points;
+                const ans = userAnswers[q.id];
+                if (q.type === 'mc') {
+                    if (ans && ans.mcChoice === q.correct) totalObtained += q.points;
+                } else {
+                    totalObtained += (ans?.localGrade?.points || 0);
+                }
+            });
+
+            const pct = totalPossible > 0 ? Math.round((totalObtained / totalPossible) * 100) : 0;
+
+            // Dutch Grade formula with 55% cesuur (5.5)
+            let grade = 1.0;
+            if (totalObtained > 0 && totalPossible > 0) {
+                const cesuur = totalPossible * 0.55;
+                if (totalObtained >= cesuur) {
+                    grade = 5.5 + ((totalObtained - cesuur) / (totalPossible - cesuur)) * 4.5;
+                } else {
+                    grade = 1.0 + (totalObtained / cesuur) * 4.5;
+                }
+            }
+            const formattedGrade = Math.min(10.0, Math.max(1.0, grade)).toFixed(1);
+
+            const gradeEl = document.getElementById('final-grade');
+            const circleEl = document.getElementById('grade-circle');
+            const badgeEl = document.getElementById('grade-badge');
+            const ptsEl = document.getElementById('result-points');
+            const pctEl = document.getElementById('result-percentage');
+            const statusEl = document.getElementById('result-status');
+
+            if (gradeEl) gradeEl.innerText = formattedGrade;
+            if (ptsEl) ptsEl.innerText = `${totalObtained} / ${totalPossible}`;
+            if (pctEl) pctEl.innerText = `${pct}%`;
+
+            const numGrade = parseFloat(formattedGrade);
+            if (numGrade >= 8.0) {
+                if (circleEl) circleEl.style.borderColor = 'var(--emerald)';
+                if (badgeEl) { badgeEl.className = 'tag tag-emerald'; badgeEl.innerText = 'Uitmuntend gewerkt! 🏆'; }
+                if (statusEl) { statusEl.innerText = 'Ruim Voldoende'; statusEl.style.color = 'var(--emerald)'; }
+            } else if (numGrade >= 5.5) {
+                if (circleEl) circleEl.style.borderColor = 'var(--blue)';
+                if (badgeEl) { badgeEl.className = 'tag tag-blue'; badgeEl.innerText = 'Voldoende behaald! 👍'; }
+                if (statusEl) { statusEl.innerText = 'Voldoende'; statusEl.style.color = 'var(--blue)'; }
+            } else {
+                if (circleEl) circleEl.style.borderColor = 'var(--rose)';
+                if (badgeEl) { badgeEl.className = 'tag tag-rose'; badgeEl.innerText = 'Nog even extra oefenen 📚'; }
+                if (statusEl) { statusEl.innerText = 'Onvoldoende'; statusEl.style.color = 'var(--rose)'; }
+            }
+
+            renderReviewList();
+            switchTab('results');
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            })[char]);
+        }
+
+        function renderReviewList() {
+            const container = document.getElementById('review-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            activeQuizQuestions.forEach((q, idx) => {
+                const ans = userAnswers[q.id];
+                let earned = 0;
+                let userStr = '';
+                let feedbackStr = '';
+
+                if (q.type === 'mc') {
+                    const c = ans?.mcChoice;
+                    if (c === q.correct) earned = q.points;
+                    userStr = c !== undefined ? `Jouw keuze: ${String.fromCharCode(65 + c)}. ${q.options[c]}` : 'Geen antwoord gekozen';
+                    feedbackStr = q.explanation;
+                } else {
+                    earned = ans?.localGrade?.points || 0;
+                    userStr = ans?.openText ? `Jouw antwoord: "${ans.openText}"` : 'Geen antwoord ingevuld';
+                    feedbackStr = ans?.localGrade?.feedback || 'Vergeleken met het modelantwoord.';
+                }
+
+                const stateClass = earned === q.points ? 'correct' : (earned > 0 ? 'partial' : 'wrong');
+                const tagClass = earned === q.points ? 'tag-emerald' : (earned > 0 ? 'tag-amber' : 'tag-rose');
+
+                const div = document.createElement('div');
+                div.className = `review-card ${stateClass}`;
+                div.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+                        <strong style="color:#fff;font-size:0.95rem;">${idx + 1}. ${q.question}</strong>
+                        <span class="tag ${tagClass}" style="flex-shrink:0;">${earned} / ${q.points} pt</span>
+                    </div>
+                    <div class="user-answer-box">${escapeHtml(userStr)}</div>
+                    ${q.type === 'mc'
+                        ? `<div style="font-size:0.85rem;color:var(--emerald);font-weight:700;">✅ Juist antwoord: ${String.fromCharCode(65 + q.correct)}. ${q.options[q.correct]}</div>`
+                        : `<div style="font-size:0.85rem;color:#e2e8f0;"><strong>📖 Modelantwoord:</strong> ${q.modelAnswer}</div>`
+                    }
+                    <div class="feedback-box">💡 <strong>Feedback:</strong> ${feedbackStr}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        /* ==========================================================================
+           7. OEFENMIX — WILLEKEURIGE VRAGEN UIT DE INGEBOUWDE VRAGENBANK
+           ========================================================================== */
+        function shuffleArray(items) {
+            const copy = [...items];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function generatePracticeMix() {
+            const topicIndex = document.getElementById('gen-topic')?.selectedIndex ?? 0;
+            const count = Number.parseInt(document.getElementById('gen-count')?.value || '10', 10);
+            const questionType = document.getElementById('gen-type')?.value || 'mixed';
+            const topicParas = { 1: ['1.1'], 2: ['1.2'], 3: ['1.3'], 4: ['1.4'], 5: ['Kaart'] };
+
+            let pool = prebuiltTests.flatMap(test => test.questions);
+            if (topicParas[topicIndex]) {
+                pool = pool.filter(q => topicParas[topicIndex].includes(q.para));
+            }
+            if (questionType === 'mc' || questionType === 'open') {
+                const typedPool = pool.filter(q => q.type === questionType);
+                if (typedPool.length) pool = typedPool;
+            }
+
+            if (!pool.length) {
+                showToast('Voor deze selectie zijn nog geen vragen beschikbaar. Kies een ander onderwerp.');
+                return;
+            }
+
+            const selected = shuffleArray(pool).slice(0, Math.min(count, pool.length));
+            activeQuizQuestions = selected.map(q => ({ ...q }));
+            const topicNames = ['heel hoofdstuk 1', 'paragraaf 1.1', 'paragraaf 1.2', 'paragraaf 1.3', 'paragraaf 1.4', 'kaartvaardigheden'];
+            activeQuizTitle = `Oefenmix: ${topicNames[topicIndex] || 'aardrijkskunde'} (${selected.length} vragen)`;
+
+            if (selected.length < count) {
+                showToast(`Er zijn ${selected.length} passende vragen in de vragenbank. Je oefenmix bevat ze allemaal.`);
+            }
+            initQuizEngine();
+        }
+
+        /* ==========================================================================
+           8. FLASHCARDS RENDER (WITH SAFE NULL CHECKS)
+           ========================================================================== */
+        function renderFlashcards() {
+            const container = document.getElementById('flashcard-grid');
+            const filterEl = document.getElementById('fc-filter');
+            const searchEl = document.getElementById('fc-search');
+            const countEl = document.getElementById('fc-count');
+
+            if (!container) return;
+
+            const filterVal = filterEl ? filterEl.value : 'all';
+            const searchVal = searchEl ? searchEl.value.toLowerCase().trim() : '';
+
+            const filtered = flashcardsData.filter(card => {
+                const matchPara = (filterVal === 'all' || card.para === filterVal);
+                const matchText = card.term.toLowerCase().includes(searchVal) || card.def.toLowerCase().includes(searchVal);
+                return matchPara && matchText;
+            });
+
+            if (countEl) {
+                countEl.innerText = String(filtered.length);
+            }
+
+            container.innerHTML = '';
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="panel" style="grid-column:1/-1;text-align:center;color:var(--text-muted);">Geen begrippen gevonden voor deze zoekopdracht.</div>`;
+                return;
+            }
+
+            filtered.forEach(card => {
+                const el = document.createElement('div');
+                el.className = 'flashcard';
+                el.addEventListener('click', () => el.classList.toggle('flipped'));
+
+                el.innerHTML = `
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span class="tag tag-emerald">${card.para === 'Kaart' ? 'Kaart' : '§ ' + card.para}</span>
+                                <span style="font-size:0.72rem;color:var(--text-dim);">🔄 Klik om te draaien</span>
+                            </div>
+                            <div class="fc-term">${card.term}</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);text-align:center;">Begrip</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <strong style="color:var(--emerald);font-size:0.85rem;">${card.term}</strong>
+                                <span style="font-size:0.72rem;color:var(--text-dim);">Uitleg</span>
+                            </div>
+                            <div class="fc-def">${card.def}</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim);text-align:center;">Klik om terug te draaien</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        /* ==========================================================================
+           9. INITIALIZE ALL EVENT LISTENERS SAFELY
+           ========================================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('brand-logo')?.addEventListener('click', () => switchTab('home'));
+
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tab = btn.getAttribute('data-tab');
+                    if (tab) switchTab(tab);
+                });
+            });
+
+            document.querySelectorAll('[data-open-subject]').forEach(card => {
+                const openCard = () => openSubjectCard(card.getAttribute('data-open-subject'));
+                card.addEventListener('click', openCard);
+                card.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        openCard();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.start-test-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.getAttribute('data-test-index') || '0', 10);
+                    startBuiltInQuiz(idx);
+                });
+            });
+
+            document.getElementById('btn-generate-mix')?.addEventListener('click', generatePracticeMix);
+
+            document.getElementById('btn-prev')?.addEventListener('click', () => {
+                if (currentQuizIndex > 0) {
+                    currentQuizIndex--;
+                    renderQuestion(currentQuizIndex);
+                }
+            });
+
+            document.getElementById('btn-next')?.addEventListener('click', () => {
+                if (currentQuizIndex < activeQuizQuestions.length - 1) {
+                    currentQuizIndex++;
+                    renderQuestion(currentQuizIndex);
+                }
+            });
+
+            document.getElementById('btn-quit-quiz')?.addEventListener('click', () => {
+                if (timerInterval) clearInterval(timerInterval);
+                switchTab('tests');
+            });
+
+            document.getElementById('btn-finish')?.addEventListener('click', submitQuizForGrading);
+
+            document.getElementById('btn-restart-tests')?.addEventListener('click', () => switchTab('tests'));
+            document.getElementById('btn-retry-same')?.addEventListener('click', () => initQuizEngine());
+            document.getElementById('btn-review-learn')?.addEventListener('click', () => switchTab('learn'));
+
+            document.getElementById('fc-filter')?.addEventListener('change', renderFlashcards);
+            document.getElementById('fc-search')?.addEventListener('input', renderFlashcards);
+
+            document.getElementById('toast-close')?.addEventListener('click', () => {
+                document.getElementById('toast-message')?.classList.add('hidden');
+            });
+
+            renderFlashcards();
+        });
+    </script>
+</body>
+</html>
