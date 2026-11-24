@@ -37,7 +37,7 @@
                 <button class="nav-tab-btn subject-nav" id="nav-tests" data-tab="tests">🌍 Aardrijkskunde</button>
                 <button class="nav-tab-btn subject-nav" id="nav-generator" data-tab="generator">🎲 Oefenmix</button>
                 <button class="nav-tab-btn subject-nav" id="nav-learn" data-tab="learn">🗂️ Begrippen</button>
-                <button class="nav-tab-btn subject-nav" id="nav-summary" data-tab="summary">📊 Uitleg</button>
+                <button class="nav-tab-btn subject-nav" id="nav-summary" data-tab="summary">📚 Samenvattingen</button>
             </nav>
         </div>
     </header>
@@ -109,133 +109,100 @@
              SECTION 1: OEFENTOETSEN OVERZICHT
              ====================================================================== -->
         <section id="section-tests" class="hidden">
-            <div class="panel">
+            <div class="panel subject-intro-panel">
                 <div class="panel-header">
                     <div>
-                        <h2>Kies een oefentoets</h2>
-                        <p class="subtitle">Meerkeuzevragen worden direct nagekeken. Open vragen krijgen een automatische kernwoorden-score die je kunt vergelijken met het modelantwoord. Alles werkt lokaal in je browser; er is geen API-key nodig.</p>
+                        <div class="section-eyebrow">AARDRIJKSKUNDE · HAVO 2</div>
+                        <h2>Maak een oefentoets die bij jou past</h2>
+                        <p class="subtitle">Kies een paragraaf, niveau en aantal vragen. StudyHub stelt lokaal een gevarieerde oefentoets samen met begripsvragen, toepassingsvragen en open uitlegvragen.</p>
                     </div>
-                    <div style="display:flex;align-items:center;gap:0.5rem;">
-                        <label for="timer-select" style="font-size:0.85rem;color:var(--text-muted);font-weight:600;">⏱️ Tijdslimiet:</label>
-                        <select id="timer-select">
-                            <option value="0">Geen tijdslimiet</option>
-                            <option value="15">15 minuten (Korte toets)</option>
-                            <option value="30">30 minuten (Proefwerk)</option>
-                        </select>
-                    </div>
+                    <span class="tag tag-emerald">Werkt zonder API-key</span>
+                </div>
+                <div class="subject-action-row">
+                    <button class="btn btn-emerald" id="open-geo-generator" type="button">✨ Open toetsgenerator</button>
+                    <button class="btn btn-secondary" id="open-geo-summaries" type="button">📚 Bekijk samenvattingen</button>
                 </div>
             </div>
-
-            <div class="grid-tests">
-                <!-- Test 1 -->
-                <div class="test-card">
-                    <div>
-                        <div class="card-meta">
-                            <span class="tag tag-emerald">§ 1.1 &amp; 1.2</span>
-                            <span style="color:var(--text-muted);">⭐ 10 Vragen (15 pt)</span>
-                        </div>
-                        <h3>Gebergtevorming &amp; Verwering</h3>
-                        <p class="card-desc">Platentektoniek, Pangea, ontstaan van de Himalaya, jong vs. oud gebergte, graniet vs. zandsteen, vorstverwering, chemische verwering &amp; kalksteengrotten.</p>
-                    </div>
-                    <button class="btn btn-emerald btn-full start-test-btn" data-test-index="0">Start Toets 1 →</button>
-                </div>
-
-                <!-- Test 2 -->
-                <div class="test-card">
-                    <div>
-                        <div class="card-meta">
-                            <span class="tag tag-blue">§ 1.3 &amp; 1.4</span>
-                            <span style="color:var(--text-muted);">⭐ 10 Vragen (15 pt)</span>
-                        </div>
-                        <h3>Erosie, Rivieren &amp; Sedimentatie</h3>
-                        <p class="card-desc">Massabewegingen, V-dal vs. U-dal (gletsjers), boven-, midden- en benedenloop, sortering van stenen tot klei, delta's, estuaria en duinvorming.</p>
-                    </div>
-                    <button class="btn btn-blue btn-full start-test-btn" data-test-index="1">Start Toets 2 →</button>
-                </div>
-
-                <!-- Test 3 -->
-                <div class="test-card">
-                    <div>
-                        <div class="card-meta">
-                            <span class="tag tag-purple">Vaardigheden</span>
-                            <span style="color:var(--text-muted);">⭐ 8 Vragen (12 pt)</span>
-                        </div>
-                        <h3>Kaartvaardigheden &amp; Reliëf</h3>
-                        <p class="card-desc">Hoogtelijnen aflezen, steile vs. flauwe hellingen, hoogtezones (laagland t/m hooggebergte), schaduwtechniek en voorbeelden uit NL, België &amp; Zwitserland.</p>
-                    </div>
-                    <button class="btn btn-purple btn-full start-test-btn" data-test-index="2">Start Toets 3 →</button>
-                </div>
-
-                <!-- Test 4 -->
-                <div class="test-card featured">
-                    <div class="ribbon">Aanbevolen</div>
-                    <div>
-                        <div class="card-meta">
-                            <span class="tag tag-amber">Compleet H1</span>
-                            <span style="color:var(--text-muted);">⭐ 20 Vragen (30 pt)</span>
-                        </div>
-                        <h3>Grote Hoofdstuktoets H1</h3>
-                        <p class="card-desc">De complete proefwerkvoorbereiding met 20 gevarieerde vragen over alle paragrafen (§1.1 t/m 1.4) en kaartvaardigheden voor een officieel cijfer.</p>
-                    </div>
-                    <button class="btn btn-gradient btn-full start-test-btn" data-test-index="3">Start Eindtoets 🔥</button>
-                </div>
+            <div class="section-headline-row">
+                <div><div class="section-eyebrow">ONDERWERPEN</div><h3>Waar wil je op oefenen?</h3></div>
+                <p>Je kunt ook alles door elkaar oefenen.</p>
+            </div>
+            <div class="grid-tests geo-topic-grid">
+                <article class="test-card"><div><div class="card-meta"><span class="tag tag-emerald">§ 1.1</span><span class="topic-emoji">🏔️</span></div><h3>Gebergten</h3><p class="card-desc">Platentektoniek, Pangea, jonge en oude gebergten en gesteenten.</p></div><button class="btn btn-emerald btn-full geo-topic-start" data-topic="1.1">Oefen dit onderwerp →</button></article>
+                <article class="test-card"><div><div class="card-meta"><span class="tag tag-blue">§ 1.2</span><span class="topic-emoji">🪨</span></div><h3>Verwering</h3><p class="card-desc">Mechanische en chemische verwering, vorst en kalksteengrotten.</p></div><button class="btn btn-blue btn-full geo-topic-start" data-topic="1.2">Oefen dit onderwerp →</button></article>
+                <article class="test-card"><div><div class="card-meta"><span class="tag tag-purple">§ 1.3</span><span class="topic-emoji">🏞️</span></div><h3>Erosie en massabeweging</h3><p class="card-desc">Zwaartekracht, rivieren, gletsjers, V-dalen en U-dalen.</p></div><button class="btn btn-purple btn-full geo-topic-start" data-topic="1.3">Oefen dit onderwerp →</button></article>
+                <article class="test-card"><div><div class="card-meta"><span class="tag tag-amber">§ 1.4</span><span class="topic-emoji">🌊</span></div><h3>Sedimentatie</h3><p class="card-desc">Rivierlopen, grind, zand, klei, delta's, estuaria en duinen.</p></div><button class="btn btn-emerald btn-full geo-topic-start" data-topic="1.4">Oefen dit onderwerp →</button></article>
+                <article class="test-card"><div><div class="card-meta"><span class="tag tag-rose">Vaardigheden</span><span class="topic-emoji">🗺️</span></div><h3>Kaartvaardigheden</h3><p class="card-desc">Reliëf, hoogtelijnen, hellingen en hoogtezones herkennen.</p></div><button class="btn btn-purple btn-full geo-topic-start" data-topic="Kaart">Oefen dit onderwerp →</button></article>
             </div>
         </section>
 
-        <!-- ======================================================================
-             SECTION 2: LOKALE OEFENMIX
-             ====================================================================== -->
         <section id="section-generator" class="hidden">
-            <div class="panel" style="max-width:680px;margin:0 auto;">
-                <h2>🎲 Maak een oefenmix</h2>
-                <p class="subtitle">Stel een oefenmix samen uit de ingebouwde vragenbank. Kies een paragraaf, het aantal vragen en het vraagtype.</p>
-
-                <div style="margin-top:1.25rem;display:flex;flex-direction:column;gap:1rem;">
+            <div class="panel generator-panel" style="max-width:760px;margin:0 auto;">
+                <div class="panel-header">
                     <div>
-                        <label for="gen-topic" style="display:block;font-size:0.85rem;font-weight:700;margin-bottom:0.4rem;">Kies het onderwerp:</label>
-                        <select id="gen-topic" style="width:100%;">
-                            <option value="Heel Hoofdstuk 1: Landschappen (1.1 t/m 1.4 + Kaartvaardigheden)">Heel Hoofdstuk 1: Landschappen (Compleet)</option>
-                            <option value="Paragraaf 1.1: Gebergten ontstaan, gebergten verslijten (Platentektoniek, Himalaya, Graniet)">Paragraaf 1.1: Gebergten ontstaan &amp; verslijten</option>
-                            <option value="Paragraaf 1.2: Gesteente verandert (Mechanische en chemische verwering, grotten)">Paragraaf 1.2: Gesteente verandert (Verwering)</option>
-                            <option value="Paragraaf 1.3: Gesteente wordt verplaatst (Massabeweging, erosie, V-dal en U-dal)">Paragraaf 1.3: Gesteente wordt verplaatst (Erosie)</option>
-                            <option value="Paragraaf 1.4: Waar blijft al het grind, zand en klei (Rivierloop, delta, estuarium, duinen)">Paragraaf 1.4: Sedimentatie, Delta &amp; Estuarium</option>
-                            <option value="Kaartvaardigheden: Hoogtelijnen, reliëf, hoogtezones en dwarsdoorsneden">Kaartvaardigheden: Reliëf &amp; Hoogtelijnen</option>
+                        <div class="section-eyebrow">SLIMME OEFENMAKER</div>
+                        <h2>✨ Aardrijkskunde oefentoets-generator</h2>
+                        <p class="subtitle">StudyHub combineert je lesstof, begrippen en toepassingsvragen tot een nieuwe oefenmix. Vraagvarianten en de volgorde wisselen per toets.</p>
+                    </div>
+                    <span class="tag tag-emerald">100% lokaal</span>
+                </div>
+                <div class="generator-fields">
+                    <div>
+                        <label for="gen-topic">Kies het onderwerp:</label>
+                        <select id="gen-topic">
+                            <option value="all">Heel hoofdstuk 1 · Landschappen</option>
+                            <option value="1.1">§ 1.1 · Gebergten ontstaan en verslijten</option>
+                            <option value="1.2">§ 1.2 · Gesteente verandert</option>
+                            <option value="1.3">§ 1.3 · Gesteente wordt verplaatst</option>
+                            <option value="1.4">§ 1.4 · Grind, zand en klei</option>
+                            <option value="Kaart">Kaartvaardigheden · Reliëf en hoogtelijnen</option>
                         </select>
                     </div>
-
-                    <div class="grid-2">
+                    <div class="generator-two-col">
                         <div>
-                            <label for="gen-count" style="display:block;font-size:0.85rem;font-weight:700;margin-bottom:0.4rem;">Aantal vragen:</label>
-                            <select id="gen-count" style="width:100%;">
-                                <option value="6">6 vragen (Snelle check)</option>
-                                <option value="10" selected>10 vragen (Standaard toets)</option>
-                                <option value="15">15 vragen (Uitgebreid)</option>
+                            <label for="gen-count">Aantal vragen:</label>
+                            <select id="gen-count">
+                                <option value="6">6 · Snelle check</option>
+                                <option value="10" selected>10 · Standaard oefentoets</option>
+                                <option value="15">15 · Uitgebreid</option>
+                                <option value="20">20 · Proefwerktraining</option>
                             </select>
                         </div>
                         <div>
-                            <label for="gen-type" style="display:block;font-size:0.85rem;font-weight:700;margin-bottom:0.4rem;">Soort vragen:</label>
-                            <select id="gen-type" style="width:100%;">
-                                <option value="mixed" selected>Gemengd</option>
+                            <label for="gen-difficulty">Moeilijkheid:</label>
+                            <select id="gen-difficulty">
+                                <option value="basis">Basis · Begrippen en herkenning</option>
+                                <option value="havo" selected>Havo 2 · Begrijpen en toepassen</option>
+                                <option value="uitdaging">Uitdaging · Inzicht en verbanden</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="generator-two-col">
+                        <div>
+                            <label for="gen-type">Soort vragen:</label>
+                            <select id="gen-type">
+                                <option value="mixed" selected>Gemengd · Meerkeuze en open</option>
                                 <option value="mc">Alleen meerkeuze</option>
                                 <option value="open">Alleen open vragen</option>
                             </select>
                         </div>
+                        <div>
+                            <label for="timer-select">Tijdslimiet:</label>
+                            <select id="timer-select">
+                                <option value="0">Geen tijdslimiet</option>
+                                <option value="15">15 minuten</option>
+                                <option value="30">30 minuten</option>
+                            </select>
+                        </div>
                     </div>
-
-                    <button id="btn-generate-mix" class="btn btn-amber btn-full">🎲 Maak mijn oefenmix</button>
-
-                    <div id="gen-loading" class="hidden" style="text-align:center;padding:1.5rem 0;">
-                        <div class="spinner"></div>
-                        <p style="font-weight:700;color:var(--amber);">StudyHub stelt een oefenmix samen...</p>
-                        <p style="font-size:0.8rem;color:var(--text-muted);">Je toets start automatisch.</p>
-                    </div>
+                    <div class="generator-note"><strong>Hoe maakt StudyHub een toets?</strong><span>De generator gebruikt een gecontroleerde vragenbank, begrippenkaarten en nieuwe varianten. Getallen, voorbeelden, antwoordvolgorde en vraagcombinaties veranderen. Dit is slimme lokale automatisering, geen online AI-model.</span></div>
+                    <button id="btn-generate-mix" class="btn btn-amber btn-full">✨ Maak mijn oefentoets</button>
+                    <div id="gen-loading" class="hidden generator-loading" role="status" aria-live="polite"><div class="spinner"></div><p>StudyHub stelt je oefentoets samen...</p><span>Vragen worden geselecteerd en gecontroleerd.</span></div>
+                    <p class="generator-footnote">Open antwoorden worden op kernbegrippen vergeleken. Bekijk altijd ook het modelantwoord.</p>
                 </div>
             </div>
         </section>
 
-        <!-- ======================================================================
-             SECTION 3: ACTIEVE TOETS ENGINE
-             ====================================================================== -->
         <section id="section-quiz" class="hidden">
             <div class="panel" style="max-width:820px;margin:0 auto;">
                 <div class="quiz-top-bar">
@@ -362,8 +329,51 @@
              ====================================================================== -->
         <section id="section-summary" class="hidden">
             <div class="panel">
-                <h2>📊 Overzichtsschema's &amp; Visuele Uitleg (H1)</h2>
-                <p class="subtitle">De belangrijkste plaatjes en tabellen uit het boek op een rij voor snelle herhaling.</p>
+                <h2>📊 Samenvattingen &amp; schema's · Landschappen</h2>
+                <p class="subtitle">Bekijk eerst de uitklapbare samenvattingen en herhaal daarna met de schema's en tabellen.</p>
+            </div>
+
+            <div class="summary-intro">
+                <div class="section-eyebrow">SAMENVATTINGEN · AARDRIJKSKUNDE</div>
+                <h3>Hoofdstuk 1 · Landschappen</h3>
+                <p class="subtitle">Klap een onderdeel open om de belangrijkste begrippen, processen en verschillen te herhalen.</p>
+            </div>
+            <div class="summary-accordion-list">
+                <details class="summary-accordion" open>
+                    <summary><span><b>§ 1.1</b> Gebergten ontstaan en verslijten</span><span class="summary-chevron">⌄</span></summary>
+                    <div class="summary-content">
+                        <p><b>Platentektoniek</b> is het bewegen van aardkorstplaten. Het vroegere supercontinent <b>Pangea</b> brak op in losse platen. Als platen naar elkaar toe bewegen en botsen, kan een gebergte ontstaan. De botsing van de Indische plaat met de Euraziatische plaat hangt samen met het ontstaan van de Himalaya.</p>
+                        <ul><li><b>Jong gebergte:</b> hoge, spitse toppen en diepe, steile dalen.</li><li><b>Oud gebergte:</b> lagere, afgeronde toppen en ondiepere dalen. Door lange verwering en erosie zijn de vormen afgesleten.</li><li><b>Stollingsgesteente:</b> ontstaat als magma stolt, bijvoorbeeld graniet. Het is hard en bevat geen fossielen.</li><li><b>Sedimentgesteente:</b> ontstaat uit samengeperste lagen sediment. Het kan fossielen bevatten.</li></ul>
+                    </div>
+                </details>
+                <details class="summary-accordion">
+                    <summary><span><b>§ 1.2</b> Gesteente verandert · Verwering</span><span class="summary-chevron">⌄</span></summary>
+                    <div class="summary-content">
+                        <p><b>Verwering</b> is het afbreken of veranderen van gesteente op dezelfde plek. Bij verwering wordt het materiaal niet meteen vervoerd.</p>
+                        <ul><li><b>Mechanische verwering:</b> gesteente valt uiteen, maar de samenstelling verandert niet. Voorbeelden zijn vorstverwering, temperatuurverschillen en plantenwortels die in spleten groeien.</li><li><b>Vorstverwering:</b> water komt in een spleet, bevriest en zet uit. Daardoor kan de spleet groter worden.</li><li><b>Chemische verwering:</b> de samenstelling verandert of gesteente lost op door reacties met water, zuurstof of zuren.</li><li>Chemische verwering gaat vaak sneller in een warm en vochtig klimaat. Zuur water kan kalksteen langzaam oplossen en zo grotten vormen.</li></ul>
+                    </div>
+                </details>
+                <details class="summary-accordion">
+                    <summary><span><b>§ 1.3</b> Gesteente wordt verplaatst · Erosie</span><span class="summary-chevron">⌄</span></summary>
+                    <div class="summary-content">
+                        <p><b>Massabewegingen</b> zijn het naar beneden bewegen van materiaal langs een helling door de zwaartekracht. Materiaal kan vallen, rollen of schuiven.</p>
+                        <ul><li><b>Erosie</b> is het uitschuren en meenemen van materiaal door bewegend water, ijs of wind.</li><li>Verwering maakt gesteente los; dat losse materiaal kan daarna bij erosie worden meegenomen en als schuurmiddel werken.</li><li><b>V-dal:</b> een rivier snijdt vooral de bodem uit. Het dal krijgt een V-vorm.</li><li><b>U-dal:</b> een gletsjer schuurt de bodem en zijkanten breed uit. Daardoor ontstaat een brede, relatief vlakke dalbodem met steile wanden.</li></ul>
+                    </div>
+                </details>
+                <details class="summary-accordion">
+                    <summary><span><b>§ 1.4</b> Waar blijft grind, zand en klei? · Sedimentatie</span><span class="summary-chevron">⌄</span></summary>
+                    <div class="summary-content">
+                        <p><b>Sedimentatie</b> is het neerleggen of afzetten van materiaal wanneer water of wind minder kracht heeft om het te vervoeren.</p>
+                        <ul><li><b>Bovenloop:</b> groot verval en veel erosie; vooral grote stenen en grind.</li><li><b>Middenloop:</b> het verval wordt kleiner; grind en zand worden vervoerd en afgezet.</li><li><b>Benedenloop:</b> het water stroomt rustiger; fijn materiaal zoals klei kan bezinken.</li><li><b>Delta:</b> vertakte riviermonding waar veel sediment wordt afgezet.</li><li><b>Estuarium:</b> trechtervormige riviermonding die samenhangt met een groot verschil tussen eb en vloed.</li><li><b>Duinen:</b> ontstaan wanneer de wind droog zand verplaatst en obstakels, zoals planten, het zand laten ophopen.</li></ul>
+                    </div>
+                </details>
+                <details class="summary-accordion">
+                    <summary><span><b>Kaartvaardigheden</b> Reliëf, hoogtelijnen en hoogtezones</span><span class="summary-chevron">⌄</span></summary>
+                    <div class="summary-content">
+                        <p><b>Reliëf</b> betekent hoogteverschillen in het landschap. Op kaarten kan reliëf worden weergegeven met hoogtekleuren, hoogtelijnen, hoogtegetallen en schaduwen.</p>
+                        <ul><li><b>Hoogtelijnen</b> verbinden plaatsen met dezelfde hoogte. Liggen ze dicht bij elkaar, dan is de helling steil; liggen ze ver uit elkaar, dan is de helling flauw.</li><li><b>Laagland:</b> 0–200 meter.</li><li><b>Heuvelland:</b> 200–500 meter.</li><li><b>Middelgebergte:</b> 500–1500 meter.</li><li><b>Hooggebergte:</b> hoger dan 1500 meter.</li><li>Een hoogteverschil bereken je door de lagere hoogte van de hogere hoogte af te trekken.</li></ul>
+                    </div>
+                </details>
             </div>
 
             <div class="grid-2">
@@ -492,7 +502,7 @@
         <section id="section-math" class="math-app hidden">
 <section id="overviewView">
   <div class="hero"><div><div class="eyebrow">STUDYHUB · WISKUNDE</div><h1>Reken met vertrouwen.<br><span>Oefen stap voor stap.</span></h1><p>Werk aan de hoofdstukken uit je lesmateriaal. Kies een onderwerp, beantwoord de vragen en bekijk direct de uitleg.</p></div><div class="hero-art"><div class="hero-chip chip-one">x² + y²</div><div class="math-symbol">∑</div><div class="hero-chip chip-two">√  ·  π  ·  %</div></div></div>
-  <div class="stats"><div class="stat"><span class="stat-icon">📘</span><div><strong>4 hoofdstukken</strong><span>Uit je aangeleverde lesmateriaal</span></div></div><div class="stat"><span class="stat-icon">✍️</span><div><strong id="totalQuestions">32 oefenvragen</strong><span>Zelfstandig gemaakte oefenvragen</span></div></div><div class="stat"><span class="stat-icon">📈</span><div><strong id="progressStat">0 vragen</strong><span>Door jou beantwoord op dit apparaat</span></div></div></div>
+  <div class="stats"><div class="stat"><span class="stat-icon">📘</span><div><strong>4 hoofdstukken</strong><span>Uit je aangeleverde lesmateriaal</span></div></div><div class="stat"><span class="stat-icon">✍️</span><div><strong id="totalQuestions">93 oefenvarianten</strong><span>Basisvragen en nieuwe rekenvarianten</span></div></div><div class="stat"><span class="stat-icon">📈</span><div><strong id="progressStat">0 vragen</strong><span>Door jou beantwoord op dit apparaat</span></div></div></div>
   <div class="section-head"><div><div class="eyebrow">KIES JE ONDERWERP</div><h2>Jouw hoofdstukken</h2></div><p>Open een hoofdstuk om te oefenen.</p></div>
   <div class="chapter-grid" id="chapterGrid">
     <a class="chapter-card" href="#practice" data-chapter="1"><div class="chapter-top"><span class="chapter-icon">ƒ(x)</span><span class="chapter-tag">HOOFDSTUK 1</span></div><h3>Lineaire formules</h3><p>Lineaire verbanden, grafieken, startgetal, hellingsgetal en formules opstellen.</p><div class="chapter-footer"><span>Start oefenen →</span><small>1.1 t/m 1.7</small></div></a>
@@ -505,7 +515,59 @@
   <div class="content-grid">
     <article class="info-card"><h3>📐 Formulekaart</h3><p>Een handig overzicht met de regels die je bij deze hoofdstukken nodig hebt.</p><button class="btn btn-light" data-view="formulaView">Bekijk formulekaart</button></article>
   </div>
-  <p class="muted-note">De oefenvragen op StudyHub zijn nieuw opgesteld op basis van de onderwerpen uit je lesmateriaal. Ze zijn bedoeld om mee te oefenen, niet als officiële toets.</p>
+  <div class="summary-area math-summary-area">
+    <div class="section-head"><div><div class="eyebrow">SAMENVATTINGEN</div><h2>Herhaal elk hoofdstuk</h2></div><p>Klik op een hoofdstuk om alle paragrafen open te klappen.</p></div>
+    <div class="summary-accordion-list">
+      <details class="summary-accordion">
+        <summary><span><b>H1</b> Lineaire formules <small>§ 1.1 t/m 1.7</small></span><span class="summary-chevron">⌄</span></summary>
+        <div class="summary-content">
+          <h4>§ 1.1 Lineaire verbanden</h4><p>Bij een lineair verband verandert de uitkomst steeds met hetzelfde aantal als de invoer met gelijke stappen toeneemt. Je herkent dit aan een constante toename in een tabel. De formule heeft de vorm <b>y = ax + b</b>.</p>
+          <h4>§ 1.2 Formules van lijnen</h4><p>In <b>y = ax + b</b> is <b>a</b> het hellingsgetal: de verandering van y per stap van x. <b>b</b> is het startgetal: de waarde van y bij x = 0. Bij een situatieverhaal beschrijf je wat deze getallen betekenen.</p>
+          <h4>§ 1.3 Lijnen schetsen bij formules</h4><p>Maak een tabel met x-waarden, vul die in de formule in en bereken de bijbehorende y-waarden. Zet de punten in een assenstelsel en trek de rechte lijn door de punten.</p>
+          <h4>§ 1.4 Lineaire formules opstellen</h4><p>Bepaal eerst hoeveel y verandert als x één stap toeneemt. Dat is het hellingsgetal. Bepaal daarna de beginwaarde bij x = 0. Vul beide in bij <b>y = ax + b</b>.</p>
+          <h4>§ 1.5 Recht evenredig</h4><p>Een recht evenredig verband is een speciaal lineair verband met <b>b = 0</b>. De formule heeft de vorm <b>y = ax</b> en de grafiek gaat door de oorsprong (0, 0). Als x twee keer zo groot wordt, wordt y ook twee keer zo groot.</p>
+          <h4>§ 1.6 Lijn door twee punten</h4><p>Bereken eerst het hellingsgetal met <b>a = (y₂ − y₁) ÷ (x₂ − x₁)</b>. Vul daarna één van de punten in bij <b>y = ax + b</b> om het startgetal b te vinden.</p>
+          <h4>§ 1.7 Gemengde opdrachten</h4><p>Combineer tabellen, grafieken, situaties, recht evenredige verbanden en het opstellen van formules. Controleer of de toename constant is en of de gevonden formule bij de gegevens past.</p>
+          <div class="formula">y = ax + b &nbsp;·&nbsp; recht evenredig: y = ax</div>
+        </div>
+      </details>
+      <details class="summary-accordion">
+        <summary><span><b>H3</b> Gelijkvormigheid <small>§ 3.1 t/m 3.5</small></span><span class="summary-chevron">⌄</span></summary>
+        <div class="summary-content">
+          <h4>§ 3.1 Vergroten</h4><p>Bij een vergroting blijft de vorm hetzelfde. Overeenkomstige hoeken blijven even groot en alle overeenkomstige zijden worden met dezelfde factor vermenigvuldigd.</p>
+          <h4>§ 3.2 Rekenen met de factor</h4><p>De vergrotingsfactor bereken je met <b>nieuwe lengte ÷ oude lengte</b>. Een factor groter dan 1 vergroot; een factor tussen 0 en 1 verkleint. Vermenigvuldig een bekende zijde met de factor om de nieuwe lengte te berekenen.</p>
+          <h4>§ 3.3 Gelijkvormige figuren</h4><p>Figuren zijn gelijkvormig als de overeenkomstige hoeken even groot zijn en de overeenkomstige zijden dezelfde verhouding hebben. De figuren mogen wel verschillend groot zijn. Let goed op welke zijden en hoeken bij elkaar horen.</p>
+          <h4>§ 3.4 Rekenen met gelijkvormigheid</h4><p>Gebruik de vaste verhouding tussen overeenkomstige zijden om een onbekende lengte te berekenen. Zet maten eerst in dezelfde eenheid en werk eventueel met een verhoudingstabel.</p>
+          <h4>§ 3.5 Gemengde opdrachten</h4><p>Combineer vergrotingsfactoren, gelijkvormige figuren, schaal en het controleren of alle verhoudingen hetzelfde zijn. Als twee verhoudingen verschillen, zijn de figuren niet gelijkvormig.</p>
+          <div class="formula">factor = nieuwe lengte ÷ oude lengte</div>
+        </div>
+      </details>
+      <details class="summary-accordion">
+        <summary><span><b>H4</b> Wortels <small>§ 4.1 t/m 4.5</small></span><span class="summary-chevron">⌄</span></summary>
+        <div class="summary-content">
+          <h4>§ 4.1 Wortels van getallen</h4><p>De wortel van een positief getal is het niet-negatieve getal dat je met zichzelf vermenigvuldigt om het getal onder het wortelteken te krijgen. Bijvoorbeeld: √49 = 7, want 7² = 49. Een wortel uit een negatief getal bestaat niet binnen de gewone reële getallen. Benader een wortel door kwadraten te vergelijken.</p>
+          <h4>§ 4.2 Wortels optellen en aftrekken</h4><p>Je telt worteltermen alleen samen als het getal onder het wortelteken hetzelfde is. Tel dan de getallen vóór de wortel op of trek ze van elkaar af. Bijvoorbeeld: 3√5 + 2√5 = 5√5.</p>
+          <h4>§ 4.3 Wortels vermenigvuldigen</h4><p>Vermenigvuldig de getallen buiten de wortels met elkaar en vermenigvuldig de getallen onder de wortels met elkaar. Gebruik <b>√a × √b = √(a × b)</b> voor niet-negatieve a en b.</p>
+          <h4>§ 4.4 Wortels vereenvoudigen</h4><p>Zoek onder het wortelteken naar een factor die een kwadraat is. Haal de wortel van die factor naar buiten. Bijvoorbeeld: √72 = √(36 × 2) = 6√2.</p>
+          <h4>§ 4.5 Gemengde opdrachten</h4><p>Bij samengestelde sommen moet je soms eerst vermenigvuldigen, vereenvoudigen en daarna gelijksoortige wortels optellen of aftrekken. Let goed op de volgorde en op mintekens.</p>
+          <div class="formula">√(a × b) = √a × √b &nbsp;·&nbsp; √72 = 6√2</div>
+        </div>
+      </details>
+      <details class="summary-accordion">
+        <summary><span><b>H6</b> De stelling van Pythagoras <small>§ 6.1 t/m 6.6</small></span><span class="summary-chevron">⌄</span></summary>
+        <div class="summary-content">
+          <h4>§ 6.1 De stelling van Pythagoras</h4><p>De stelling geldt in een rechthoekige driehoek. De langste zijde tegenover de rechte hoek heet de schuine zijde. De oppervlakte van het vierkant op de schuine zijde is gelijk aan de som van de oppervlakten van de vierkanten op de rechthoekszijden.</p>
+          <h4>§ 6.2 Een zijde berekenen</h4><p>Als de schuine zijde onbekend is, tel je de kwadraten van de rechthoekszijden op en trek je daar de wortel uit. Als een rechthoekszijde onbekend is, trek je het bekende rechthoekszijdekwadraat af van het kwadraat van de schuine zijde en neem je de wortel.</p>
+          <h4>§ 6.3 De stelling toepassen</h4><p>Herken in een praktijksituatie een rechthoekige driehoek, bijvoorbeeld bij een diagonaal in een rechthoek. Teken zo nodig de driehoek, noteer de bekende zijden en kies de passende berekening.</p>
+          <h4>§ 6.4 Pythagoras in de kubus en in de balk</h4><p>Bereken bij een balk eerst een diagonaal van het grondvlak. Gebruik daarna opnieuw Pythagoras met die diagonaal en de hoogte om de lichaamsdiagonaal te vinden.</p>
+          <h4>§ 6.5 Pythagoras in de piramide</h4><p>Maak een doorsnede waarin een rechthoekige driehoek ontstaat. Gebruik de hoogte van de piramide en een afstand in het grondvlak (bij een vierkant vaak de helft van de diagonaal) als rechthoekszijden.</p>
+          <h4>§ 6.6 Gemengde opdrachten</h4><p>Pas de stelling toe in verschillende figuren en situaties. Controleer steeds of er echt een rechte hoek is en of je de schuine zijde goed hebt aangewezen.</p>
+          <div class="formula">a² + b² = c² &nbsp;·&nbsp; c = √(a² + b²)</div>
+        </div>
+      </details>
+    </div>
+  </div>
+  <p class="muted-note">De oefenvragen zijn oefenmateriaal op basis van de onderwerpen uit je lesmateriaal; het zijn geen officiële toetsvragen.</p>
 </section>
 
 <section id="mathMixView" class="hidden">
@@ -536,12 +598,21 @@
           <option value="10" selected>10 vragen · Standaard oefentoets</option>
           <option value="15">15 vragen · Uitgebreid</option>
           <option value="20">20 vragen · Grote oefentoets</option>
+          <option value="30">30 vragen · Extra oefenen</option>
+        </select>
+      </div>
+      <div>
+        <label for="math-mix-difficulty">Moeilijkheid:</label>
+        <select id="math-mix-difficulty">
+          <option value="basis">Basis · Instappen</option>
+          <option value="havo" selected>Havo 2 · Proefwerkniveau</option>
+          <option value="challenge">Uitdagend · Extra inzicht</option>
         </select>
       </div>
     </div>
 
     <div class="math-generator-note">
-      <strong>Hoe werkt de generator?</strong> De oefentoets wordt automatisch samengesteld uit de Wiskunde-vragenbank. Er is geen API-key nodig. Dit is dus een slimme offline generator en geen echte AI die nieuwe vragen bedenkt.
+      <strong>Hoe werkt de slimme generator?</strong> StudyHub maakt telkens nieuwe rekenvarianten met andere getallen, situaties en antwoordopties. De generator werkt volledig lokaal, zonder account, API-key of kosten. Het is geen online AI-model; de vragen komen uit gecontroleerde vraagpatronen op basis van je hoofdstukken.
     </div>
 
     <button id="math-generate-mix" class="btn btn-amber btn-full">✨ Genereer mijn oefentoets</button>
@@ -550,7 +621,7 @@
       <p>StudyHub stelt je oefentoets samen...</p>
       <span>Je toets start automatisch.</span>
     </div>
-    <p class="math-generator-footnote">Alle vragen worden direct nagekeken. Na elk antwoord krijg je uitleg.</p>
+    <p class="math-generator-footnote">Alle vragen worden direct nagekeken. Na elk antwoord krijg je een uitgewerkte stap-voor-stap uitleg.</p>
   </div>
 </section>
 

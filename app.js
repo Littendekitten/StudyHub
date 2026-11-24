@@ -413,25 +413,36 @@
             calculateAndDisplayResults();
         }
 
+        function normalizeStudyText(value) {
+            return String(value || '')
+                .toLocaleLowerCase('nl-NL')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
         function gradeWithFallback(q, studentAnswer) {
-            const lower = studentAnswer.toLocaleLowerCase('nl-NL');
-            const kws = q.keywords || [];
-            const matched = kws.filter(k => lower.includes(k.toLocaleLowerCase('nl-NL')));
-            const ratio = kws.length ? matched.length / kws.length : (studentAnswer.trim().length >= 35 ? 1 : 0);
-            let pts = 0;
+            const answer = normalizeStudyText(studentAnswer);
+            const keywords = (q.keywords || []).map(normalizeStudyText).filter(Boolean);
+            const matched = keywords.filter(word => answer.includes(word));
+            const missing = keywords.filter(word => !answer.includes(word));
+            const ratio = keywords.length ? matched.length / keywords.length : (answer.length >= 35 ? 1 : 0);
+            let points = 0;
 
-            if (ratio >= 0.7) pts = q.points;
-            else if (ratio >= 0.3) pts = Math.max(1, Math.floor(q.points / 2));
+            if (ratio >= 0.65 || (matched.length >= 3 && ratio >= 0.5)) points = q.points;
+            else if (ratio >= 0.25 || matched.length >= 1) points = Math.max(1, Math.floor(q.points / 2));
 
-            let fb;
-            if (pts === q.points) {
-                fb = `Je noemt veel belangrijke kernbegrippen (${matched.join(', ')}). Lees het modelantwoord nog even na om te controleren of je uitleg compleet is.`;
-            } else if (pts > 0) {
-                fb = `Je noemt al een deel van de kernbegrippen (${matched.join(', ')}). Vergelijk je uitleg met het modelantwoord en vul ontbrekende stappen aan.`;
+            let feedback;
+            if (points === q.points) {
+                feedback = `Sterk antwoord. Je noemt belangrijke onderdelen${matched.length ? ` (${matched.slice(0, 5).join(', ')})` : ''}. Lees het modelantwoord nog even na om te controleren of je uitleg volledig is.`;
+            } else if (points > 0) {
+                feedback = `Je hebt al een deel goed. Deze onderdelen herken ik: ${matched.slice(0, 5).join(', ')}. Denk ook aan: ${missing.slice(0, 4).join(', ') || 'de volledige uitleg en het verband tussen de begrippen'}.`;
             } else {
-                fb = 'Ik herken nog te weinig kernbegrippen in je antwoord. Gebruik het modelantwoord om te zien welke onderdelen ontbreken.';
+                feedback = `Je antwoord bevat nog te weinig belangrijke onderdelen. Gebruik het modelantwoord als stappenplan en probeer de vraag daarna nog eens in je eigen woorden te beantwoorden.`;
             }
-            return { points: pts, feedback: fb };
+            return { points, feedback, matchedKeywords: matched, missingKeywords: missing };
         }
 
         /* ==========================================================================
@@ -556,35 +567,123 @@
             return copy;
         }
 
+        function keywordSeeds(definition) {
+            const stopWords = new Set(['de','het','een','en','of','van','door','met','als','dat','dit','die','wordt','worden','zijn','is','op','in','uit','bij','naar','voor','zonder','waardoor','zoals','kan','kunnen','dan','ook','wel','niet','zelfde','plek','materiaal']);
+            return [...new Set(normalizeStudyText(definition).split(' ').filter(word => word.length >= 5 && !stopWords.has(word)))].slice(0, 7);
+        }
+
+        function makeGeoMultipleChoice(id, para, question, correctText, distractors, explanation, level = 'basis') {
+            const unique = [...new Set([correctText, ...distractors])].slice(0, 4);
+            const options = shuffleArray(unique);
+            return {
+                id, para, points: 1, type: 'mc', level, question,
+                options,
+                correct: options.indexOf(correctText),
+                explanation
+            };
+        }
+
+        const geoApplicationQuestions = [
+            {id:'scenario-1',para:'1.1',points:2,type:'open',level:'challenge',question:'Een gebergte heeft hoge, spitse toppen en diepe, steile dalen. Leg uit of dit eerder een jong of oud gebergte is en noem een kenmerk.',modelAnswer:'Dit is eerder een jong gebergte. Jonge gebergten hebben hoge, spitse toppen en diepe, steile dalen.',keywords:['jong gebergte','spitse toppen','diepe dalen']},
+            {id:'scenario-2',para:'1.1',points:1,type:'mc',level:'havo',question:'Twee aardkorstplaten botsen tegen elkaar. Welk landschap kan daardoor ontstaan?',options:['Een gebergte','Een delta','Een duinlandschap','Een estuarium'],correct:0,explanation:'Bij het naar elkaar toe bewegen en botsen van aardkorstplaten kan gebergtevorming plaatsvinden.'},
+            {id:'scenario-3',para:'1.2',points:2,type:'open',level:'challenge',question:'Water komt in een rotsspleet, bevriest en zet uit. Leg uit welk soort verwering dit is en waarom de spleet groter kan worden.',modelAnswer:'Dit is mechanische verwering, namelijk vorstverwering. Het water bevriest en zet uit, waardoor de druk in de spleet groter wordt en de spleet wijder kan worden.',keywords:['mechanische verwering','vorstverwering','bevriest','zet uit','spleet']},
+            {id:'scenario-4',para:'1.2',points:1,type:'mc',level:'havo',question:'In welke omstandigheden verloopt chemische verwering volgens de leerstof vaak het snelst?',options:['Warm en vochtig','Koud en droog','Alleen bij vorst','Alleen in een woestijn'],correct:0,explanation:'Warmte en vocht bevorderen veel chemische reacties en versnellen chemische verwering.'},
+            {id:'scenario-5',para:'1.3',points:2,type:'open',level:'havo',question:'Leg het verschil uit tussen verwering en erosie.',modelAnswer:'Bij verwering breekt gesteente op één plek af of verandert het. Bij erosie wordt materiaal door water, ijs of wind uitgesleten en meegenomen.',keywords:['verwering','op een plek','erosie','water','ijs','wind','meegenomen']},
+            {id:'scenario-6',para:'1.3',points:1,type:'mc',level:'basis',question:'Welke kracht zorgt ervoor dat los gesteente langs een helling naar beneden beweegt?',options:['Zwaartekracht','Magnetisme','Zonlicht','Getijdenwerking'],correct:0,explanation:'Massabewegingen worden veroorzaakt door de zwaartekracht.'},
+            {id:'scenario-7',para:'1.3',points:1,type:'mc',level:'basis',question:'Welk dal hoort bij uitschuring door een rivier?',options:['V-dal','U-dal','Delta','Estuarium'],correct:0,explanation:'Een rivier snijdt vooral de bodem uit en kan zo een V-dal vormen.'},
+            {id:'scenario-8',para:'1.3',points:1,type:'mc',level:'basis',question:'Welk dal wordt breed uitgesleten door een gletsjer?',options:['U-dal','V-dal','Kloofdelta','Duinvallei'],correct:0,explanation:'Een gletsjer schuurt zowel de dalbodem als de zijkanten uit; zo ontstaat een U-dal.'},
+            {id:'scenario-9',para:'1.4',points:2,type:'open',level:'challenge',question:'Een rivier stroomt richting zee en wordt steeds langzamer. Leg uit waarom eerst grover materiaal en later fijner materiaal kan worden afgezet.',modelAnswer:'Als de stroomsnelheid afneemt, kan de rivier minder materiaal vervoeren. Grote en zware deeltjes worden eerder afgezet; kleine en lichte kleideeltjes bezinken pas bij een lage stroomsnelheid.',keywords:['stroomsnelheid','minder vervoeren','grote','zware','kleine','lichte','klei','afgezet']},
+            {id:'scenario-10',para:'1.4',points:1,type:'mc',level:'havo',question:'Een rivier vertakt zich bij de monding en zet veel sediment af. Hoe heet deze riviermonding?',options:['Delta','Estuarium','U-dal','Hoogvlakte'],correct:0,explanation:'Een delta ontstaat door sedimentafzetting bij de riviermonding, waarna de rivier zich kan vertakken.'},
+            {id:'scenario-11',para:'1.4',points:1,type:'mc',level:'havo',question:'Welke vorm past het best bij een estuarium?',options:['Trechtervormige riviermonding','Vertakte riviermonding met veel afzetting','Smalle V-vormige bergvallei','Brede gletsjervallei'],correct:0,explanation:'Een estuarium is een trechtervormige riviermonding die samenhangt met getijdenwerking.'},
+            {id:'scenario-12',para:'Kaart',points:1,type:'mc',level:'basis',question:'Op een kaart liggen hoogtelijnen heel dicht bij elkaar. Wat betekent dit?',options:['De helling is steil','De helling is flauw','Het gebied ligt op zeeniveau','Er is geen hoogteverschil'],correct:0,explanation:'Hoe dichter hoogtelijnen bij elkaar liggen, hoe sneller de hoogte verandert: de helling is steil.'},
+            {id:'scenario-13',para:'Kaart',points:2,type:'open',level:'havo',question:'Een bergtop ligt op 860 meter en het dal ernaast op 320 meter. Bereken het hoogteverschil.',modelAnswer:'860 − 320 = 540 meter.',keywords:['860','320','540','hoogteverschil','meter']},
+            {id:'scenario-14',para:'Kaart',points:1,type:'mc',level:'basis',question:'In welke hoogtezone valt een gebied op 350 meter hoogte?',options:['Heuvelland','Laagland','Middelgebergte','Hooggebergte'],correct:0,explanation:'Heuvelland ligt tussen 200 en 500 meter.'}
+        ];
+
+        function buildGeographyQuestionPool() {
+            const curated = prebuiltTests.flatMap(test => test.questions).map(question => ({
+                ...question,
+                id: `basis-${question.id}`,
+                level: question.level || (question.type === 'open' ? 'havo' : 'basis')
+            }));
+            const conceptQuestions = [];
+            flashcardsData.forEach(card => {
+                const otherCards = shuffleArray(flashcardsData.filter(other => other.id !== card.id));
+                const termOptions = otherCards.slice(0, 3).map(other => other.term);
+                conceptQuestions.push(makeGeoMultipleChoice(
+                    `concept-definition-${card.id}`, card.para,
+                    `Welk begrip past bij deze omschrijving? “${card.def}”`,
+                    card.term, termOptions,
+                    `${card.term}: ${card.def}`, 'basis'
+                ));
+                const definitionOptions = otherCards.slice(0, 3).map(other => other.def);
+                conceptQuestions.push(makeGeoMultipleChoice(
+                    `concept-meaning-${card.id}`, card.para,
+                    `Welke omschrijving past bij het begrip ${card.term}?`,
+                    card.def, definitionOptions,
+                    `${card.term}: ${card.def}`, 'havo'
+                ));
+                conceptQuestions.push({
+                    id: `concept-open-${card.id}`, para: card.para, points: 2, type: 'open', level: 'havo',
+                    question: `Leg in je eigen woorden uit wat ${card.term} betekent.`,
+                    modelAnswer: card.def,
+                    keywords: [card.term.toLocaleLowerCase('nl-NL'), ...keywordSeeds(card.def)].slice(0, 7)
+                });
+            });
+            return [...curated, ...conceptQuestions, ...geoApplicationQuestions];
+        }
+
+        function balancedQuestionSelection(pool, count) {
+            const groups = new Map();
+            shuffleArray(pool).forEach(question => {
+                const key = question.para || 'overig';
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key).push(question);
+            });
+            const queues = shuffleArray([...groups.values()]);
+            const selected = [];
+            while (selected.length < count && queues.some(queue => queue.length)) {
+                for (const queue of queues) {
+                    if (queue.length && selected.length < count) selected.push(queue.pop());
+                }
+            }
+            return selected;
+        }
+
         function generatePracticeMix() {
-            const topicIndex = document.getElementById('gen-topic')?.selectedIndex ?? 0;
+            const topic = document.getElementById('gen-topic')?.value || 'all';
             const count = Number.parseInt(document.getElementById('gen-count')?.value || '10', 10);
             const questionType = document.getElementById('gen-type')?.value || 'mixed';
-            const topicParas = { 1: ['1.1'], 2: ['1.2'], 3: ['1.3'], 4: ['1.4'], 5: ['Kaart'] };
+            const difficulty = document.getElementById('gen-difficulty')?.value || 'havo';
+            const button = document.getElementById('btn-generate-mix');
+            const loading = document.getElementById('gen-loading');
+            if (button) button.disabled = true;
+            if (loading) loading.classList.remove('hidden');
 
-            let pool = prebuiltTests.flatMap(test => test.questions);
-            if (topicParas[topicIndex]) {
-                pool = pool.filter(q => topicParas[topicIndex].includes(q.para));
-            }
-            if (questionType === 'mc' || questionType === 'open') {
-                const typedPool = pool.filter(q => q.type === questionType);
-                if (typedPool.length) pool = typedPool;
-            }
+            window.setTimeout(() => {
+                let pool = buildGeographyQuestionPool();
+                if (topic !== 'all') pool = pool.filter(question => question.para === topic);
+                if (difficulty === 'basis') pool = pool.filter(question => question.level === 'basis' || (questionType === 'open' && question.level === 'havo'));
+                else if (difficulty === 'havo') pool = pool.filter(question => question.level !== 'challenge');
+                else pool = pool.filter(question => question.level === 'havo' || question.level === 'challenge');
+                if (questionType !== 'mixed') pool = pool.filter(question => question.type === questionType);
 
-            if (!pool.length) {
-                showToast('Voor deze selectie zijn nog geen vragen beschikbaar. Kies een ander onderwerp.');
-                return;
-            }
-
-            const selected = shuffleArray(pool).slice(0, Math.min(count, pool.length));
-            activeQuizQuestions = selected.map(q => ({ ...q }));
-            const topicNames = ['heel hoofdstuk 1', 'paragraaf 1.1', 'paragraaf 1.2', 'paragraaf 1.3', 'paragraaf 1.4', 'kaartvaardigheden'];
-            activeQuizTitle = `Oefenmix: ${topicNames[topicIndex] || 'aardrijkskunde'} (${selected.length} vragen)`;
-
-            if (selected.length < count) {
-                showToast(`Er zijn ${selected.length} passende vragen in de vragenbank. Je oefenmix bevat ze allemaal.`);
-            }
-            initQuizEngine();
+                if (!pool.length) {
+                    showToast('Geen vragen gevonden met deze combinatie. Kies een ander niveau of vraagtype.');
+                    if (button) button.disabled = false;
+                    if (loading) loading.classList.add('hidden');
+                    return;
+                }
+                const selected = balancedQuestionSelection(pool, Math.min(count, pool.length));
+                activeQuizQuestions = selected.map(question => ({ ...question }));
+                const topicLabels = {'all':'heel hoofdstuk 1','1.1':'§ 1.1 · Gebergten','1.2':'§ 1.2 · Verwering','1.3':'§ 1.3 · Erosie','1.4':'§ 1.4 · Sedimentatie','Kaart':'kaartvaardigheden'};
+                const levelLabels = {basis:'Basis',havo:'Havo 2',uitdaging:'Uitdaging'};
+                activeQuizTitle = `Slimme oefentoets · ${topicLabels[topic] || topic} · ${levelLabels[difficulty]} (${selected.length} vragen)`;
+                if (selected.length < count) showToast(`Er zijn ${selected.length} passende vragen. Je krijgt ze allemaal, zonder dubbele vragen.`);
+                if (button) button.disabled = false;
+                if (loading) loading.classList.add('hidden');
+                initQuizEngine();
+            }, 180);
         }
 
         /* ==========================================================================
@@ -683,6 +782,16 @@
             });
 
             document.getElementById('btn-generate-mix')?.addEventListener('click', generatePracticeMix);
+            document.getElementById('open-geo-generator')?.addEventListener('click', () => switchTab('generator'));
+            document.getElementById('open-geo-summaries')?.addEventListener('click', () => switchTab('summary'));
+            document.querySelectorAll('.geo-topic-start').forEach(button => {
+                button.addEventListener('click', () => {
+                    const topic = button.dataset.topic;
+                    const select = document.getElementById('gen-topic');
+                    if (select) select.value = topic;
+                    switchTab('generator');
+                });
+            });
 
             document.getElementById('btn-prev')?.addEventListener('click', () => {
                 if (currentQuizIndex > 0) {
@@ -768,44 +877,193 @@ const bank = {
 const chapterNames={1:'H1 · Lineaire formules',3:'H3 · Gelijkvormigheid',4:'H4 · Wortels',6:'H6 · De stelling van Pythagoras'};
 let currentChapter=null,currentQuestions=[],currentIndex=0,correctCount=0,answered=false;
 const $math = id => document.getElementById(id);
-function showMathView(id){['overviewView','mathMixView','practiceView','formulaView','videosView'].forEach(v=>$math(v).classList.toggle('hidden',v!==id));window.scrollTo({top:0,behavior:'smooth'});}
+function showMathView(id){['overviewView','mathMixView','practiceView','formulaView','videosView'].forEach(v=>{const el=$math(v);if(el)el.classList.toggle('hidden',v!==id);});window.scrollTo({top:0,behavior:'smooth'});}
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function startPractice(chapter, requestedCount=null, generated=false){
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+function uniqueNumbers(values){return [...new Set(values.map(v=>Math.round(v*1000)/1000))];}
+function prettyNumber(value){return Number.isInteger(value)?String(value):String(Number(value.toFixed(2))).replace('.',',');}
+function signedNumber(value){return value<0?`− ${Math.abs(value)}`:`+ ${value}`;}
+function linearFormula(a,b){return `y = ${a===1?'':a===-1?'−':a}x ${signedNumber(b)}`;}
+function mathQuestion(prompt, correctValue, distractorValues, explanation){
+  const correct=String(correctValue);
+  let wrong=[...new Set(distractorValues.map(String).filter(value=>value!==correct))];
+  let bump=1;
+  const numericMatch=correct.match(/^(-?\d+(?:[.,]\d+)?)(.*)$/);
+  while(wrong.length<3){
+    let candidate;
+    if(numericMatch){
+      const numeric=Number(numericMatch[1].replace(',','.'));
+      candidate=`${prettyNumber(numeric+bump)}${numericMatch[2]}`;
+    } else {
+      candidate=`Alternatief ${wrong.length+1}`;
+    }
+    if(candidate!==correct&&!wrong.includes(candidate))wrong.push(candidate);
+    bump++;
+  }
+  const options=shuffle([correct,...wrong.slice(0,3)]);
+  return {q:prompt,o:options,a:options.indexOf(correct),e:explanation};
+}
+function makeMathVariants(chapter,difficulty='havo'){
+  const questions=[];
+  const hard=difficulty==='challenge';
+  const easy=difficulty==='basis';
+  const add=(q)=>questions.push(q);
+
+  if(chapter===1){
+    for(let i=0;i<5;i++){
+      const a=randInt(hard?-9:-6,hard?11:8)||2,b=randInt(-12,14),x=randInt(easy?1:-4,hard?9:6),answer=a*x+b;
+      add(mathQuestion(`Bereken y bij ${linearFormula(a,b)} als x = ${x}.`,answer,[a*x-b,a+b+x,a*x+b+randInt(2,7)],`Vul x in: y = ${a} × ${x} ${signedNumber(b)} = ${a*x} ${signedNumber(b)} = ${answer}.`));
+    }
+    for(let i=0;i<4;i++){
+      const a=randInt(-7,9)||3,b=randInt(-10,12),x1=randInt(-4,3),x2=x1+randInt(2,5),y1=a*x1+b,y2=a*x2+b;
+      const target=linearFormula(a,b);
+      add(mathQuestion(`Een rechte lijn gaat door (${x1}, ${y1}) en (${x2}, ${y2}). Welke formule hoort bij de lijn?`,target,[linearFormula(a+1,b),linearFormula(a,b+randInt(2,5)),linearFormula(-a,b)],`Het hellingsgetal is (${y2} − ${y1}) ÷ (${x2} − ${x1}) = ${a}. Vul een punt in om b = ${b} te vinden. De formule is ${target}.`));
+    }
+    for(let i=0;i<4;i++){
+      const a=randInt(2,9),x=randInt(2,9),b=randInt(-8,9),y=a*x+b;
+      add(mathQuestion(`Bij ${linearFormula(a,b)} hoort y = ${y}. Welke x-waarde hoort daarbij?`,x,[x+1,Math.max(0,x-1),x+2],`Los ${a}x ${signedNumber(b)} = ${y} op. Dan ${a}x = ${y-b} en x = ${x}.`));
+    }
+    for(let i=0;i<3;i++){
+      const a=randInt(1,8),b=randInt(-6,8),formula=linearFormula(a,b),correct=b===0?'Ja':'Nee';
+      add(mathQuestion(`Is ${formula} een recht evenredig verband?`,correct,correct==='Ja'?['Nee','Alleen als x positief is','Dat kun je niet zien']:['Ja','Alleen bij x = 0','Altijd'],b===0?'Ja. Bij een recht evenredig verband is het startgetal 0 en heeft de formule de vorm y = ax.':`Nee. Het startgetal is ${b}; bij een recht evenredig verband moet b = 0 zijn.`));
+    }
+  }
+
+  if(chapter===3){
+    for(let i=0;i<5;i++){
+      const old=randInt(2,16),factorTenths=randInt(5,hard?25:20),factor=factorTenths/10,newLength=old*factor;
+      add(mathQuestion(`Een zijde van ${old} cm wordt vergroot of verkleind tot ${prettyNumber(newLength)} cm. Wat is de factor?`,prettyNumber(factor),[prettyNumber(factor+0.2),prettyNumber(Math.max(0.1,factor-0.2)),prettyNumber(old/newLength)],`Factor = nieuwe lengte ÷ oude lengte = ${prettyNumber(newLength)} ÷ ${old} = ${prettyNumber(factor)}.`));
+    }
+    for(let i=0;i<4;i++){
+      const factorTenths=randInt(6,hard?24:18),factor=factorTenths/10,old=randInt(3,15),answer=old*factor;
+      add(mathQuestion(`Een figuur wordt vergroot/verkleind met factor ${prettyNumber(factor)}. Een zijde was ${old} cm. Hoe lang wordt die zijde?`,`${prettyNumber(answer)} cm`,[`${prettyNumber(answer+1)} cm`,`${prettyNumber(Math.max(0,answer-1))} cm`,`${prettyNumber(old/factor)} cm`],`Nieuwe lengte = oude lengte × factor = ${old} × ${prettyNumber(factor)} = ${prettyNumber(answer)} cm.`));
+    }
+    for(let i=0;i<3;i++){
+      const factor=randInt(2,4),areaFactor=factor*factor;
+      add(mathQuestion(`Alle zijden van een figuur worden ${factor} keer zo lang. Hoeveel keer zo groot wordt de oppervlakte?`,`${areaFactor} keer`,[`${factor-1} keer`,`${factor+1} keer`,`${factor*3} keer`],`Oppervlakte schaalt met het kwadraat van de lengtfactor: ${factor}² = ${areaFactor}.`));
+    }
+    for(let i=0;i<3;i++){
+      const scale=randInt(20,100),map=randInt(2,9),actual=scale*map;
+      add(mathQuestion(`Op een kaart met schaal 1 : ${scale} is een afstand ${map} cm. Hoeveel cm is dat in werkelijkheid?`,`${actual} cm`,[`${actual/10} cm`,`${actual+scale} cm`,`${map+scale} cm`],`Werkelijke afstand = ${map} × ${scale} = ${actual} cm.`));
+    }
+  }
+
+  if(chapter===4){
+    for(let i=0;i<4;i++){
+      const n=randInt(3,hard?24:18),square=n*n;
+      add(mathQuestion(`Wat is √${square}?`,n,[n-1,n+1,square],`Omdat ${n} × ${n} = ${square}, geldt √${square} = ${n}.`));
+    }
+    for(let i=0;i<3;i++){
+      const n=randInt(3,14),inside=n*n+randInt(1,2*n),correct=`${n} en ${n+1}`;
+      add(mathQuestion(`Tussen welke twee opeenvolgende hele getallen ligt √${inside}?`,correct,[`${n-1} en ${n}`,`${n+1} en ${n+2}`,`${n-2} en ${n-1}`],`${n}² = ${n*n} en ${n+1}² = ${(n+1)*(n+1)}. ${inside} ligt daartussen, dus √${inside} ligt tussen ${n} en ${n+1}.`));
+    }
+    for(let i=0;i<4;i++){
+      const outside=randInt(2,9),inside=[2,3,5,6,7,10][randInt(0,5)],value=outside*outside*inside,answer=`${outside}√${inside}`;
+      add(mathQuestion(`Vereenvoudig √${value}.`,answer,[`${outside+1}√${inside}`,`${outside}√${inside+1}`,`${inside}√${outside}`],`Splits ${value} in ${outside*outside} × ${inside}. Dan √${value} = √${outside*outside} × √${inside} = ${answer}.`));
+    }
+    for(let i=0;i<3;i++){
+      const a=randInt(2,7),b=randInt(2,8),same=randInt(2,9),mode=randInt(0,1);
+      const expression=mode?`${a}√${same} + ${b}√${same}`:`${a}√${same} − ${b}√${same}`;
+      const result=mode?a+b:a-b,answer=result===0?'0':`${result===1?'':result===-1?'−':result}√${same}`;
+      add(mathQuestion(`Vereenvoudig: ${expression}.`,answer,[`${a+b}√${same*2}`,`${a*b}√${same}`,`${result}√${same+1}`],`De wortel blijft hetzelfde. ${a} ${mode?'+':'−'} ${b} = ${result}, dus de uitkomst is ${answer}.`));
+    }
+  }
+
+  if(chapter===6){
+    const triples=[[3,4,5],[5,12,13],[6,8,10],[8,15,17],[7,24,25]];
+    for(let i=0;i<5;i++){
+      const [aa,bb,cc]=triples[randInt(0,triples.length-1)],k=randInt(1,hard?4:3),a=aa*k,b=bb*k,c=cc*k;
+      add(mathQuestion(`Een rechthoekige driehoek heeft rechthoekszijden ${a} cm en ${b} cm. Hoe lang is de schuine zijde?`,`${c} cm`,[`${c+1} cm`,`${Math.abs(a-b)} cm`,`${a+b} cm`],`c² = ${a}² + ${b}² = ${a*a} + ${b*b} = ${c*c}. Dus c = √${c*c} = ${c} cm.`));
+    }
+    for(let i=0;i<4;i++){
+      const [aa,bb,cc]=triples[randInt(0,triples.length-1)],k=randInt(1,hard?3:2),known=aa*k,c=cc*k,missing=bb*k;
+      add(mathQuestion(`De schuine zijde is ${c} cm en één rechthoekszijde is ${known} cm. Bereken de andere rechthoekszijde.`,`${missing} cm`,[`${c-known} cm`,`${Math.sqrt(c*c+known*known)} cm`,`${missing+2} cm`],`b² = c² − a² = ${c}² − ${known}² = ${c*c} − ${known*known} = ${missing*missing}. Dus b = ${missing} cm.`));
+    }
+    for(let i=0;i<4;i++){
+      const [a,b,c]=triples[randInt(0,triples.length-1)];
+      add(mathQuestion(`Een rechthoek is ${a} cm lang en ${b} cm breed. Hoe lang is de diagonaal?`,`${c} cm`,[`${a+b} cm`,`${c+2} cm`,`${Math.abs(a-b)} cm`],`De diagonaal is de schuine zijde: d² = ${a}² + ${b}² = ${a*a} + ${b*b} = ${c*c}. Dus d = ${c} cm.`));
+    }
+    for(let i=0;i<3;i++){
+      const [a,b,c]=triples[randInt(0,triples.length-1)],correct='Ja';
+      add(mathQuestion(`Een driehoek heeft zijden ${a} cm, ${b} cm en ${c} cm. Is dit een rechthoekige driehoek?`,correct,['Nee','Alleen als de kleinste hoek recht is','Dat is niet te bepalen'],`Controleer de langste zijde: ${a}² + ${b}² = ${a*a+b*b} en ${c}² = ${c*c}. De uitkomsten zijn gelijk, dus de driehoek is rechthoekig.`));
+    }
+  }
+  return questions;
+}
+function buildMathPool(chapter,difficulty='havo'){
+  const chapters=chapter==='mix'?[1,3,4,6]:[Number(chapter)];
+  return chapters.flatMap(ch=>[...(bank[ch]||[]),...makeMathVariants(ch,difficulty)]);
+}
+function startPractice(chapter, requestedCount=null, generated=false, customPool=null){
   currentChapter=chapter;
-  const pool=chapter==='mix'?Object.values(bank).flat():(bank[chapter]||[]);
-  const defaultCount=chapter==='mix'?12:pool.length;
+  const pool=customPool||buildMathPool(chapter,'havo');
+  const defaultCount=chapter==='mix'?16:12;
   const count=Number.isFinite(requestedCount)?requestedCount:defaultCount;
   currentQuestions=shuffle(pool).slice(0,Math.min(count,pool.length));
   currentIndex=0;correctCount=0;answered=false;
-  $math('practiceTitle').textContent=generated?`Oefentoets · ${chapter==='mix'?'Alle hoofdstukken':chapterNames[chapter]}`:(chapter==='mix'?'Oefenmix · Alle hoofdstukken':chapterNames[chapter]);
-  $math('practiceSubtitle').textContent=generated?`Een willekeurige selectie van ${currentQuestions.length} vragen uit de ingebouwde vragenbank. Je krijgt na elk antwoord direct uitleg.`:(chapter==='mix'?'Een mix van vragen uit H1, H3, H4 en H6.':'Neem rustig de tijd. Na elk antwoord zie je meteen de uitleg.');
+  $math('practiceTitle').textContent=generated?`Slimme oefentoets · ${chapter==='mix'?'Alle hoofdstukken':chapterNames[chapter]}`:(chapter==='mix'?'Oefenmix · Alle hoofdstukken':chapterNames[chapter]);
+  $math('practiceSubtitle').textContent=`${currentQuestions.length} vragen met variaties in getallen en vraagstellingen. Na elk antwoord krijg je de berekening en uitleg.`;
   $math('resultCard').classList.add('hidden');$math('questionCard').classList.remove('hidden');showMathView('practiceView');renderQuestion();
 }
-function renderQuestion(){const q=currentQuestions[currentIndex];answered=false;$math('questionCounter').textContent=`Vraag ${currentIndex+1} van ${currentQuestions.length}`;$math('chapterLabel').textContent=currentChapter==='mix'?'GEMENGD':`HOOFDSTUK ${currentChapter}`;$math('questionProgress').style.width=`${(currentIndex/currentQuestions.length)*100}%`;$math('questionText').textContent=q.q;$math('feedback').className='hidden';$math('feedback').innerHTML='';$math('nextQuestion').disabled=true;$math('nextQuestion').textContent=currentIndex===currentQuestions.length-1?'Bekijk resultaat →':'Volgende vraag →';$math('answerList').innerHTML='';q.o.forEach((answer,i)=>{const btn=document.createElement('button');btn.className='answer';btn.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span>${answer}</span>`;btn.addEventListener('click',()=>chooseAnswer(i));$math('answerList').appendChild(btn);});}
-function chooseAnswer(choice){if(answered)return;answered=true;const q=currentQuestions[currentIndex];const buttons=[...$math('answerList').querySelectorAll('.answer')];buttons.forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('correct');else if(i===choice)b.classList.add('wrong');});const good=choice===q.a;if(good)correctCount++;const f=$math('feedback');f.className=`feedback ${good?'good':'bad'}`;f.innerHTML=`<strong>${good?'✓ Helemaal goed!':'Nog niet helemaal.'}</strong>${q.e}`;$math('nextQuestion').disabled=false;$math('questionProgress').style.width=`${((currentIndex+1)/currentQuestions.length)*100}%`;}
-function finishPractice(){ $math('questionCard').classList.add('hidden');$math('resultCard').classList.remove('hidden');const total=currentQuestions.length,pct=Math.round(correctCount/total*100);$math('resultScore').textContent=`${correctCount}/${total}`;$math('resultTitle').textContent=pct>=80?'Heel sterk gedaan!':pct>=55?'Goed geoefend!':'Blijf oefenen, je komt er!';$math('resultMessage').textContent=`Je had ${correctCount} van de ${total} vragen goed (${pct}%). Bekijk de uitleg bij vragen die lastig waren en probeer het daarna nog eens.`;try{const old=JSON.parse(localStorage.getItem('studyhub-math-progress')||'{"answered":0,"correct":0}');old.answered+=total;old.correct+=correctCount;localStorage.setItem('studyhub-math-progress',JSON.stringify(old));updateProgress();}catch(e){}}
+function renderQuestion(){
+  const q=currentQuestions[currentIndex];
+  answered=false;
+  $math('questionCounter').textContent=`Vraag ${currentIndex+1} van ${currentQuestions.length}`;
+  $math('chapterLabel').textContent=currentChapter==='mix'?'GEMENGD':`HOOFDSTUK ${currentChapter}`;
+  $math('questionProgress').style.width=`${(currentIndex/currentQuestions.length)*100}%`;
+  $math('questionText').textContent=q.q;
+  $math('feedback').className='hidden';$math('feedback').innerHTML='';
+  $math('nextQuestion').disabled=true;$math('nextQuestion').textContent=currentIndex===currentQuestions.length-1?'Bekijk resultaat →':'Volgende vraag →';
+  $math('answerList').innerHTML='';
+  q.o.forEach((answer,i)=>{
+    const btn=document.createElement('button');btn.className='answer';
+    const letter=document.createElement('span');letter.className='letter';letter.textContent=String.fromCharCode(65+i);
+    const text=document.createElement('span');text.textContent=answer;
+    btn.append(letter,text);btn.addEventListener('click',()=>chooseAnswer(i));$math('answerList').appendChild(btn);
+  });
+}
+function chooseAnswer(choice){
+  if(answered)return;answered=true;
+  const q=currentQuestions[currentIndex];
+  const buttons=[...$math('answerList').querySelectorAll('.answer')];
+  buttons.forEach((button,index)=>{button.disabled=true;if(index===q.a)button.classList.add('correct');else if(index===choice)button.classList.add('wrong');});
+  const good=choice===q.a;if(good)correctCount++;
+  const feedback=$math('feedback');feedback.className=`feedback ${good?'good':'bad'}`;
+  const heading=document.createElement('strong');heading.textContent=good?'✓ Helemaal goed!':'Nog niet helemaal.';
+  const explanation=document.createElement('p');explanation.textContent=q.e;
+  feedback.replaceChildren(heading,explanation);
+  $math('nextQuestion').disabled=false;$math('questionProgress').style.width=`${((currentIndex+1)/currentQuestions.length)*100}%`;
+}
+function finishPractice(){
+  $math('questionCard').classList.add('hidden');$math('resultCard').classList.remove('hidden');
+  const total=currentQuestions.length,pct=Math.round(correctCount/total*100);
+  $math('resultScore').textContent=`${correctCount}/${total}`;
+  $math('resultTitle').textContent=pct>=80?'Heel sterk gedaan!':pct>=55?'Goed geoefend!':'Blijf oefenen, je komt er!';
+  $math('resultMessage').textContent=`Je had ${correctCount} van de ${total} vragen goed (${pct}%). De volgende oefentoets krijgt opnieuw andere getalvarianten.`;
+  try{const old=JSON.parse(localStorage.getItem('studyhub-math-progress')||'{"answered":0,"correct":0}');old.answered+=total;old.correct+=correctCount;localStorage.setItem('studyhub-math-progress',JSON.stringify(old));updateProgress();}catch(e){}
+}
 function updateProgress(){try{const p=JSON.parse(localStorage.getItem('studyhub-math-progress')||'{"answered":0,"correct":0}');$math('progressStat').textContent=`${p.answered||0} vragen`;}catch(e){}}
-function toast(msg){$math('toast').textContent=msg;$math('toast').classList.remove('hidden');setTimeout(()=>$math('toast').classList.add('hidden'),2400);}
+function toast(message){const el=$math('toast');if(!el)return;el.textContent=message;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),2600);}
 function generateMathMix(){
   const topic=$math('math-mix-topic').value;
   const count=Number.parseInt($math('math-mix-count').value,10)||10;
-  const pool=topic==='all'?Object.values(bank).flat():(bank[Number(topic)]||[]);
+  const difficulty=$math('math-mix-difficulty')?.value||'havo';
+  const chapter=topic==='all'?'mix':Number(topic);
+  const pool=buildMathPool(chapter,difficulty);
   if(!pool.length){toast('Voor dit onderwerp zijn nog geen vragen beschikbaar.');return;}
-  const button=$math('math-generate-mix');
-  const loading=$math('math-generator-loading');
+  const button=$math('math-generate-mix'),loading=$math('math-generator-loading');
   button.disabled=true;loading.classList.remove('hidden');
   window.setTimeout(()=>{
     button.disabled=false;loading.classList.add('hidden');
-    const chapter=topic==='all'?'mix':Number(topic);
-    startPractice(chapter,count,true);
-    if(pool.length<count){toast(`Dit hoofdstuk bevat ${pool.length} vragen. Je krijgt alle beschikbare vragen.`);}
-  },350);
+    startPractice(chapter,count,true,pool);
+    if(pool.length<count)toast(`Er zijn ${pool.length} passende vragen beschikbaar. Je krijgt ze allemaal.`);
+  },250);
 }
-document.querySelectorAll('#section-math [data-chapter]').forEach(btn=>btn.addEventListener('click',event=>{event.preventDefault();startPractice(btn.dataset.chapter);}));
-document.querySelectorAll('#section-math [data-view]').forEach(btn=>btn.addEventListener('click',()=>{
-  const target=btn.dataset.view;
-  if(target==='formulaView') switchTab('math-formulas');
-  else if(target==='videosView') switchTab('math-videos');
+document.querySelectorAll('#section-math [data-chapter]').forEach(button=>button.addEventListener('click',event=>{event.preventDefault();startPractice(Number(button.dataset.chapter));}));
+document.querySelectorAll('#section-math [data-view]').forEach(button=>button.addEventListener('click',()=>{
+  const target=button.dataset.view;
+  if(target==='formulaView')switchTab('math-formulas');
+  else if(target==='videosView')switchTab('math-videos');
   else switchTab('math-overview');
 }));
 $math('mixedPractice').addEventListener('click',()=>switchTab('math-mix'));
@@ -816,6 +1074,6 @@ $math('nextQuestion').addEventListener('click',()=>{if(!answered)return;if(curre
 $math('retryChapter').addEventListener('click',()=>startPractice(currentChapter));
 $math('resultOverview').addEventListener('click',()=>switchTab('math-overview'));
 updateProgress();
-window.showMathView = showMathView;
-window.startStudyHubMathPractice = startPractice;
+window.showMathView=showMathView;
+window.startStudyHubMathPractice=startPractice;
 })();
