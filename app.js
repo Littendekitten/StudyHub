@@ -1109,6 +1109,10 @@ const studyHubFirebaseConfig = {
   measurementId: "G-QBRNQQKZ44"
 };
 
+// Replace this with the exact public URL Render assigns to the StudyHub API.
+// Example: https://studyhub-vip-api.onrender.com
+const STUDYHUB_API_BASE_URL = "https://YOUR-RENDER-SERVICE.onrender.com";
+
 const studyHubFirebaseApp = initializeApp(studyHubFirebaseConfig);
 const studyHubAuth = getAuth(studyHubFirebaseApp);
 const studyHubDb = getFirestore(studyHubFirebaseApp);
@@ -1249,6 +1253,7 @@ function startUserListeners(user) {
 
   if (vipTimerHandle) clearInterval(vipTimerHandle);
   vipTimerHandle = setInterval(refreshVipTimer, 1000);
+  refreshStudyHubAdminAccess();
 }
 
 function vipLifetime() {
@@ -1311,6 +1316,7 @@ function renderAccountState() {
   }
 
   if (!loggedIn) {
+    $id("admin-code-panel")?.classList.add("hidden");
     applyStudyHubAppearance();
     return;
   }
@@ -1496,6 +1502,99 @@ function sha256Hex(value) {
   );
 }
 
+function setAdminCodeMessage(message, isError = false) {
+  const target = $id("admin-code-message");
+  if (!target) return;
+  target.textContent = message || "";
+  target.classList.toggle("error", isError);
+}
+
+function studyHubApiConfigured() {
+  return STUDYHUB_API_BASE_URL &&
+    !STUDYHUB_API_BASE_URL.includes("YOUR-RENDER-SERVICE") &&
+    /^https:\/\//i.test(STUDYHUB_API_BASE_URL);
+}
+
+async function studyHubApiRequest(path, options = {}) {
+  if (!studyHubUser) throw new Error("Log eerst in met je StudyHub-account.");
+  if (!studyHubApiConfigured()) {
+    throw new Error("De Render-backend is nog niet gekoppeld. Vul de Render-URL in bovenaan app.js.");
+  }
+
+  const idToken = await studyHubUser.getIdToken();
+  const headers = new Headers(options.headers || {});
+  headers.set("Authorization", `Bearer ${idToken}`);
+  if (options.body !== undefined) headers.set("Content-Type", "application/json");
+
+  const response = await fetch(`${STUDYHUB_API_BASE_URL.replace(/\/$/, "")}${path}`, {
+    method: options.method || "GET",
+    headers,
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    cache: "no-store"
+  });
+
+  let data = {};
+  try { data = await response.json(); } catch { /* non-JSON error response */ }
+  if (!response.ok) throw new Error(data.error || `De StudyHub-server gaf fout ${response.status}.`);
+  return data;
+}
+
+async function refreshStudyHubAdminAccess() {
+  const panel = $id("admin-code-panel");
+  if (!panel) return;
+  panel.classList.add("hidden");
+  if (!studyHubUser || !studyHubProfile || !studyHubApiConfigured()) return;
+  try {
+    const result = await studyHubApiRequest("/api/admin/status");
+    panel.classList.toggle("hidden", result.isAdmin !== true);
+  } catch (error) {
+    // A temporarily sleeping Render Free service must not reveal admin controls.
+    console.info("StudyHub admin status not available yet:", error.message);
+  }
+}
+
+async function createAdminVipCode() {
+  const button = $id("admin-create-code");
+  const resultPanel = $id("admin-code-result");
+  if (!button) return;
+  const durationSeconds = Number($id("admin-code-duration")?.value || 0);
+  const maxRedemptions = Number($id("admin-code-uses")?.value || 0);
+  if (!Number.isInteger(maxRedemptions) || maxRedemptions < 1 || maxRedemptions > 500) {
+    setAdminCodeMessage("Kies een aantal accounts tussen 1 en 500.", true);
+    return;
+  }
+
+  button.disabled = true;
+  setAdminCodeMessage("Veilige VIP-code aanmaken…", false);
+  if (resultPanel) resultPanel.classList.add("hidden");
+  try {
+    const result = await studyHubApiRequest("/api/admin/codes", {
+      method: "POST",
+      body: { durationSeconds, maxRedemptions }
+    });
+    $id("admin-code-value").value = result.code;
+    resultPanel?.classList.remove("hidden");
+    setAdminCodeMessage("Code aangemaakt! Kopieer hem nu; hij wordt maar één keer getoond.", false);
+  } catch (error) {
+    setAdminCodeMessage(error.message || "VIP-code maken is mislukt.", true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function copyAdminVipCode() {
+  const field = $id("admin-code-value");
+  if (!field?.value) return;
+  try {
+    await navigator.clipboard.writeText(field.value);
+    setAdminCodeMessage("VIP-code gekopieerd!", false);
+  } catch {
+    field.focus();
+    field.select();
+    setAdminCodeMessage("Selecteer en kopieer de code handmatig.", true);
+  }
+}
+
 async function redeemStudyHubCode() {
   if (!studyHubUser || !studyHubProfile) return;
   if (vipLifetime()) {
@@ -1503,82 +1602,28 @@ async function redeemStudyHubCode() {
     return;
   }
   const field = $id("redeem-code-input");
-  const code = String(field.value || "").trim().toUpperCase().replace(/\s+/g, "");
+  const code = String(field?.value || "").trim().toUpperCase().replace(/\s+/g, "");
   if (code.length < 12) {
     setCodeMessage("Deze code lijkt te kort. Controleer of je de volledige code hebt ingevuld.", true);
     return;
   }
 
   const button = $id("redeem-code-button");
-  button.disabled = true;
-  setCodeMessage("Code controleren…");
+  if (button) button.disabled = true;
+  setCodeMessage("Code veilig controleren…", false);
   try {
-    const codeHash = await sha256Hex(code);
-    const codeRef = doc(studyHubDb, "codes", codeHash);
-    const redemptionRef = redemptionDocRef(studyHubUser.uid, codeHash);
-
-    await runTransaction(studyHubDb, async (transaction) => {
-      const profileRef = userDocRef(studyHubUser.uid);
-      const [profileSnap, codeSnap, redemptionSnap] = await Promise.all([
-        transaction.get(profileRef), transaction.get(codeRef), transaction.get(redemptionRef)
-      ]);
-      if (!profileSnap.exists()) throw new Error("Je gebruikersprofiel is niet gevonden.");
-      if (profileSnap.data()["Lifetime-VIP"] === true) throw new Error("Lifetime VIP heeft geen coupons nodig.");
-      if (!codeSnap.exists()) throw new Error("Deze code bestaat niet of is ongeldig.");
-      if (redemptionSnap.exists()) throw new Error("Je hebt deze code al eens gebruikt.");
-
-      const codeData = codeSnap.data();
-      if (codeData.active !== true || codeData.type !== "VIP-Coupon") throw new Error("Deze code is niet actief of heeft een ongeldig type.");
-      const durationSeconds = Number(codeData.durationSeconds);
-      const maxRedemptions = Number(codeData.maxRedemptions);
-      const redeemedCount = Number(codeData.redeemedCount || 0);
-      if (!Number.isInteger(durationSeconds) || durationSeconds < 1 || durationSeconds > 31536000) throw new Error("Deze coupon heeft een ongeldige tijdsduur.");
-      if (!Number.isInteger(maxRedemptions) || redeemedCount >= maxRedemptions) throw new Error("Deze code is al maximaal ingewisseld.");
-      if (codeData.expiresAt?.toMillis && codeData.expiresAt.toMillis() <= Date.now()) throw new Error("Deze code is verlopen.");
-
-      const itemId = `vip-coupon-${durationSeconds}`;
-      const inventoryRef = doc(studyHubDb, "users", studyHubUser.uid, "inventory", itemId);
-      const inventorySnap = await transaction.get(inventoryRef);
-
-      transaction.update(codeRef, {
-        redeemedCount: redeemedCount + 1,
-        updatedAt: serverTimestamp()
-      });
-      transaction.set(redemptionRef, {
-        type: "VIP-Coupon",
-        durationSeconds,
-        inventoryItemId: itemId,
-        redeemedAt: serverTimestamp()
-      });
-      if (inventorySnap.exists()) {
-        const oldItem = inventorySnap.data();
-        if (oldItem.type !== "VIP-Coupon" || Number(oldItem.durationSeconds) !== durationSeconds) throw new Error("Inventory-item heeft een ongeldige structuur.");
-        transaction.update(inventoryRef, {
-          quantity: Number(oldItem.quantity || 0) + 1,
-          lastRedemptionHash: codeHash,
-          lastRedemptionAt: serverTimestamp()
-        });
-      } else {
-        transaction.set(inventoryRef, {
-          type: "VIP-Coupon",
-          durationSeconds,
-          quantity: 1,
-          createdAt: serverTimestamp(),
-          lastRedemptionHash: codeHash,
-          lastRedemptionAt: serverTimestamp(),
-          lastUseId: ""
-        });
-      }
+    const result = await studyHubApiRequest("/api/redeem", {
+      method: "POST",
+      body: { code }
     });
-
     field.value = "";
-    setCodeMessage("Gelukt! Je VIP-Coupon is toegevoegd aan je inventory. ✨", false);
+    setCodeMessage(result.message || "Gelukt! Je VIP-Coupon is toegevoegd aan je inventory. ✨", false);
     showToast("VIP-Coupon ontvangen! 🎟️");
   } catch (error) {
     console.error("Code redemption failed:", error);
-    setCodeMessage(error.message || friendlyFirebaseError(error), true);
+    setCodeMessage(error.message || "De code kon niet worden ingewisseld.", true);
   } finally {
-    button.disabled = false;
+    if (button) button.disabled = false;
   }
 }
 
@@ -1766,6 +1811,8 @@ function initialiseStudyHubAccounts() {
   $id("theme-mode-select")?.addEventListener("change", (event) => saveProfilePreference("themeMode", event.target.value));
   $id("toggle-code-panel")?.addEventListener("click", openCodePanel);
   $id("redeem-code-button")?.addEventListener("click", redeemStudyHubCode);
+  $id("admin-create-code")?.addEventListener("click", createAdminVipCode);
+  $id("admin-copy-code")?.addEventListener("click", copyAdminVipCode);
   $id("redeem-code-input")?.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); redeemStudyHubCode(); } });
   $id("gold-mode-toggle")?.addEventListener("change", (event) => saveProfilePreference("goldModeEnabled", event.target.checked));
   $id("vip-theme-select")?.addEventListener("change", (event) => saveProfilePreference("vipTheme", event.target.value));
@@ -1792,6 +1839,7 @@ function initialiseStudyHubAccounts() {
       studyHubInventory = [];
       studyHubVipState = null;
       stopUserListeners();
+      $id("admin-code-panel")?.classList.add("hidden");
       if (localStorage.getItem("studyhub-guest-mode") === "1") {
         showAppShell("guest");
       } else {

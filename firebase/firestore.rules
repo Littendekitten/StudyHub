@@ -1,0 +1,231 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedInAs(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function userPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function vipPath(uid) {
+      return /databases/$(database)/documents/users/$(uid)/vip/current;
+    }
+
+    function vipEntitled(uid) {
+      let profile = get(userPath(uid)).data;
+      let statePath = vipPath(uid);
+      return profile.get('Lifetime-VIP', false) == true ||
+        (exists(statePath) &&
+          get(statePath).data.status == 'active' &&
+          get(statePath).data.expiresAt is timestamp &&
+          get(statePath).data.expiresAt > request.time);
+    }
+
+    function validUsername(value) {
+      return value is string && value.size() >= 2 && value.size() <= 24 &&
+        !value.matches('.*[<>].*');
+    }
+
+    function validCodeDocument(codeHash) {
+      return exists(/databases/$(database)/documents/codes/$(codeHash)) &&
+        get(/databases/$(database)/documents/codes/$(codeHash)).data.type == 'VIP-Coupon' &&
+        get(/databases/$(database)/documents/codes/$(codeHash)).data.active == true &&
+        get(/databases/$(database)/documents/codes/$(codeHash)).data.durationSeconds is int &&
+        get(/databases/$(database)/documents/codes/$(codeHash)).data.durationSeconds > 0 &&
+        get(/databases/$(database)/documents/codes/$(codeHash)).data.durationSeconds <= 31536000 &&
+        get(/databases/$(database)/documents/codes/$(codeHash)).data.maxRedemptions is int &&
+        get(/databases/$(database)/documents/codes/$(codeHash)).data.redeemedCount is int &&
+        get(/databases/$(database)/documents/codes/$(codeHash)).data.redeemedCount < get(/databases/$(database)/documents/codes/$(codeHash)).data.maxRedemptions &&
+        (get(/databases/$(database)/documents/codes/$(codeHash)).data.expiresAt == null ||
+         get(/databases/$(database)/documents/codes/$(codeHash)).data.expiresAt > request.time);
+    }
+
+    function redemptionMatches(uid, codeHash, itemId) {
+      let redemptionPath = /databases/$(database)/documents/users/$(uid)/redemptions/$(codeHash);
+      let codePath = /databases/$(database)/documents/codes/$(codeHash);
+      let inventoryPath = /databases/$(database)/documents/users/$(uid)/inventory/$(itemId);
+      return existsAfter(redemptionPath) &&
+        getAfter(redemptionPath).data.type == 'VIP-Coupon' &&
+        getAfter(redemptionPath).data.inventoryItemId == itemId &&
+        getAfter(redemptionPath).data.durationSeconds == get(codePath).data.durationSeconds &&
+        getAfter(redemptionPath).data.redeemedAt == request.time &&
+        getAfter(codePath).data.redeemedCount == get(codePath).data.redeemedCount + 1 &&
+        existsAfter(inventoryPath) &&
+        getAfter(inventoryPath).data.type == 'VIP-Coupon' &&
+        getAfter(inventoryPath).data.durationSeconds == get(codePath).data.durationSeconds &&
+        getAfter(inventoryPath).data.lastRedemptionHash == codeHash &&
+        getAfter(inventoryPath).data.lastRedemptionAt == request.time;
+    }
+
+    function validInventoryRedemption(uid, itemId) {
+      let codeHash = request.resource.data.lastRedemptionHash;
+      let codePath = /databases/$(database)/documents/codes/$(codeHash);
+      let redemptionPath = /databases/$(database)/documents/users/$(uid)/redemptions/$(codeHash);
+      return codeHash is string && codeHash.size() == 64 &&
+        validCodeDocument(codeHash) &&
+        get(codePath).data.durationSeconds == request.resource.data.durationSeconds &&
+        existsAfter(redemptionPath) &&
+        getAfter(redemptionPath).data.inventoryItemId == itemId &&
+        getAfter(redemptionPath).data.durationSeconds == request.resource.data.durationSeconds &&
+        getAfter(codePath).data.redeemedCount == get(codePath).data.redeemedCount + 1 &&
+        getAfter(redemptionPath).data.redeemedAt == request.time &&
+        request.resource.data.lastRedemptionAt == request.time;
+    }
+
+    function validCouponUse(uid, itemId) {
+      let vipAfterPath = vipPath(uid);
+      return resource.data.quantity is int && resource.data.quantity > 0 &&
+        request.resource.data.quantity == resource.data.quantity - 1 &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['quantity', 'lastUseId']) &&
+        request.resource.data.lastUseId is string && request.resource.data.lastUseId.size() >= 16 &&
+        existsAfter(vipAfterPath) &&
+        getAfter(vipAfterPath).data.status == 'active' &&
+        getAfter(vipAfterPath).data.sourceItemId == itemId &&
+        getAfter(vipAfterPath).data.durationSeconds == resource.data.durationSeconds &&
+        getAfter(vipAfterPath).data.useId == request.resource.data.lastUseId;
+    }
+
+    function validCouponActivation(uid) {
+      let itemId = request.resource.data.sourceItemId;
+      let itemPath = /databases/$(database)/documents/users/$(uid)/inventory/$(itemId);
+      let itemBefore = get(itemPath).data;
+      let itemAfter = getAfter(itemPath).data;
+      return request.resource.data.status == 'active' &&
+        request.resource.data.keys().hasOnly(['status', 'durationSeconds', 'remainingSeconds', 'expiresAt', 'startedAt', 'sourceItemId', 'useId', 'updatedAt']) &&
+        itemId is string && exists(itemPath) &&
+        itemBefore.type == 'VIP-Coupon' && itemBefore.quantity is int && itemBefore.quantity > 0 &&
+        itemAfter.quantity == itemBefore.quantity - 1 &&
+        itemAfter.lastUseId == request.resource.data.useId &&
+        request.resource.data.durationSeconds == itemBefore.durationSeconds &&
+        request.resource.data.remainingSeconds == 0 &&
+        request.resource.data.useId is string && request.resource.data.useId.size() >= 16 &&
+        request.resource.data.expiresAt is timestamp && request.resource.data.expiresAt > request.time &&
+        request.resource.data.expiresAt <= request.time + duration.value(request.resource.data.durationSeconds, 's') + duration.value(5, 's') &&
+        request.resource.data.startedAt == request.time &&
+        request.resource.data.updatedAt == request.time;
+    }
+
+    // User-owned profile documents. Lifetime-VIP is deliberately immutable to clients.
+    match /users/{uid} {
+      allow read: if signedInAs(uid);
+
+      allow create: if signedInAs(uid) &&
+        request.resource.data.keys().hasAll(['username', 'themeMode', 'vipTheme', 'goldModeEnabled', 'premiumMode', 'Lifetime-VIP', 'createdAt', 'updatedAt']) &&
+        request.resource.data.keys().hasOnly(['username', 'themeMode', 'vipTheme', 'goldModeEnabled', 'premiumMode', 'Lifetime-VIP', 'createdAt', 'updatedAt']) &&
+        validUsername(request.resource.data.username) &&
+        request.resource.data.themeMode in ['dark', 'light'] &&
+        request.resource.data.vipTheme in ['dark-gold', 'light-gold'] &&
+        request.resource.data.goldModeEnabled == false &&
+        request.resource.data.premiumMode == false &&
+        request.resource.data['Lifetime-VIP'] == false &&
+        request.resource.data.createdAt == request.time &&
+        request.resource.data.updatedAt == request.time;
+
+      allow update: if signedInAs(uid) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['username', 'themeMode', 'vipTheme', 'goldModeEnabled', 'premiumMode', 'updatedAt']) &&
+        request.resource.data.get('Lifetime-VIP', false) == resource.data.get('Lifetime-VIP', false) &&
+        request.resource.data.get('createdAt', request.time) == resource.data.get('createdAt', request.time) &&
+        request.resource.data.updatedAt == request.time &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['username']) || validUsername(request.resource.data.username)) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['themeMode']) || request.resource.data.themeMode in ['dark', 'light']) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['vipTheme']) || (vipEntitled(uid) && request.resource.data.vipTheme in ['dark-gold', 'light-gold'])) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['goldModeEnabled']) || request.resource.data.goldModeEnabled == false || vipEntitled(uid)) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['premiumMode']) || request.resource.data.premiumMode == false || vipEntitled(uid));
+
+      allow delete: if false;
+
+      match /inventory/{itemId} {
+        allow read: if signedInAs(uid);
+        allow create: if signedInAs(uid) &&
+          request.resource.data.keys().hasOnly(['type', 'durationSeconds', 'quantity', 'createdAt', 'lastRedemptionHash', 'lastRedemptionAt', 'lastUseId']) &&
+          request.resource.data.type == 'VIP-Coupon' &&
+          request.resource.data.durationSeconds is int && request.resource.data.durationSeconds > 0 && request.resource.data.durationSeconds <= 31536000 &&
+          request.resource.data.quantity == 1 &&
+          request.resource.data.createdAt == request.time &&
+          request.resource.data.lastUseId == '' &&
+          get(userPath(uid)).data.get('Lifetime-VIP', false) == false &&
+          validInventoryRedemption(uid, itemId);
+
+        allow update: if signedInAs(uid) &&
+          request.resource.data.type == resource.data.type &&
+          request.resource.data.durationSeconds == resource.data.durationSeconds &&
+          request.resource.data.createdAt == resource.data.createdAt &&
+          get(userPath(uid)).data.get('Lifetime-VIP', false) == false &&
+          (
+            (
+              request.resource.data.diff(resource.data).affectedKeys().hasOnly(['quantity', 'lastRedemptionHash', 'lastRedemptionAt']) &&
+              request.resource.data.quantity == resource.data.quantity + 1 &&
+              validInventoryRedemption(uid, itemId)
+            ) || validCouponUse(uid, itemId)
+          );
+        allow delete: if false;
+      }
+
+      match /redemptions/{codeHash} {
+        // Redemption records are created only by the trusted Render Admin SDK.
+        allow read: if signedInAs(uid);
+        allow create, update, delete: if false;
+      }
+
+      match /vip/{vipId} {
+        allow read: if signedInAs(uid);
+
+        allow create: if signedInAs(uid) && vipId == 'current' &&
+          get(userPath(uid)).data.get('Lifetime-VIP', false) == false &&
+          validCouponActivation(uid);
+
+        allow update: if signedInAs(uid) && vipId == 'current' &&
+          (
+            (
+              resource.data.status == 'active' &&
+              resource.data.expiresAt is timestamp && resource.data.expiresAt <= request.time &&
+              get(userPath(uid)).data.get('Lifetime-VIP', false) == false &&
+              validCouponActivation(uid)
+            ) ||
+            (
+              resource.data.status == 'active' && resource.data.expiresAt is timestamp && resource.data.expiresAt > request.time &&
+              request.resource.data.keys().hasOnly(['status', 'durationSeconds', 'remainingSeconds', 'expiresAt', 'startedAt', 'sourceItemId', 'useId', 'updatedAt']) &&
+              request.resource.data.status == 'paused' &&
+              request.resource.data.durationSeconds == resource.data.durationSeconds &&
+              request.resource.data.sourceItemId == resource.data.sourceItemId &&
+              request.resource.data.useId == resource.data.useId &&
+              request.resource.data.expiresAt == null &&
+              request.resource.data.remainingSeconds is int && request.resource.data.remainingSeconds > 0 &&
+              request.resource.data.remainingSeconds <= (resource.data.expiresAt - request.time).seconds() &&
+              request.resource.data.startedAt == resource.data.startedAt &&
+              request.resource.data.updatedAt == request.time
+            ) ||
+            (
+              resource.data.status == 'paused' && resource.data.remainingSeconds is int && resource.data.remainingSeconds > 0 &&
+              request.resource.data.keys().hasOnly(['status', 'durationSeconds', 'remainingSeconds', 'expiresAt', 'startedAt', 'sourceItemId', 'useId', 'updatedAt']) &&
+              request.resource.data.status == 'active' &&
+              request.resource.data.durationSeconds == resource.data.durationSeconds &&
+              request.resource.data.remainingSeconds == resource.data.remainingSeconds &&
+              request.resource.data.sourceItemId == resource.data.sourceItemId &&
+              request.resource.data.useId == resource.data.useId &&
+              request.resource.data.expiresAt is timestamp && request.resource.data.expiresAt > request.time &&
+              request.resource.data.expiresAt <= request.time + duration.value(resource.data.remainingSeconds, 's') + duration.value(5, 's') &&
+              request.resource.data.startedAt == request.time &&
+              request.resource.data.updatedAt == request.time
+            )
+          );
+
+        allow delete: if false;
+      }
+    }
+
+    // Coupon definitions are private server data. The Render API uses the
+    // Firebase Admin SDK; browser clients must never read or mutate code docs.
+    match /codes/{codeHash} {
+      allow read, write: if false;
+    }
+
+    // No other collection can be read or written by browser clients.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
