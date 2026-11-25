@@ -1908,35 +1908,22 @@ body.light-gold-mode .inventory-item { background:linear-gradient(120deg,#fff4cf
 body.light-gold-mode .inventory-item-copy strong { color:#63420d !important; }
 body.light-gold-mode .inventory-item-copy small { color:#80652f !important; }
 
-/* Premium Experience — richer, more noticeable styling than regular Gold. */
+/* Premium Experience preview in the VIP settings panel. */
 .vip-premium-showcase {
   position:relative;display:flex;align-items:center;gap:1rem;overflow:hidden;
   margin-top:1.1rem;padding:1.1rem;border-radius:18px;
-  border:1px solid rgba(255,220,133,.52);
-  background:radial-gradient(circle at 90% 0%,rgba(255,219,130,.26),transparent 35%),linear-gradient(125deg,#3a2a10,#211809 55%,#100e09);
-  box-shadow:inset 0 1px 0 rgba(255,245,211,.16),0 14px 32px rgba(0,0,0,.22);
+  border:1px solid rgba(137,152,255,.28);
+  background:radial-gradient(circle at 90% 0%,rgba(105,127,241,.15),transparent 35%),linear-gradient(125deg,#1a2240,#172033 58%,#10262b);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 12px 28px rgba(0,0,0,.2);
 }
 .vip-premium-mark { width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center;border-radius:16px;font-size:1.8rem; }
 .vip-premium-copy { min-width:0; }
-.vip-premium-kicker { display:block;color:#f1ca71;font-size:.62rem;font-weight:950;letter-spacing:.18em;margin-bottom:.22rem; }
-.vip-premium-copy h4 { color:#fff0bf;font-size:1.05rem;letter-spacing:-.025em;margin:0 0 .3rem; }
-.vip-premium-copy p { color:#d5c08d;font-size:.78rem;line-height:1.55;margin:0;max-width:620px; }
+.vip-premium-kicker { display:block;color:#aab6ff;font-size:.62rem;font-weight:950;letter-spacing:.18em;margin-bottom:.22rem; }
+.vip-premium-copy h4 { color:#e5eaff;font-size:1.05rem;letter-spacing:-.025em;margin:0 0 .3rem; }
+.vip-premium-copy p { color:#bdc8dd;font-size:.78rem;line-height:1.55;margin:0;max-width:620px; }
 .vip-premium-perks { display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem; }
-.vip-premium-perks span { padding:.32rem .56rem;border:1px solid rgba(248,213,133,.28);border-radius:99px;background:rgba(255,226,158,.09);color:#f4d88f;font-size:.65rem;font-weight:800; }
-.premium-setting { margin-top:.9rem;padding-top:.9rem;border-top:1px solid rgba(227,184,86,.33); }
-body.premium-mode .panel,body.premium-mode .test-card,body.premium-mode .home-stat,body.premium-mode .math-app .chapter-card,body.premium-mode .math-app .practice-card,body.premium-mode .math-app .info-card,body.premium-mode .math-app .quick-panel { position:relative;box-shadow:0 18px 42px rgba(0,0,0,.36),0 0 0 1px rgba(244,206,117,.18),0 0 28px rgba(222,171,64,.13) !important;border-color:rgba(245,211,133,.62) !important; }
-body.premium-mode .home-hero,body.premium-mode .math-app .hero { background-image:radial-gradient(circle at 86% 12%,rgba(255,229,159,.30),transparent 27%),radial-gradient(circle at 4% 100%,rgba(201,147,42,.16),transparent 30%),linear-gradient(125deg,#3a2b12,#1b160d 58%,#100d08) !important;border:1px solid rgba(255,220,130,.78) !important; }
-body.premium-mode .nav-tab-btn.active,body.premium-mode .btn-emerald,body.premium-mode .btn-gradient,body.premium-mode .btn-amber,body.premium-mode .math-app .btn-primary { box-shadow:0 9px 26px rgba(220,171,65,.34),inset 0 1px 0 rgba(255,255,255,.62) !important;filter:saturate(1.12); }
-body.premium-mode .vip-emblem { box-shadow:0 0 0 5px rgba(243,202,102,.13),0 0 34px rgba(239,190,74,.42),0 9px 30px rgba(0,0,0,.24) !important; }
-body.premium-mode .vip-panel { border:1px solid #f5d58b !important;box-shadow:0 20px 48px rgba(0,0,0,.43),0 0 42px rgba(226,177,68,.21),inset 0 1px 0 rgba(255,237,181,.2) !important; }
-body.premium-mode .vip-premium-showcase { border-color:#ffe3a1;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 30px rgba(234,186,80,.23),0 15px 36px rgba(0,0,0,.28); }
-body.premium-mode .vip-premium-mark { animation:studyhubPremiumPulse 3.5s ease-in-out infinite; }
-@keyframes studyhubPremiumPulse { 0%,100%{box-shadow:0 0 0 4px rgba(224,178,75,.12),0 8px 22px rgba(202,151,48,.22)}50%{box-shadow:0 0 0 7px rgba(255,226,151,.17),0 8px 30px rgba(238,190,75,.38)} }
-body.light-gold-mode.premium-mode .vip-premium-showcase { background:radial-gradient(circle at 90% 0%,rgba(230,189,96,.28),transparent 35%),linear-gradient(125deg,#fff1c7,#f1dfb3 60%,#fff9e9) !important;border-color:#bd913e !important; }
-body.light-gold-mode.premium-mode .vip-premium-copy h4 { color:#51360b !important; }
-body.light-gold-mode.premium-mode .vip-premium-copy p { color:#745b2a !important; }
-body.light-gold-mode.premium-mode .vip-premium-kicker { color:#926719 !important; }
-body.light-gold-mode.premium-mode .vip-premium-perks span { color:#775315 !important;border-color:#c9a65b;background:rgba(183,130,31,.08); }
+.vip-premium-perks span { padding:.32rem .56rem;border:1px solid rgba(137,152,255,.24);border-radius:99px;background:rgba(137,152,255,.08);color:#c5d0ff;font-size:.65rem;font-weight:800; }
+.premium-setting { margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--border-color); }
 
 /* =====================================================================
    MOBILE FIRST FINISH — navigation, forms, cards and practice screens
@@ -2040,3 +2027,331 @@ img,svg,video,canvas { max-width:100%; }
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { scroll-behavior:auto !important;animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important; }
 }
+
+
+/* Admin VIP-code registry */
+.admin-code-label-field { margin:.9rem 0; }
+.admin-code-label-field input { width:100%;min-height:44px; }
+.admin-code-library { margin-top:1.5rem;padding-top:1.15rem;border-top:1px solid var(--border-color); }
+.admin-code-library-heading { display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.9rem; }
+.admin-code-library-heading h4 { color:var(--text-main);font-size:1rem;margin:0 0 .25rem; }
+.admin-code-library-heading .muted-note { margin:0;max-width:680px; }
+.admin-code-library-heading .btn { flex:0 0 auto;margin:0; }
+.admin-code-security-note { margin:.8rem 0 1rem;padding:.75rem .85rem;border:1px solid rgba(230,185,83,.25);border-radius:11px;background:rgba(230,185,83,.07);color:var(--text-muted);font-size:.75rem;line-height:1.5; }
+.admin-code-list { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem; }
+.admin-code-item { min-width:0;padding:1rem;border:1px solid var(--border-color);border-radius:15px;background:var(--bg-card-dark); }
+.admin-code-item-top { display:flex;align-items:flex-start;justify-content:space-between;gap:.6rem; }
+.admin-code-item-title { min-width:0;display:flex;flex-direction:column;gap:.18rem; }
+.admin-code-item-title strong { color:var(--text-main);font-size:.92rem;overflow-wrap:anywhere; }
+.admin-code-reference { color:var(--text-dim);font-size:.68rem;font-variant-numeric:tabular-nums;letter-spacing:.04em; }
+.admin-code-status { flex:0 0 auto;padding:.28rem .55rem;border-radius:99px;background:rgba(16,185,129,.12);color:#69d7ae;font-size:.65rem;font-weight:900; }
+.admin-code-status.status-disabled { background:rgba(148,163,184,.13);color:#a8b4c5; }
+.admin-code-status.status-expired,.admin-code-status.status-exhausted { background:rgba(244,63,94,.12);color:#ff9aa6; }
+.admin-code-description { margin:.8rem 0 .6rem;color:var(--text-main);font-size:.8rem;font-weight:750; }
+.admin-code-meta { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.35rem .7rem;color:var(--text-muted);font-size:.69rem; }
+.admin-code-meta span { min-width:0;overflow-wrap:anywhere; }
+.admin-code-progress { height:6px;margin:.8rem 0;border-radius:99px;background:rgba(148,163,184,.15);overflow:hidden; }
+.admin-code-progress span { display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#b98730,#f1d27b); }
+.admin-code-actions { display:flex;flex-wrap:wrap;gap:.45rem; }
+.admin-code-actions .btn { flex:1 1 auto;margin:0;min-height:39px;padding:.55rem .65rem;font-size:.73rem; }
+.btn-danger-soft { border:1px solid rgba(244,100,115,.35);background:rgba(244,63,94,.1);color:#ff9aa6;border-radius:11px;font-weight:800;cursor:pointer; }
+.btn-danger-soft:hover { background:rgba(244,63,94,.18);border-color:rgba(244,100,115,.65); }
+.btn-danger-soft:disabled,.admin-code-actions .btn:disabled { opacity:.45;cursor:not-allowed; }
+.admin-code-load-more { width:100%;margin-top:.8rem; }
+body.gold-mode .admin-code-item { border-color:rgba(227,184,91,.36);box-shadow:inset 0 1px 0 rgba(255,225,154,.05); }
+body.premium-mode .admin-code-item { box-shadow:0 12px 30px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,228,160,.08); }
+body.light-gold-mode .admin-code-item { background:rgba(255,255,255,.72);border-color:#d7bd83; }
+body.light-gold-mode .admin-code-item-title strong,body.light-gold-mode .admin-code-description { color:#4b3510; }
+body.light-gold-mode .admin-code-meta,body.light-gold-mode .admin-code-reference { color:#78643e; }
+@media (max-width:760px) {
+  .admin-code-library-heading { flex-direction:column; }
+  .admin-code-library-heading .btn { width:100%;min-height:44px; }
+  .admin-code-list { grid-template-columns:minmax(0,1fr); }
+  .admin-code-actions { display:grid;grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .admin-code-actions .btn { min-height:44px; }
+}
+
+/* =====================================================================
+   VIP CODE MANAGER — simple status + reward view
+   ===================================================================== */
+.admin-code-create-row { display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:1rem;margin:.9rem 0 .25rem; }
+.admin-code-create-row .account-form-group { margin:0; }
+.admin-code-create-row select { width:100%;min-height:46px; }
+.admin-code-create-row > .btn { min-height:46px;white-space:nowrap; }
+.admin-code-rule { margin:.65rem 0 1rem;line-height:1.55; }
+.admin-code-item { border-radius:15px; }
+.admin-code-item-top { align-items:center; }
+.admin-code-reference { color:var(--text-main);font-size:.82rem;font-weight:900;letter-spacing:.04em; }
+.admin-code-description { margin:.9rem 0 .85rem;font-size:.9rem;font-weight:850;letter-spacing:.01em; }
+.admin-code-status { text-transform:uppercase;letter-spacing:.06em; }
+.admin-code-status.status-active { background:rgba(16,185,129,.13);color:#65d9b1;border:1px solid rgba(16,185,129,.25); }
+.admin-code-status.status-inactive { background:rgba(148,163,184,.13);color:#aeb9c8;border:1px solid rgba(148,163,184,.22); }
+.admin-code-actions { display:flex;gap:.6rem;margin-top:.35rem; }
+.admin-code-actions .btn { min-height:42px; }
+
+/* =====================================================================
+   VIP GOLD MODE — softer antique-gold accents, not a full gold wash
+   ===================================================================== */
+body.gold-mode {
+  --bg-main:#0d0d0c;
+  --bg-card:#191918;
+  --bg-card-dark:#121211;
+  --bg-input:#141412;
+  --border-color:#4a412e;
+  --border-light:#746344;
+  --text-main:#f6f0e2;
+  --text-muted:#bcb29d;
+  --text-dim:#92866d;
+  --emerald:#cfb574;
+  --emerald-dark:#8e713a;
+  --emerald-bg:rgba(195,163,94,.12);
+  --blue:#c4ae7b;
+  --blue-dark:#8e713a;
+  --blue-bg:rgba(195,163,94,.10);
+  --purple:#c3ad7b;
+  --purple-dark:#8e713a;
+  --purple-bg:rgba(195,163,94,.09);
+  --amber:#dcc58d;
+  --amber-dark:#8e713a;
+  --amber-bg:rgba(195,163,94,.12);
+  --brand:#bca16a;
+  --brand-dark:#806638;
+  --brand-soft:rgba(188,161,106,.12);
+  background-image:radial-gradient(ellipse at 12% 0%,rgba(190,157,87,.055),transparent 34%),radial-gradient(ellipse at 95% 16%,rgba(151,116,52,.045),transparent 30%) !important;
+}
+body.gold-mode .panel,
+body.gold-mode .test-card,
+body.gold-mode .home-stat,
+body.gold-mode .flashcard-front,
+body.gold-mode .flashcard-back,
+body.gold-mode .math-app .chapter-card,
+body.gold-mode .math-app .practice-card,
+body.gold-mode .math-app .info-card,
+body.gold-mode .math-app .quick-panel {
+  border-color:rgba(194,166,108,.22) !important;
+  box-shadow:0 9px 24px rgba(0,0,0,.20) !important;
+}
+body.gold-mode header { border-bottom-color:rgba(194,166,108,.25) !important;box-shadow:0 6px 22px rgba(0,0,0,.25) !important; }
+body.gold-mode .brand-icon,
+body.gold-mode .subject-icon,
+body.gold-mode .account-avatar,
+body.gold-mode .math-app .stat-icon,
+body.gold-mode .math-app .chapter-icon {
+  background:rgba(190,157,87,.12) !important;
+  border:1px solid rgba(194,166,108,.32) !important;
+  box-shadow:none !important;
+}
+body.gold-mode .nav-tab-btn.active,
+body.gold-mode .btn-emerald,
+body.gold-mode .btn-gradient,
+body.gold-mode .btn-amber,
+body.gold-mode .math-app .btn-primary {
+  background:linear-gradient(135deg,#b89b60,#8d7444) !important;
+  color:#18140b !important;
+  border-color:rgba(224,202,151,.46) !important;
+  box-shadow:none !important;
+}
+body.gold-mode .vip-panel,
+body.gold-mode .admin-code-panel,
+body.gold-mode .inventory-panel,
+body.gold-mode .codes-panel-card {
+  border:1px solid rgba(194,166,108,.34) !important;
+  background:linear-gradient(145deg,#201e19,#171613 72%,#12110f) !important;
+  box-shadow:0 10px 28px rgba(0,0,0,.24) !important;
+}
+body.gold-mode .vip-emblem,
+body.gold-mode .vip-premium-mark {
+  background:linear-gradient(135deg,#e4d1a2,#b69a62) !important;
+  color:#282012 !important;
+  border:1px solid rgba(231,213,169,.55) !important;
+  box-shadow:none !important;
+}
+body.gold-mode .inventory-item {
+  background:linear-gradient(120deg,rgba(190,157,87,.10),rgba(26,24,19,.92)) !important;
+  border-color:rgba(190,157,87,.38) !important;
+  box-shadow:none !important;
+}
+body.gold-mode .voucher-art { box-shadow:0 0 0 2px rgba(190,157,87,.10),0 5px 14px rgba(0,0,0,.20) !important; }
+body.gold-mode .admin-code-item { border-color:rgba(194,166,108,.24) !important;box-shadow:none !important; }
+
+/* =====================================================================
+   PREMIUM EXPERIENCE — a different study workspace, not just a colour
+   ===================================================================== */
+body.premium-mode {
+  --premium-accent:#8998ff;
+  --premium-accent-strong:#6274e8;
+  --premium-teal:#52d6c4;
+}
+body.premium-mode header .header-inner {
+  max-width:1320px;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:.8rem;
+}
+body.premium-mode header nav {
+  width:100%;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.45rem;
+  padding:.5rem;
+  border:1px solid rgba(137,152,255,.22);
+  border-radius:17px;
+  background:linear-gradient(110deg,rgba(94,109,201,.12),rgba(55,184,171,.07)),var(--bg-card-dark);
+}
+body.premium-mode header nav .nav-tab-btn {
+  border:1px solid transparent;
+  background:transparent;
+  border-radius:11px;
+  padding:.58rem .82rem;
+  transition:background .18s,border-color .18s,transform .18s;
+}
+body.premium-mode header nav .nav-tab-btn:hover { background:rgba(137,152,255,.10);border-color:rgba(137,152,255,.2);transform:translateY(-1px); }
+body.premium-mode header nav .nav-tab-btn.active {
+  background:linear-gradient(120deg,#596ee2,#327f93) !important;
+  color:#fff !important;
+  border-color:rgba(184,199,255,.32) !important;
+  box-shadow:0 5px 16px rgba(75,96,198,.24) !important;
+}
+body.premium-mode #nav-premium {
+  order:1;
+  background:rgba(137,152,255,.13);
+  border-color:rgba(137,152,255,.26);
+  color:#b9c4ff;
+  font-weight:900;
+}
+body.premium-mode #account-button { margin-left:auto; }
+body.premium-mode .home-hero,
+body.premium-mode .math-app .hero {
+  background-image:radial-gradient(circle at 90% 4%,rgba(93,125,238,.16),transparent 30%),linear-gradient(125deg,#1b2340,#151c2c 65%,#11232b) !important;
+  border-color:rgba(130,151,255,.34) !important;
+}
+body.premium-mode .panel,
+body.premium-mode .test-card,
+body.premium-mode .home-stat,
+body.premium-mode .math-app .chapter-card,
+body.premium-mode .math-app .practice-card,
+body.premium-mode .math-app .info-card,
+body.premium-mode .math-app .quick-panel {
+  border-color:rgba(137,152,255,.22) !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.22),0 0 0 1px rgba(82,214,196,.035) !important;
+}
+body.premium-mode .vip-premium-showcase {
+  border-color:rgba(137,152,255,.42) !important;
+  background:linear-gradient(120deg,rgba(88,105,210,.17),rgba(42,168,158,.11)),var(--bg-card-dark) !important;
+  box-shadow:0 10px 24px rgba(0,0,0,.18) !important;
+}
+body.premium-mode .vip-premium-kicker { color:#aab6ff !important; }
+body.premium-mode .vip-premium-copy h4 { color:#e5eaff !important; }
+body.premium-mode .vip-premium-copy p { color:#b7c2d9 !important; }
+body.premium-mode .vip-premium-perks span { color:#c5d0ff !important;border-color:rgba(137,152,255,.24) !important;background:rgba(137,152,255,.08) !important; }
+
+.premium-page { max-width:1220px;margin:0 auto; }
+.premium-page-hero {
+  display:flex;align-items:center;justify-content:space-between;gap:1.2rem;
+  padding:clamp(1.2rem,3vw,2.2rem);margin-bottom:1.25rem;border-radius:23px;
+  border:1px solid rgba(137,152,255,.30);
+  background:radial-gradient(circle at 88% 12%,rgba(105,127,241,.22),transparent 30%),radial-gradient(circle at 10% 95%,rgba(54,191,180,.13),transparent 34%),linear-gradient(120deg,#1c2441,#172137 70%,#132b31);
+  box-shadow:0 16px 38px rgba(0,0,0,.22);
+}
+.premium-page-eyebrow { color:#aab6ff;font-size:.69rem;font-weight:950;letter-spacing:.17em;margin-bottom:.55rem; }
+.premium-page-hero h1 { color:#f1f4ff;font-size:clamp(1.55rem,3.2vw,2.45rem);line-height:1.08;letter-spacing:-.045em;margin:0 0 .55rem; }
+.premium-page-hero p { color:#bdc8dd;max-width:680px;font-size:.92rem;line-height:1.65;margin:0; }
+.premium-hero-badge { flex:0 0 86px;width:86px;height:86px;display:grid;place-items:center;border-radius:25px;background:linear-gradient(145deg,rgba(137,152,255,.27),rgba(82,214,196,.15));border:1px solid rgba(167,184,255,.34);color:#d7e1ff;font-size:2.6rem;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 12px 24px rgba(0,0,0,.16); }
+.premium-tool-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem; }
+.premium-tool-card { min-width:0;padding:1.2rem;border-radius:19px;border:1px solid var(--border-color);background:linear-gradient(145deg,var(--bg-card),var(--bg-card-dark));box-shadow:0 10px 24px rgba(0,0,0,.16); }
+.premium-tool-heading { display:flex;align-items:center;gap:.8rem;margin-bottom:1rem; }
+.premium-tool-icon { flex:0 0 42px;width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:rgba(137,152,255,.13);border:1px solid rgba(137,152,255,.24);color:#aab6ff;font-size:1.25rem;font-weight:900; }
+.premium-tool-heading h2 { font-size:1.02rem;margin:0 0 .12rem; }
+.premium-tool-heading p { color:var(--text-muted);font-size:.77rem;margin:0;line-height:1.45; }
+.premium-focus-clock { text-align:center;font-size:clamp(3rem,8vw,4.4rem);line-height:1;font-weight:950;letter-spacing:-.06em;font-variant-numeric:tabular-nums;color:#e8edff;margin:1.15rem 0; }
+.premium-progress-track { width:100%;height:9px;border-radius:99px;overflow:hidden;background:rgba(137,152,255,.13);border:1px solid rgba(137,152,255,.12); }
+.premium-progress-track span { display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#677bea,#52d6c4);transition:width .25s linear; }
+.premium-focus-controls { display:grid;grid-template-columns:minmax(0,1.25fr) repeat(3,minmax(0,1fr));gap:.45rem;margin-top:.95rem; }
+.premium-focus-controls select,
+.premium-goal-controls select,
+.premium-challenge-card select { min-width:0;width:100%;min-height:43px;padding:.6rem .7rem;border-radius:11px;background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-color); }
+.premium-focus-controls .btn { min-height:43px;margin:0;padding:.55rem .7rem;font-size:.78rem; }
+.premium-tool-status { min-height:1.3rem;color:var(--text-muted);font-size:.74rem;line-height:1.5;margin:.85rem 0 0; }
+.premium-goal-total { display:flex;align-items:baseline;gap:.5rem;margin:.5rem 0 1rem; }
+.premium-goal-total strong { font-size:2.7rem;line-height:1;font-weight:950;letter-spacing:-.05em;color:var(--premium-accent,#8998ff);font-variant-numeric:tabular-nums; }
+.premium-goal-total span { color:var(--text-muted);font-size:.85rem; }
+.premium-goal-controls { display:grid;grid-template-columns:minmax(0,1fr) minmax(125px,.8fr);align-items:center;gap:.8rem;margin-top:1rem;color:var(--text-muted);font-size:.78rem; }
+.premium-challenge-card > label { display:block;color:var(--text-muted);font-size:.76rem;font-weight:800;margin:.8rem 0 .4rem; }
+.premium-challenge-button { width:100%;margin-top:.75rem;min-height:48px;background:linear-gradient(120deg,#596ee2,#327f93) !important;color:#fff !important;border:1px solid rgba(184,199,255,.3) !important; }
+.premium-shortcut-list { display:grid;gap:.55rem;margin-top:.75rem; }
+.premium-shortcut { display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:.65rem;width:100%;padding:.7rem;border:1px solid var(--border-color);border-radius:13px;background:var(--bg-card-dark);color:var(--text-main);text-align:left;cursor:pointer; }
+.premium-shortcut:hover { border-color:rgba(137,152,255,.42);background:rgba(137,152,255,.07); }
+.premium-shortcut > span:first-child { width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:rgba(137,152,255,.12);font-size:1.2rem; }
+.premium-shortcut strong,.premium-shortcut small { display:block; }
+.premium-shortcut strong { font-size:.82rem; }
+.premium-shortcut small { color:var(--text-muted);font-size:.7rem;margin-top:.12rem; }
+.premium-shortcut > span:last-child { color:var(--premium-accent,#8998ff);font-size:1.2rem; }
+.premium-visually-hidden { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+body.light-theme .premium-page-hero,body.light-theme .premium-tool-card { box-shadow:0 10px 25px rgba(37,56,95,.08); }
+body.light-theme .premium-focus-clock { color:#24334e; }
+body.light-theme .premium-page-hero { background:radial-gradient(circle at 88% 12%,rgba(105,127,241,.15),transparent 30%),linear-gradient(120deg,#e9edff,#e7f8f5); }
+body.light-theme .premium-page-hero h1 { color:#1d2b48; }
+body.light-theme .premium-page-hero p { color:#526582; }
+body.light-theme .premium-hero-badge { color:#596ee2;background:linear-gradient(145deg,#dfe5ff,#d9f7f1); }
+body.light-gold-mode.premium-mode .premium-page-hero { background:linear-gradient(120deg,#f0e8d2,#e7f1ee) !important;border-color:rgba(137,152,255,.25) !important; }
+body.light-gold-mode.premium-mode .premium-page-hero h1 { color:#26324b !important; }
+body.light-gold-mode.premium-mode .premium-page-hero p { color:#59677b !important; }
+
+@media(max-width:760px) {
+  .admin-code-create-row { grid-template-columns:minmax(0,1fr); }
+  .admin-code-create-row > .btn { width:100%; }
+  .premium-page-hero { align-items:flex-start; }
+  .premium-hero-badge { width:58px;height:58px;flex-basis:58px;border-radius:18px;font-size:1.8rem; }
+  .premium-tool-grid { grid-template-columns:minmax(0,1fr); }
+  .premium-focus-controls { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .premium-focus-controls select { grid-column:1/-1; }
+  .premium-focus-controls .btn { min-height:46px; }
+  .premium-goal-controls { grid-template-columns:minmax(0,1fr); }
+  body.premium-mode header nav { display:flex;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin; }
+  body.premium-mode header nav .nav-tab-btn { flex:0 0 auto;white-space:nowrap; }
+  body.premium-mode #account-button { margin-left:0; }
+}
+@media(max-width:420px) {
+  .premium-page-hero { padding:1.05rem;gap:.65rem; }
+  .premium-page-hero h1 { font-size:1.55rem; }
+  .premium-tool-card { padding:1rem; }
+  .premium-focus-controls { gap:.4rem; }
+}
+
+/* Final Premium override: Premium's identity is indigo/teal; Gold remains optional. */
+body.premium-mode .home-hero,
+body.premium-mode .math-app .hero {
+  background-image:radial-gradient(circle at 90% 4%,rgba(93,125,238,.16),transparent 30%),linear-gradient(125deg,#1b2340,#151c2c 65%,#11232b) !important;
+  border:1px solid rgba(130,151,255,.34) !important;
+}
+body.premium-mode .panel,
+body.premium-mode .test-card,
+body.premium-mode .home-stat,
+body.premium-mode .math-app .chapter-card,
+body.premium-mode .math-app .practice-card,
+body.premium-mode .math-app .info-card,
+body.premium-mode .math-app .quick-panel {
+  border-color:rgba(137,152,255,.22) !important;
+  box-shadow:0 12px 30px rgba(0,0,0,.22),0 0 0 1px rgba(82,214,196,.035) !important;
+}
+body.premium-mode header nav .nav-tab-btn.active,
+body.premium-mode .btn-emerald,
+body.premium-mode .btn-gradient,
+body.premium-mode .btn-amber,
+body.premium-mode .math-app .btn-primary {
+  box-shadow:none !important;
+  filter:none !important;
+}
+body.premium-mode .vip-emblem { box-shadow:0 0 0 4px rgba(137,152,255,.10),0 8px 22px rgba(75,96,198,.16) !important; }
+body.premium-mode .vip-panel { border-color:rgba(137,152,255,.38) !important;box-shadow:0 12px 28px rgba(0,0,0,.25) !important; }
+body.premium-mode .vip-premium-mark { animation:none !important; }
+
+
+/* Code usage policy selector: clear desktop layout, stacked on phones. */
+.admin-code-create-row-scoped { grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) auto; }
+.admin-code-usage-scope { margin:-.45rem 0 .8rem;color:var(--text-muted);font-size:.72rem;font-weight:750;letter-spacing:.045em; }
+body.gold-mode .admin-code-usage-scope { color:#c5b58e; }
+body.premium-mode .admin-code-usage-scope { color:#b7c2d9; }
+@media(max-width:760px) { .admin-code-create-row-scoped { grid-template-columns:minmax(0,1fr); } }

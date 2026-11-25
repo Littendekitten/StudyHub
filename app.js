@@ -208,12 +208,13 @@ import {
         function switchTab(tabName) {
             const isMathTab = tabName.startsWith('math-');
             const isAccountTab = tabName === 'account';
+            const isPremiumTab = tabName === 'premium';
 
             if (isAccountTab) {
                 if (window.studyHubCurrentTab !== 'account') window.studyHubReturnTab = window.studyHubCurrentTab || 'home';
             } else {
                 window.studyHubCurrentTab = tabName;
-                if (tabName === 'home') {
+                if (tabName === 'home' || isPremiumTab) {
                     document.body.classList.remove('subject-open', 'math-open');
                 } else if (isMathTab) {
                     document.body.classList.add('subject-open', 'math-open');
@@ -226,7 +227,7 @@ import {
                 }
             }
 
-            const sections = ['home', 'tests', 'generator', 'quiz', 'grading', 'results', 'learn', 'summary', 'math', 'account'];
+            const sections = ['home', 'premium', 'tests', 'generator', 'quiz', 'grading', 'results', 'learn', 'summary', 'math', 'account'];
             sections.forEach(id => {
                 const el = document.getElementById(`section-${id}`);
                 if (el) el.classList.add('hidden');
@@ -1145,6 +1146,8 @@ let stopInventoryListener = null;
 let stopVipListener = null;
 let vipTimerHandle = null;
 let expiryToastKey = "";
+let adminCodeNextCursor = null;
+let adminCodeListBusy = false;
 
 const $id = (id) => document.getElementById(id);
 const userDocRef = (uid) => doc(studyHubDb, "users", uid);
@@ -1312,10 +1315,14 @@ function applyStudyHubAppearance() {
     studyHubVipState?.expiresAt?.toMillis?.() > Date.now()
   );
   const gold = active && profile.goldModeEnabled === true;
+  const premium = active && profile.premiumMode === true;
   document.body.classList.toggle("light-theme", !gold && profile.themeMode === "light");
   document.body.classList.toggle("gold-mode", gold);
   document.body.classList.toggle("light-gold-mode", gold && profile.vipTheme === "light-gold");
-  document.body.classList.toggle("premium-mode", gold && profile.premiumMode === true);
+  document.body.classList.toggle("premium-mode", premium);
+  $id("nav-premium")?.classList.toggle("hidden", !premium);
+  if (!premium && window.studyHubCurrentTab === "premium") switchTab("home");
+  updatePremiumToolsUI();
   const themeColor = $id("theme-color-meta");
   if (themeColor) themeColor.content = gold ? (profile.vipTheme === "light-gold" ? "#f4f0e5" : "#15130e") : (profile.themeMode === "light" ? "#edf2f8" : "#0d1626");
 }
@@ -1508,8 +1515,6 @@ async function saveProfilePreference(field, value) {
   if (!studyHubUser || !studyHubProfile) return;
   try {
     const updates = { [field]: value, updatedAt: serverTimestamp() };
-    // Premium is een extra laag op Gold Mode. Gold uitschakelen zet Premium ook uit.
-    if (field === "goldModeEnabled" && value === false) updates.premiumMode = false;
     await updateDoc(userDocRef(studyHubUser.uid), updates);
   } catch (error) {
     showToast(`Instelling opslaan mislukt: ${friendlyFirebaseError(error)}`);
@@ -1520,14 +1525,18 @@ async function saveProfilePreference(field, value) {
 async function savePremiumExperience(enabled) {
   if (!studyHubUser || !studyHubProfile) return;
   try {
-    const updates = {
+    await updateDoc(userDocRef(studyHubUser.uid), {
       premiumMode: Boolean(enabled),
       updatedAt: serverTimestamp()
-    };
-    // Premium automatisch laten inschakelen met de volledige Gold-stijl,
-    // zodat de schakelaar nooit aan kan staan zonder zichtbaar resultaat.
-    if (enabled) updates.goldModeEnabled = true;
-    await updateDoc(userDocRef(studyHubUser.uid), updates);
+    });
+    studyHubProfile = { ...studyHubProfile, premiumMode: Boolean(enabled) };
+    applyStudyHubAppearance();
+    if (enabled) {
+      showToast("Premium Study Lab ingeschakeld! Je nieuwe leertools staan klaar. ✦");
+      switchTab("premium");
+    } else if (window.studyHubCurrentTab === "premium") {
+      switchTab("home");
+    }
   } catch (error) {
     showToast(`Premium-instelling opslaan mislukt: ${friendlyFirebaseError(error)}`);
     renderAccountState();
@@ -1585,6 +1594,9 @@ async function refreshStudyHubAdminAccess() {
   try {
     const result = await studyHubApiRequest("/api/admin/status");
     panel.classList.toggle("hidden", result.isAdmin !== true);
+    if (result.isAdmin === true) {
+      await refreshAdminVipCodeList({ reset: true });
+    }
   } catch (error) {
     // A temporarily sleeping Render Free service must not reveal admin controls.
     console.info("StudyHub admin status not available yet:", error.message);
@@ -1596,23 +1608,20 @@ async function createAdminVipCode() {
   const resultPanel = $id("admin-code-result");
   if (!button) return;
   const durationSeconds = Number($id("admin-code-duration")?.value || 0);
-  const maxRedemptions = Number($id("admin-code-uses")?.value || 0);
-  if (!Number.isInteger(maxRedemptions) || maxRedemptions < 1 || maxRedemptions > 500) {
-    setAdminCodeMessage("Kies een aantal accounts tussen 1 en 500.", true);
-    return;
-  }
+  const usageScope = $id("admin-code-usage-scope")?.value || "per_user";
 
   button.disabled = true;
-  setAdminCodeMessage("Veilige VIP-code aanmaken…", false);
+  setAdminCodeMessage("VIP-code veilig aanmaken…", false);
   if (resultPanel) resultPanel.classList.add("hidden");
   try {
     const result = await studyHubApiRequest("/api/admin/codes", {
       method: "POST",
-      body: { durationSeconds, maxRedemptions }
+      body: { durationSeconds, usageScope }
     });
     $id("admin-code-value").value = result.code;
     resultPanel?.classList.remove("hidden");
-    setAdminCodeMessage("Code aangemaakt! Kopieer hem nu; hij wordt maar één keer getoond.", false);
+    setAdminCodeMessage("Code aangemaakt! Kopieer hem nu; de volledige code wordt maar één keer getoond.", false);
+    await refreshAdminVipCodeList({ reset: true });
   } catch (error) {
     setAdminCodeMessage(error.message || "VIP-code maken is mislukt.", true);
   } finally {
@@ -1630,6 +1639,149 @@ async function copyAdminVipCode() {
     field.focus();
     field.select();
     setAdminCodeMessage("Selecteer en kopieer de code handmatig.", true);
+  }
+}
+
+
+function formatAdminCodeDate(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("nl-NL", {
+    dateStyle: "medium", timeStyle: "short"
+  }).format(date);
+}
+
+function adminCodeStatusLabel(status) {
+  return status === "active" ? "ACTIEF" : "INACTIEF";
+}
+
+function buildAdminCodeCard(code) {
+  const card = document.createElement("article");
+  card.className = `admin-code-item status-${code.status || "inactive"}`;
+  card.dataset.codeId = code.id || "";
+  card.dataset.usageScope = code.usageScope === "global" ? "global" : "per_user";
+
+  const top = document.createElement("div");
+  top.className = "admin-code-item-top";
+  const reference = document.createElement("strong");
+  reference.className = "admin-code-reference";
+  reference.textContent = `CODE · …${code.reference || String(code.id || "").slice(-8).toUpperCase()}`;
+
+  const status = document.createElement("span");
+  status.className = `admin-code-status status-${code.status || "inactive"}`;
+  status.textContent = adminCodeStatusLabel(code.status);
+  top.append(reference, status);
+
+  const reward = document.createElement("p");
+  reward.className = "admin-code-description";
+  reward.textContent = `REWARD: ${code.reward || `VIP-Coupon · ${formatStudyHubTime(code.durationSeconds || 0)}`}`;
+
+  const usage = document.createElement("p");
+  usage.className = "admin-code-usage-scope";
+  usage.textContent = code.usageScope === "global" ? "GEBRUIK: GLOBAAL · 1× TOTAAL" : "GEBRUIK: PER PERSOON · 1× ELKE GEBRUIKER";
+
+  const actions = document.createElement("div");
+  actions.className = "admin-code-actions";
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "btn btn-secondary";
+  toggle.textContent = code.active ? "Maak INACTIEF" : "Maak ACTIEF";
+  toggle.addEventListener("click", () => updateAdminVipCode(code.id, !code.active));
+
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "btn btn-danger-soft";
+  remove.textContent = "Verwijderen";
+  remove.addEventListener("click", () => deleteAdminVipCode(code));
+  actions.append(toggle, remove);
+
+  card.append(top, reward, usage, actions);
+  return card;
+}
+
+async function refreshAdminVipCodeList({ reset = false } = {}) {
+  const list = $id("admin-code-list");
+  const moreButton = $id("admin-load-more-codes");
+  if (!list || adminCodeListBusy) return;
+  if (reset) {
+    adminCodeNextCursor = null;
+    list.innerHTML = "";
+    list.append(Object.assign(document.createElement("p"), {
+      className: "muted-note", textContent: "VIP-codes laden…"
+    }));
+  }
+
+  adminCodeListBusy = true;
+  const refreshButton = $id("admin-refresh-codes");
+  if (refreshButton) refreshButton.disabled = true;
+  if (moreButton) moreButton.disabled = true;
+  try {
+    const params = new URLSearchParams({ limit: "50" });
+    if (!reset && adminCodeNextCursor) params.set("cursor", adminCodeNextCursor);
+    const response = await studyHubApiRequest(`/api/admin/codes?${params.toString()}`);
+    if (reset) list.innerHTML = "";
+
+    if (reset && response.codes.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "muted-note";
+      empty.textContent = "Je hebt nog geen VIP-codes aangemaakt.";
+      list.append(empty);
+    } else {
+      response.codes.forEach(code => list.append(buildAdminCodeCard(code)));
+    }
+
+    adminCodeNextCursor = response.nextCursor || null;
+    if (moreButton) {
+      moreButton.classList.toggle("hidden", !response.hasMore);
+      moreButton.disabled = false;
+    }
+  } catch (error) {
+    if (reset) list.innerHTML = "";
+    const message = document.createElement("p");
+    message.className = "account-feedback error";
+    message.textContent = error.message || "Het code-overzicht kon niet worden geladen.";
+    list.append(message);
+    if (moreButton) moreButton.classList.add("hidden");
+  } finally {
+    adminCodeListBusy = false;
+    if (refreshButton) refreshButton.disabled = false;
+    if (moreButton) moreButton.disabled = false;
+  }
+}
+
+async function updateAdminVipCode(codeId, active) {
+  const codeCard = [...document.querySelectorAll(".admin-code-item")].find(card => card.dataset.codeId === codeId);
+  const scope = codeCard?.dataset.usageScope || "per_user";
+  const resetExplanation = scope === "global"
+    ? "De globale eenmalige limiet wordt gereset; de eerste gebruiker kan hem opnieuw één keer totaal inwisselen."
+    : "Iedere gebruiker kan hem opnieuw één keer inwisselen, ook als die persoon hem eerder al gebruikte.";
+  const message = active
+    ? `Deze code wordt opnieuw ACTIEF. ${resetExplanation} Doorgaan?`
+    : "Deze code wordt INACTIEF en kan niet meer worden ingewisseld. Eerder ontvangen vouchers blijven bestaan. Doorgaan?";
+  if (!window.confirm(message)) return;
+  try {
+    const result = await studyHubApiRequest(`/api/admin/codes/${encodeURIComponent(codeId)}`, {
+      method: "PATCH",
+      body: { active }
+    });
+    setAdminCodeMessage(result.message || (active ? "Code ACTIEF." : "Code INACTIEF."), false);
+    await refreshAdminVipCodeList({ reset: true });
+  } catch (error) {
+    setAdminCodeMessage(error.message || "De code kon niet worden bijgewerkt.", true);
+  }
+}
+
+async function deleteAdminVipCode(code) {
+  const reference = code.reference || String(code.id || "").slice(-8).toUpperCase();
+  const warning = "\n\nDe code wordt definitief verwijderd. Reeds ontvangen vouchers blijven in gebruikersinventories staan.";
+  if (!window.confirm(`Code …${reference} definitief verwijderen?${warning}`)) return;
+  try {
+    await studyHubApiRequest(`/api/admin/codes/${encodeURIComponent(code.id)}`, { method: "DELETE" });
+    setAdminCodeMessage("Code definitief verwijderd.", false);
+    await refreshAdminVipCodeList({ reset: true });
+  } catch (error) {
+    setAdminCodeMessage(error.message || "De code kon niet worden verwijderd.", true);
   }
 }
 
@@ -1822,6 +1974,205 @@ function openCodePanel() {
   button.textContent = open ? "Code verbergen" : "Code invoeren";
 }
 
+/* ======================================================================
+   PREMIUM STUDY LAB — local focus tools and subject shortcuts
+   ====================================================================== */
+let premiumFocusInterval = null;
+let premiumFocusDurationSeconds = 25 * 60;
+let premiumFocusRemainingSeconds = 25 * 60;
+let premiumFocusEndsAt = 0;
+let premiumFocusSessionStartRemaining = 0;
+let premiumFocusSessionRecorded = 0;
+
+function premiumTodayKey() {
+  const date = new Date();
+  const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return `studyhub-premium-focus-${studyHubUser?.uid || "guest"}-${dateKey}`;
+}
+
+function premiumGoalKey() {
+  return `studyhub-premium-goal-${studyHubUser?.uid || "guest"}`;
+}
+
+function readPremiumTodaySeconds() {
+  try {
+    const value = Number(localStorage.getItem(premiumTodayKey()) || 0);
+    return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+  } catch { return 0; }
+}
+
+function recordPremiumFocusSeconds(seconds) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return;
+  try {
+    const next = readPremiumTodaySeconds() + Math.floor(seconds);
+    localStorage.setItem(premiumTodayKey(), String(next));
+  } catch { /* Private browsing can block local storage; the timer still works. */ }
+  updatePremiumToolsUI();
+}
+
+function formatPremiumClock(seconds) {
+  const safe = Math.max(0, Math.floor(seconds));
+  return `${String(Math.floor(safe / 60)).padStart(2, "0")}:${String(safe % 60).padStart(2, "0")}`;
+}
+
+function premiumFocusTick() {
+  if (!premiumFocusInterval) return;
+  const now = Date.now();
+  premiumFocusRemainingSeconds = Math.max(0, Math.ceil((premiumFocusEndsAt - now) / 1000));
+  const elapsed = Math.max(0, premiumFocusSessionStartRemaining - premiumFocusRemainingSeconds);
+  const unrecorded = elapsed - premiumFocusSessionRecorded;
+  if (unrecorded > 0) {
+    recordPremiumFocusSeconds(unrecorded);
+    premiumFocusSessionRecorded = elapsed;
+  }
+  updatePremiumToolsUI();
+  if (premiumFocusRemainingSeconds <= 0) {
+    clearInterval(premiumFocusInterval);
+    premiumFocusInterval = null;
+    const status = $id("premium-focus-status");
+    if (status) status.textContent = "Focusblok afgerond! Neem even pauze en geef jezelf een moment. ✨";
+    showToast("Focus Sprint voltooid! Goed bezig. 🎉");
+    const startButton = $id("premium-focus-start");
+    if (startButton) startButton.textContent = "Opnieuw starten";
+    updatePremiumToolsUI();
+  }
+}
+
+function startPremiumFocus() {
+  if (!document.body.classList.contains("premium-mode")) {
+    showToast("Schakel Premium Experience in via Account → VIP-menu.");
+    return;
+  }
+  if (premiumFocusInterval) return;
+  if (premiumFocusRemainingSeconds <= 0) {
+    premiumFocusRemainingSeconds = premiumFocusDurationSeconds;
+  }
+  premiumFocusSessionStartRemaining = premiumFocusRemainingSeconds;
+  premiumFocusSessionRecorded = 0;
+  premiumFocusEndsAt = Date.now() + premiumFocusRemainingSeconds * 1000;
+  const status = $id("premium-focus-status");
+  if (status) status.textContent = "Focus staat aan. Je minuten worden automatisch bijgehouden.";
+  const button = $id("premium-focus-start");
+  if (button) button.textContent = "Bezig…";
+  premiumFocusInterval = window.setInterval(premiumFocusTick, 250);
+  premiumFocusTick();
+}
+
+function pausePremiumFocus() {
+  if (!premiumFocusInterval) return;
+  premiumFocusTick();
+  if (premiumFocusInterval) {
+    clearInterval(premiumFocusInterval);
+    premiumFocusInterval = null;
+  }
+  const status = $id("premium-focus-status");
+  if (status) status.textContent = "Focus gepauzeerd. Je resterende tijd is bewaard.";
+  const button = $id("premium-focus-start");
+  if (button) button.textContent = "Verdergaan";
+  updatePremiumToolsUI();
+}
+
+function resetPremiumFocus() {
+  pausePremiumFocus();
+  const preset = Number($id("premium-focus-preset")?.value || 25);
+  premiumFocusDurationSeconds = Math.max(5, Math.min(90, preset)) * 60;
+  premiumFocusRemainingSeconds = premiumFocusDurationSeconds;
+  premiumFocusSessionStartRemaining = premiumFocusDurationSeconds;
+  premiumFocusSessionRecorded = 0;
+  const status = $id("premium-focus-status");
+  if (status) status.textContent = "Nieuwe focusduur ingesteld. Je bent er klaar voor!";
+  const button = $id("premium-focus-start");
+  if (button) button.textContent = "Start";
+  updatePremiumToolsUI();
+}
+
+function updatePremiumToolsUI() {
+  const clock = $id("premium-focus-clock");
+  if (!clock) return;
+  if (!premiumFocusInterval && premiumFocusRemainingSeconds === 25 * 60 && $id("premium-focus-preset")) {
+    const preset = Number($id("premium-focus-preset").value || 25) * 60;
+    if (premiumFocusDurationSeconds !== preset) {
+      premiumFocusDurationSeconds = preset;
+      premiumFocusRemainingSeconds = preset;
+    }
+  }
+  clock.textContent = formatPremiumClock(premiumFocusRemainingSeconds);
+  const progress = $id("premium-focus-progress");
+  const percent = premiumFocusDurationSeconds > 0 ? ((premiumFocusDurationSeconds - premiumFocusRemainingSeconds) / premiumFocusDurationSeconds) * 100 : 0;
+  if (progress) progress.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+
+  const todaySeconds = readPremiumTodaySeconds();
+  const minutes = Math.floor(todaySeconds / 60);
+  const goalSelect = $id("premium-daily-goal");
+  if (goalSelect) {
+    const savedGoal = Number(localStorage.getItem(premiumGoalKey()) || goalSelect.value || 30);
+    if ([15, 30, 45, 60, 90].includes(savedGoal)) goalSelect.value = String(savedGoal);
+  }
+  const goal = Number(goalSelect?.value || 30);
+  const todayMinutes = $id("premium-today-minutes");
+  if (todayMinutes) todayMinutes.textContent = String(minutes);
+  const goalProgress = $id("premium-goal-progress");
+  if (goalProgress) goalProgress.style.width = `${Math.min(100, goal ? (minutes / goal) * 100 : 0)}%`;
+  const goalStatus = $id("premium-goal-status");
+  if (goalStatus) goalStatus.textContent = minutes >= goal
+    ? `Doel behaald! Je hebt vandaag ${minutes} van ${goal} minuten gefocust. 🏆`
+    : `Nog ${Math.max(0, goal - minutes)} minuten tot je doel van ${goal} minuten.`;
+}
+
+function launchPremiumRandomChallenge() {
+  if (!document.body.classList.contains("premium-mode")) return;
+  const requested = $id("premium-challenge-subject")?.value || "random";
+  const subject = requested === "random" ? (Math.random() < 0.5 ? "geo" : "math") : requested;
+  if (subject === "math") {
+    switchTab("math-mix");
+    const topic = ["all", "1", "3", "4", "6"][Math.floor(Math.random() * 5)];
+    if ($id("math-mix-topic")) $id("math-mix-topic").value = topic;
+    if ($id("math-mix-count")) $id("math-mix-count").value = "6";
+    if ($id("math-mix-difficulty")) $id("math-mix-difficulty").value = "havo";
+    window.setTimeout(() => $id("math-generate-mix")?.click(), 80);
+    return;
+  }
+
+  openSubjectCard("aardrijkskunde");
+  const topicSelect = $id("gen-topic");
+  if (topicSelect) {
+    const choices = [...topicSelect.options].filter(option => option.value && !/Heel Hoofdstuk|Compleet/i.test(option.textContent));
+    if (choices.length) topicSelect.value = choices[Math.floor(Math.random() * choices.length)].value;
+  }
+  if ($id("gen-count")) $id("gen-count").value = "6";
+  if ($id("gen-difficulty")) $id("gen-difficulty").value = "Havo / Vwo onderbouw";
+  window.setTimeout(() => {
+    switchTab("generator");
+    $id("btn-generate-mix")?.click();
+  }, 80);
+}
+
+function initialisePremiumTools() {
+  const preset = $id("premium-focus-preset");
+  const goal = $id("premium-daily-goal");
+  if (preset) preset.addEventListener("change", resetPremiumFocus);
+  if (goal) {
+    try {
+      const saved = Number(localStorage.getItem(premiumGoalKey()) || 30);
+      if ([15, 30, 45, 60, 90].includes(saved)) goal.value = String(saved);
+    } catch { /* keep default */ }
+    goal.addEventListener("change", () => {
+      try { localStorage.setItem(premiumGoalKey(), goal.value); } catch { /* optional preference */ }
+      updatePremiumToolsUI();
+    });
+  }
+  $id("premium-focus-start")?.addEventListener("click", startPremiumFocus);
+  $id("premium-focus-pause")?.addEventListener("click", pausePremiumFocus);
+  $id("premium-focus-reset")?.addEventListener("click", resetPremiumFocus);
+  $id("premium-random-challenge")?.addEventListener("click", launchPremiumRandomChallenge);
+  $id("premium-open-geo-summary")?.addEventListener("click", () => {
+    openSubjectCard("aardrijkskunde");
+    switchTab("summary");
+  });
+  $id("premium-open-math-formulas")?.addEventListener("click", () => switchTab("math-formulas"));
+  updatePremiumToolsUI();
+}
+
 function initialiseStudyHubAccounts() {
   // Restore local auth persistence before showing the first-run choice.
   setPersistence(studyHubAuth, browserLocalPersistence).catch(console.warn);
@@ -1851,10 +2202,13 @@ function initialiseStudyHubAccounts() {
   $id("redeem-code-button")?.addEventListener("click", redeemStudyHubCode);
   $id("admin-create-code")?.addEventListener("click", createAdminVipCode);
   $id("admin-copy-code")?.addEventListener("click", copyAdminVipCode);
+  $id("admin-refresh-codes")?.addEventListener("click", () => refreshAdminVipCodeList({ reset: true }));
+  $id("admin-load-more-codes")?.addEventListener("click", () => refreshAdminVipCodeList({ reset: false }));
   $id("redeem-code-input")?.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); redeemStudyHubCode(); } });
   $id("gold-mode-toggle")?.addEventListener("change", (event) => saveProfilePreference("goldModeEnabled", event.target.checked));
   $id("vip-theme-select")?.addEventListener("change", (event) => saveProfilePreference("vipTheme", event.target.value));
   $id("premium-mode-toggle")?.addEventListener("change", (event) => savePremiumExperience(event.target.checked));
+  initialisePremiumTools();
   $id("pause-vip-button")?.addEventListener("click", pauseVipTimer);
   $id("resume-vip-button")?.addEventListener("click", resumeVipTimer);
 

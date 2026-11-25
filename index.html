@@ -49,6 +49,7 @@
 
             <nav>
                 <button class="nav-tab-btn active" id="nav-home" data-tab="home">⌂ Overzicht</button>
+                <button class="nav-tab-btn premium-nav hidden" id="nav-premium" data-tab="premium">✦ Study Lab</button>
                 <button class="install-app-btn" id="install-app-btn" type="button" aria-label="Installeer StudyHub op je apparaat">⬇ Installeer app</button>
                 <button class="nav-tab-btn account-nav" id="account-button" type="button" data-tab="account">⚙ Account</button>
                 <button class="nav-tab-btn math-nav" id="nav-math" data-tab="math-overview">∑ Wiskunde</button>
@@ -126,6 +127,59 @@
                 </div>
             </div>
         </section>
+
+        <!-- PREMIUM STUDY LAB: available only while VIP Premium Experience is enabled -->
+        <section id="section-premium" class="hidden premium-page" aria-labelledby="premium-page-title">
+          <div class="premium-page-hero">
+            <div>
+              <div class="premium-page-eyebrow">STUDYHUB PREMIUM · STUDY LAB</div>
+              <h1 id="premium-page-title">Jouw persoonlijke leerwerkplek.</h1>
+              <p>Focus, oefen en herhaal met extra hulpmiddelen. Premium verandert ook de navigatie en indeling van StudyHub.</p>
+            </div>
+            <div class="premium-hero-badge" aria-hidden="true">✦</div>
+          </div>
+
+          <div class="premium-tool-grid">
+            <article class="premium-tool-card premium-focus-card">
+              <div class="premium-tool-heading"><span class="premium-tool-icon">◷</span><div><h2>Focus Sprint</h2><p>Werk in een rustig focusblok.</p></div></div>
+              <div class="premium-focus-clock" id="premium-focus-clock">25:00</div>
+              <div class="premium-progress-track"><span id="premium-focus-progress"></span></div>
+              <div class="premium-focus-controls">
+                <label class="premium-visually-hidden" for="premium-focus-preset">Focusduur</label>
+                <select id="premium-focus-preset"><option value="15">15 minuten</option><option value="25" selected>25 minuten</option><option value="45">45 minuten</option></select>
+                <button class="btn btn-primary" id="premium-focus-start" type="button">Start</button>
+                <button class="btn btn-light" id="premium-focus-pause" type="button">Pauze</button>
+                <button class="btn btn-light" id="premium-focus-reset" type="button">Reset</button>
+              </div>
+              <p class="premium-tool-status" id="premium-focus-status" role="status" aria-live="polite">Klaar voor een nieuwe focussessie.</p>
+            </article>
+
+            <article class="premium-tool-card">
+              <div class="premium-tool-heading"><span class="premium-tool-icon">◎</span><div><h2>Dagelijks doel</h2><p>Houd bij hoeveel minuten je vandaag gefocust hebt.</p></div></div>
+              <div class="premium-goal-total"><strong id="premium-today-minutes">0</strong><span>minuten vandaag</span></div>
+              <div class="premium-progress-track"><span id="premium-goal-progress"></span></div>
+              <div class="premium-goal-controls"><label for="premium-daily-goal">Mijn dagelijkse doel</label><select id="premium-daily-goal"><option value="15">15 minuten</option><option value="30" selected>30 minuten</option><option value="45">45 minuten</option><option value="60">60 minuten</option><option value="90">90 minuten</option></select></div>
+              <p class="premium-tool-status" id="premium-goal-status">Elke gefocuste minuut telt mee. Dit overzicht wordt op dit apparaat bewaard.</p>
+            </article>
+
+            <article class="premium-tool-card premium-challenge-card">
+              <div class="premium-tool-heading"><span class="premium-tool-icon">⚡</span><div><h2>Random Challenge</h2><p>Laat StudyHub een vak en hoofdstuk kiezen.</p></div></div>
+              <label for="premium-challenge-subject">Kies een vak</label>
+              <select id="premium-challenge-subject"><option value="random">Verrassingsmix · beide vakken</option><option value="geo">Aardrijkskunde</option><option value="math">Wiskunde</option></select>
+              <button class="btn btn-primary premium-challenge-button" id="premium-random-challenge" type="button">🎲 Start een challenge</button>
+              <p class="premium-tool-status">Je krijgt een korte oefensessie met een willekeurig onderwerp.</p>
+            </article>
+
+            <article class="premium-tool-card">
+              <div class="premium-tool-heading"><span class="premium-tool-icon">✧</span><div><h2>Snelle herhaling</h2><p>Ga meteen naar een samenvatting of formulekaart.</p></div></div>
+              <div class="premium-shortcut-list">
+                <button class="premium-shortcut" id="premium-open-geo-summary" type="button"><span>🌍</span><span><strong>Aardrijkskunde</strong><small>Hoofdstuk 1 samenvattingen</small></span><span>→</span></button>
+                <button class="premium-shortcut" id="premium-open-math-formulas" type="button"><span>∑</span><span><strong>Wiskunde</strong><small>Formules en rekenregels</small></span><span>→</span></button>
+              </div>
+            </article>
+          </div>
+        </section>
+
         <!-- ======================================================================
              SECTION 1: OEFENTOETSEN OVERZICHT
              ====================================================================== -->
@@ -714,19 +768,29 @@
 
             <div class="panel codes-panel-card">
               <div class="panel-header"><div><h3>🎟️ Codes</h3><p class="subtitle">Heb je een StudyHub-code gekregen? Wissel hem hier in.</p></div><button class="btn btn-secondary" id="toggle-code-panel" type="button" aria-expanded="false">Code invoeren</button></div>
-              <div id="code-entry-panel" class="code-entry-panel hidden"><label for="redeem-code-input">Code</label><div class="account-inline-form"><input id="redeem-code-input" type="text" maxlength="80" autocomplete="off" placeholder="SHVIP-PLAK-HIER-JE-CODE"><button class="btn btn-emerald" id="redeem-code-button" type="button">Inwisselen</button></div><p class="muted-note">Codes kunnen één keer per account worden gebruikt. Een coupon wordt toegevoegd aan je inventory.</p><p id="redeem-code-message" class="account-feedback" role="status" aria-live="polite"></p></div>
+              <div id="code-entry-panel" class="code-entry-panel hidden"><label for="redeem-code-input">Code</label><div class="account-inline-form"><input id="redeem-code-input" type="text" maxlength="80" autocomplete="off" placeholder="SHVIP-PLAK-HIER-JE-CODE"><button class="btn btn-emerald" id="redeem-code-button" type="button">Inwisselen</button></div><p class="muted-note">Afhankelijk van de code: globaal één keer totaal of één keer per persoon. Een coupon wordt toegevoegd aan je inventory.</p><p id="redeem-code-message" class="account-feedback" role="status" aria-live="polite"></p></div>
               <p id="lifetime-code-note" class="muted-note hidden">Codes zijn uitgeschakeld voor Lifetime VIP-accounts.</p>
             </div>
 
             <div id="admin-code-panel" class="panel admin-code-panel hidden">
               <div class="panel-header"><div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Maak VIP-codes die je veilig met klasgenoten kunt delen. Codes worden gehasht opgeslagen.</p></div><span class="tag tag-purple">ADMIN</span></div>
-              <div class="admin-code-grid">
-                <div class="account-form-group"><label for="admin-code-duration">Couponduur</label><select id="admin-code-duration"><option value="3600">1 uur</option><option value="21600">6 uur</option><option value="43200">12 uur</option><option value="86400">1 dag</option><option value="259200">3 dagen</option><option value="604800">7 dagen</option><option value="2592000">30 dagen</option></select></div>
-                <div class="account-form-group"><label for="admin-code-uses">Maximaal aantal accounts</label><input id="admin-code-uses" type="number" min="1" max="500" value="1"></div>
+              <div class="admin-code-create-row admin-code-create-row-scoped">
+                <div class="account-form-group"><label for="admin-code-duration">Reward · VIP-Coupon duur</label><select id="admin-code-duration"><option value="3600">1 uur</option><option value="21600">6 uur</option><option value="43200">12 uur</option><option value="86400">1 dag</option><option value="259200">3 dagen</option><option value="604800">7 dagen</option><option value="2592000">30 dagen</option></select></div>
+                <div class="account-form-group"><label for="admin-code-usage-scope">Hoe vaak mag de code worden gebruikt?</label><select id="admin-code-usage-scope"><option value="per_user" selected>Per persoon · iedereen 1 keer</option><option value="global">Globaal · in totaal 1 keer</option></select></div>
+                <button class="btn btn-amber" id="admin-create-code" type="button">✨ Maak code</button>
               </div>
-              <button class="btn btn-amber" id="admin-create-code" type="button">✨ Maak VIP-Coupon-code</button>
+              <p class="muted-note admin-code-rule">Per persoon: jij en iedere vriend kunnen dezelfde code elk één keer gebruiken. Globaal: de eerste persoon die de code inwisselt, gebruikt hem voor iedereen. Zet je een code INACTIEF en daarna weer ACTIEF, dan wordt de gebruiksronde volledig gereset.</p>
               <p id="admin-code-message" class="account-feedback" role="status" aria-live="polite"></p>
               <div id="admin-code-result" class="admin-code-result hidden"><label for="admin-code-value">Nieuwe code — wordt maar één keer getoond</label><div class="account-inline-form"><input id="admin-code-value" type="text" readonly><button class="btn btn-secondary" id="admin-copy-code" type="button">Kopiëren</button></div></div>
+              <section class="admin-code-library" aria-labelledby="admin-code-library-title">
+                <div class="admin-code-library-heading">
+                  <div><h4 id="admin-code-library-title">📋 Alle aangemaakte codes</h4><p class="muted-note">Bekijk de duur, het gebruik en de status. Je kunt codes pauzeren, opnieuw activeren of definitief verwijderen.</p></div>
+                  <button class="btn btn-secondary" id="admin-refresh-codes" type="button">↻ Vernieuwen</button>
+                </div>
+                <div class="admin-code-security-note">🔐 De code zelf wordt maar één keer getoond. Bij opnieuw activeren wordt de gebruiksregistratie voor alle accounts gereset. Eerder ontvangen vouchers blijven bestaan.</div>
+                <div id="admin-code-list" class="admin-code-list" aria-live="polite"><p class="muted-note">Code-overzicht wordt geladen…</p></div>
+                <button class="btn btn-secondary admin-code-load-more hidden" id="admin-load-more-codes" type="button">Meer codes laden</button>
+              </section>
             </div>
 
             <div id="vip-panel" class="panel vip-panel hidden">
@@ -740,11 +804,11 @@
                 <div class="vip-premium-copy">
                   <span class="vip-premium-kicker">THE SIGNATURE LOOK</span>
                   <h4>StudyHub Premium Experience</h4>
-                  <p>Een luxere StudyHub-uitstraling met metallic goudaccenten, diepere kaarten, subtiele glans en een exclusieve dashboardstijl.</p>
-                  <div class="vip-premium-perks"><span>✦ Premium kaarten</span><span>✦ Gouden details</span><span>✦ Extra diepte</span></div>
+                  <p>Activeer een aparte leerwerkplek met een andere navigatie, Focus Sprint, dagelijkse studiedoelen en random challenges. Premium is een extra indeling en toolkit; Gold Mode blijft een losse kleurkeuze.</p>
+                  <div class="vip-premium-perks"><span>Focus Sprint</span><span>Dagdoelen</span><span>Random Challenges</span></div>
                 </div>
               </div>
-              <div class="vip-setting-fields premium-setting"><label class="vip-toggle-row" for="premium-mode-toggle"><span><strong>Enable Premium Experience</strong><small>Activeer de volledige Premium-vormgeving.</small></span><input id="premium-mode-toggle" type="checkbox"></label><span class="muted-note">Dit is een extra uiterlijk binnen StudyHub VIP, geen betaalde aankoop.</span></div>
+              <div class="vip-setting-fields premium-setting"><label class="vip-toggle-row" for="premium-mode-toggle"><span><strong>Enable Premium Experience</strong><small>Activeer de Premium Study Lab, nieuwe navigatie en extra leertools.</small></span><input id="premium-mode-toggle" type="checkbox"></label><span class="muted-note">Premium werkt onafhankelijk van Gold Mode. Je kunt dus Premium gebruiken met of zonder gouden kleuren.</span></div>
               <div id="vip-action-row" class="vip-action-row"><button class="btn btn-secondary" id="pause-vip-button" type="button">⏸ VIP stoppen en tijd bewaren</button><button class="btn btn-emerald hidden" id="resume-vip-button" type="button">▶ VIP hervatten</button></div>
             </div>
 
