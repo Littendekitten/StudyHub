@@ -13,6 +13,8 @@ import re
 import secrets
 from datetime import datetime, timezone
 from functools import wraps
+
+from google.api_core.exceptions import AlreadyExists
 from typing import Any
 
 import firebase_admin
@@ -113,6 +115,13 @@ def hash_code(code: str) -> str:
     return hashlib.sha256(code.encode("utf-8")).hexdigest()
 
 
+def mask_code(code: str) -> str:
+    """Show admins a recognizable preview without storing the redeemable code."""
+    if len(code) <= 8:
+        return f"{code[:2]}•••{code[-2:]}"
+    return f"{code[:4]}…{code[-4:]}"
+
+
 def format_duration(seconds: int) -> str:
     if seconds % 86400 == 0:
         days = seconds // 86400
@@ -152,12 +161,9 @@ def create_vip_code():
     if not 1 <= duration_seconds <= 31_536_000:
         return api_error("De couponduur moet tussen 1 seconde en 365 dagen liggen.", 400)
 
-    code_name = payload.get("name", "")
-    if not isinstance(code_name, str):
-        return api_error("De codenaam is ongeldig.", 400)
-    code_name = re.sub(r"\s+", " ", code_name).strip()
-    if not 2 <= len(code_name) <= 40 or re.search(r"[<>\x00-\x1f]", code_name):
-        return api_error("De codenaam moet 2 tot 40 tekens bevatten.", 400)
+    code = normalize_code(payload.get("code"))
+    if not re.fullmatch(r"[A-Z0-9][A-Z0-9_-]{5,63}", code):
+        return api_error("Kies zelf een code van 6–64 tekens met alleen letters, cijfers, - of _.", 400)
 
     usage_scope = payload.get("usageScope", "per_user")
     if not isinstance(usage_scope, str) or usage_scope not in {"global", "per_user"}:
@@ -165,36 +171,40 @@ def create_vip_code():
 
     # One activation generation defines a fresh redemption round. Re-enabling
     # the code rotates this value, resetting either global or per-user usage.
-    code = f"SHVIP-{secrets.token_hex(16).upper()}"
     code_hash = hash_code(code)
     generation = secrets.token_hex(16)
     code_ref = DB.collection("codes").document(code_hash)
-    code_ref.create(
-        {
-            "type": "VIP-Coupon",
-            "name": code_name,
-            "reward": "VIP-Coupon",
-            "active": True,
-            "durationSeconds": duration_seconds,
-            "usageScope": usage_scope,
-            "generation": generation,
-            "redeemedCount": 0,
-            "expiresAt": None,
-            "createdAt": firestore.SERVER_TIMESTAMP,
-            "createdBy": request.studyhub_user["uid"],
-        }
-    )
+    try:
+        code_ref.create(
+            {
+                "type": "VIP-Coupon",
+                # Only a masked preview is stored. The redeemable string itself
+                # is used as the SHA-256 document ID and is never persisted.
+                "codePreview": mask_code(code),
+                "reward": "VIP-Coupon",
+                "active": True,
+                "durationSeconds": duration_seconds,
+                "usageScope": usage_scope,
+                "generation": generation,
+                "redeemedCount": 0,
+                "expiresAt": None,
+                "createdAt": firestore.SERVER_TIMESTAMP,
+                "createdBy": request.studyhub_user["uid"],
+            }
+        )
+    except AlreadyExists:
+        return api_error("Deze code bestaat al. Kies een andere code.", 409)
 
     response = jsonify(
         {
             "ok": True,
             "code": code,
-            "name": code_name,
+            "codePreview": mask_code(code),
             "durationSeconds": duration_seconds,
             "usageScope": usage_scope,
             "reward": f"VIP-Coupon · {format_duration(duration_seconds)}",
             "message": (
-                "VIP-code is aangemaakt. Bewaar hem; hij wordt maar één keer volledig getoond. "
+                "Je eigen VIP-code is aangemaakt. Bewaar de code die je hebt gekozen. "
                 + ("Deze code kan globaal één keer worden gebruikt." if usage_scope == "global" else "Iedere gebruiker kan deze code één keer gebruiken.")
             ),
         }
@@ -246,7 +256,7 @@ def list_admin_vip_codes():
         codes.append({
             "id": snapshot.id,
             "reference": snapshot.id[-8:].upper(),
-            "name": str(data.get("name", "Naamloze code"))[:40],
+            "codePreview": str(data.get("codePreview", ""))[:24] or None,
             "active": active,
             "status": "active" if active else "inactive",
             "reward": f"{data.get('reward', 'VIP-Coupon')} · {format_duration(duration)}",
@@ -358,8 +368,8 @@ def delete_admin_vip_code(code_id: str):
 def redeem_vip_code():
     payload = request.get_json(silent=True) or {}
     code = normalize_code(payload.get("code"))
-    if len(code) < 12 or len(code) > 80:
-        return api_error("Deze code lijkt ongeldig. Controleer de volledige code.", 400)
+    if not re.fullmatch(r"[A-Z0-9][A-Z0-9_-]{5,63}", code):
+        return api_error("Deze code lijkt ongeldig. Gebruik de volledige code van 6–64 tekens.", 400)
 
     uid = request.studyhub_user["uid"]
     code_hash = hash_code(code)
