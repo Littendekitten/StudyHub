@@ -12,7 +12,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="style.css?v=20261125-lifetime-collectible">
+    <link rel="stylesheet" href="style.css?v=20261125-custom-codes">
 </head>
 <body>
 
@@ -791,16 +791,16 @@
 
             <div class="panel codes-panel-card">
               <div class="panel-header"><div><h3>🎟️ Codes</h3><p class="subtitle">Heb je een StudyHub-code gekregen? Wissel hem hier in.</p></div><button class="btn btn-secondary" id="toggle-code-panel" type="button" aria-expanded="false">Code invoeren</button></div>
-              <div id="code-entry-panel" class="code-entry-panel hidden"><label for="redeem-code-input">Code</label><div class="account-inline-form"><input id="redeem-code-input" type="text" maxlength="80" autocomplete="off" placeholder="SHVIP-PLAK-HIER-JE-CODE"><button class="btn btn-emerald" id="redeem-code-button" type="button">Inwisselen</button></div><p class="muted-note">Afhankelijk van de code: globaal één keer totaal of één keer per persoon. Een coupon wordt toegevoegd aan je inventory.</p><p id="redeem-code-message" class="account-feedback" role="status" aria-live="polite"></p></div>
+              <div id="code-entry-panel" class="code-entry-panel hidden"><label for="redeem-code-input">Code</label><div class="account-inline-form"><input id="redeem-code-input" type="text" maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="STUDYHUB-FREEVIP-2026"><button class="btn btn-emerald" id="redeem-code-button" type="button">Inwisselen</button></div><p class="muted-note">Afhankelijk van de code: globaal één keer totaal of één keer per persoon. Een coupon wordt toegevoegd aan je inventory.</p><p id="redeem-code-message" class="account-feedback" role="status" aria-live="polite"></p></div>
               <p id="lifetime-code-note" class="muted-note hidden">Ook met Lifetime VIP kun je gewone VIP-Coupons verzamelen via codes.</p>
             </div>
 
             <div id="admin-code-panel" class="panel admin-code-panel hidden">
-              <div class="panel-header admin-code-panel-heading"><div><div class="section-eyebrow">ADMINISTRATIE</div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Geef codes een eigen naam, maak ze aan en beheer ze hier.</p></div><div class="admin-code-heading-actions"><span class="tag tag-purple">ADMIN</span><button class="btn btn-secondary" id="admin-code-back" type="button">← Instellingen</button></div></div>
+              <div class="panel-header admin-code-panel-heading"><div><div class="section-eyebrow">ADMINISTRATIE</div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Kies zelf de exacte code die gebruikers moeten invoeren.</p></div><div class="admin-code-heading-actions"><span class="tag tag-purple">ADMIN</span><button class="btn btn-secondary" id="admin-code-back" type="button">← Instellingen</button></div></div>
               <div class="admin-code-label-field account-form-group">
-                <label for="admin-code-name">Naam van deze code</label>
-                <input id="admin-code-name" type="text" maxlength="40" autocomplete="off" placeholder="Bijv. Klassenactie november" required>
-                <small class="muted-note">Deze naam is alleen zichtbaar in jouw admin-overzicht. De ontvanger ziet de reward.</small>
+                <label for="admin-code-custom-code">Welke code moeten mensen invoeren?</label>
+                <input id="admin-code-custom-code" type="text" maxlength="64" minlength="6" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Bijv. STUDYHUB-FREEVIP-2026" required>
+                <small class="muted-note">Jij kiest de daadwerkelijke inwisselcode. Gebruik 6–64 letters, cijfers, - of _. Spaties worden weggehaald en letters worden hoofdletters.</small>
               </div>
               <div class="admin-code-create-row admin-code-create-row-scoped">
                 <div class="account-form-group"><label for="admin-code-duration">Reward · VIP-Coupon duur</label><select id="admin-code-duration"><option value="3600">1 uur</option><option value="21600">6 uur</option><option value="43200">12 uur</option><option value="86400">1 dag</option><option value="259200">3 dagen</option><option value="604800">7 dagen</option><option value="2592000">30 dagen</option></select></div>
@@ -809,13 +809,13 @@
               </div>
               <p class="muted-note admin-code-rule">Per persoon: jij en iedere vriend kunnen dezelfde code elk één keer gebruiken. Globaal: de eerste persoon die de code inwisselt, gebruikt hem voor iedereen. Zet je een code INACTIEF en daarna weer ACTIEF, dan wordt de gebruiksronde volledig gereset.</p>
               <p id="admin-code-message" class="account-feedback" role="status" aria-live="polite"></p>
-              <div id="admin-code-result" class="admin-code-result hidden"><label for="admin-code-value">Nieuwe code — wordt maar één keer getoond</label><div class="account-inline-form"><input id="admin-code-value" type="text" readonly><button class="btn btn-secondary" id="admin-copy-code" type="button">Kopiëren</button></div></div>
+              <div id="admin-code-result" class="admin-code-result hidden"><label for="admin-code-value">Jouw code — deel deze met gebruikers</label><div class="account-inline-form"><input id="admin-code-value" type="text" readonly><button class="btn btn-secondary" id="admin-copy-code" type="button">Kopiëren</button></div></div>
               <section class="admin-code-library" aria-labelledby="admin-code-library-title">
                 <div class="admin-code-library-heading">
                   <div><h4 id="admin-code-library-title">📋 Alle aangemaakte codes</h4><p class="muted-note">Bekijk de duur, het gebruik en de status. Je kunt codes pauzeren, opnieuw activeren of definitief verwijderen.</p></div>
                   <button class="btn btn-secondary" id="admin-refresh-codes" type="button">↻ Vernieuwen</button>
                 </div>
-                <div class="admin-code-security-note">🔐 De code zelf wordt maar één keer getoond. Bij opnieuw activeren wordt de gebruiksregistratie voor alle accounts gereset. Eerder ontvangen vouchers blijven bestaan.</div>
+                <div class="admin-code-security-note">🔐 De volledige code wordt niet in Firestore opgeslagen. Bewaar de code die je zelf hebt gekozen. Bij opnieuw activeren wordt de gebruiksregistratie gereset; eerder ontvangen vouchers blijven bestaan.</div>
                 <div id="admin-code-list" class="admin-code-list" aria-live="polite"><p class="muted-note">Code-overzicht wordt geladen…</p></div>
                 <button class="btn btn-secondary admin-code-load-more hidden" id="admin-load-more-codes" type="button">Meer codes laden</button>
               </section>
@@ -852,6 +852,6 @@
         StudyHub • Havo 2 • Aardrijkskunde & Wiskunde
     </footer>
 
-    <script type="module" src="app.js?v=20261125-lifetime-collectible"></script>
+    <script type="module" src="app.js?v=20261125-custom-codes"></script>
 </body>
 </html>

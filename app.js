@@ -1742,14 +1742,14 @@ async function createAdminVipCode() {
   const button = $id("admin-create-code");
   const resultPanel = $id("admin-code-result");
   if (!button) return;
-  const codeNameInput = $id("admin-code-name");
-  const codeName = String(codeNameInput?.value || "").trim().replace(/\s+/g, " ");
+  const codeInput = $id("admin-code-custom-code");
+  const chosenCode = String(codeInput?.value || "").trim().toUpperCase().replace(/\s+/g, "");
   const durationSeconds = Number($id("admin-code-duration")?.value || 0);
   const usageScope = $id("admin-code-usage-scope")?.value || "per_user";
 
-  if (codeName.length < 2 || codeName.length > 40 || /[<>\u0000-\u001f]/.test(codeName)) {
-    setAdminCodeMessage("Kies een codenaam van 2 tot 40 tekens.", true);
-    codeNameInput?.focus();
+  if (!/^[A-Z0-9][A-Z0-9_-]{5,63}$/.test(chosenCode)) {
+    setAdminCodeMessage("Kies een code van 6–64 tekens met alleen letters, cijfers, - of _.", true);
+    codeInput?.focus();
     return;
   }
 
@@ -1759,11 +1759,12 @@ async function createAdminVipCode() {
   try {
     const result = await studyHubApiRequest("/api/admin/codes", {
       method: "POST",
-      body: { name: codeName, durationSeconds, usageScope }
+      body: { code: chosenCode, durationSeconds, usageScope }
     });
     $id("admin-code-value").value = result.code;
+    if (codeInput) codeInput.value = "";
     resultPanel?.classList.remove("hidden");
-    setAdminCodeMessage(`“${result.name || codeName}” aangemaakt! Kopieer de code nu; de volledige code wordt maar één keer getoond.`, false);
+    setAdminCodeMessage(`Code ${chosenCode} is aangemaakt. Deel deze code met de gebruikers voor wie hij bedoeld is.`, false);
     await refreshAdminVipCodeList({ reset: true });
   } catch (error) {
     setAdminCodeMessage(error.message || "VIP-code maken is mislukt.", true);
@@ -1810,10 +1811,10 @@ function buildAdminCodeCard(code) {
   const titleWrap = document.createElement("div");
   titleWrap.className = "admin-code-item-title";
   const name = document.createElement("strong");
-  name.textContent = code.name || "Naamloze code";
+  name.textContent = code.codePreview ? `CODE · ${code.codePreview}` : "CODE · Oude code";
   const reference = document.createElement("span");
   reference.className = "admin-code-reference";
-  reference.textContent = `CODE · …${code.reference || String(code.id || "").slice(-8).toUpperCase()}`;
+  reference.textContent = `ID · …${code.reference || String(code.id || "").slice(-8).toUpperCase()}`;
   titleWrap.append(name, reference);
 
   const status = document.createElement("span");
@@ -1933,8 +1934,8 @@ async function redeemStudyHubCode() {
   if (!studyHubUser || !studyHubProfile) return;
   const field = $id("redeem-code-input");
   const code = String(field?.value || "").trim().toUpperCase().replace(/\s+/g, "");
-  if (code.length < 12) {
-    setCodeMessage("Deze code lijkt te kort. Controleer of je de volledige code hebt ingevuld.", true);
+  if (!/^[A-Z0-9][A-Z0-9_-]{5,63}$/.test(code)) {
+    setCodeMessage("Vul een volledige code van 6–64 tekens in (letters, cijfers, - of _).", true);
     return;
   }
 
