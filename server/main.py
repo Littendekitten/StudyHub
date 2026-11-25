@@ -152,6 +152,13 @@ def create_vip_code():
     if not 1 <= duration_seconds <= 31_536_000:
         return api_error("De couponduur moet tussen 1 seconde en 365 dagen liggen.", 400)
 
+    code_name = payload.get("name", "")
+    if not isinstance(code_name, str):
+        return api_error("De codenaam is ongeldig.", 400)
+    code_name = re.sub(r"\s+", " ", code_name).strip()
+    if not 2 <= len(code_name) <= 40 or re.search(r"[<>\x00-\x1f]", code_name):
+        return api_error("De codenaam moet 2 tot 40 tekens bevatten.", 400)
+
     usage_scope = payload.get("usageScope", "per_user")
     if not isinstance(usage_scope, str) or usage_scope not in {"global", "per_user"}:
         return api_error("Kies globaal één keer of één keer per persoon.", 400)
@@ -165,6 +172,7 @@ def create_vip_code():
     code_ref.create(
         {
             "type": "VIP-Coupon",
+            "name": code_name,
             "reward": "VIP-Coupon",
             "active": True,
             "durationSeconds": duration_seconds,
@@ -181,6 +189,7 @@ def create_vip_code():
         {
             "ok": True,
             "code": code,
+            "name": code_name,
             "durationSeconds": duration_seconds,
             "usageScope": usage_scope,
             "reward": f"VIP-Coupon · {format_duration(duration_seconds)}",
@@ -237,6 +246,7 @@ def list_admin_vip_codes():
         codes.append({
             "id": snapshot.id,
             "reference": snapshot.id[-8:].upper(),
+            "name": str(data.get("name", "Naamloze code"))[:40],
             "active": active,
             "status": "active" if active else "inactive",
             "reward": f"{data.get('reward', 'VIP-Coupon')} · {format_duration(duration)}",
