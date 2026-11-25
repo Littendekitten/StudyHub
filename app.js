@@ -1267,6 +1267,7 @@ async function ensureStudyHubProfile(user) {
         goldModeEnabled: false,
         premiumMode: false,
         "Lifetime-VIP": false,
+        lifetimeVipActive: false,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -1301,8 +1302,14 @@ function startUserListeners(user) {
   vipTimerHandle = setInterval(refreshVipTimer, 1000);
 }
 
-function vipLifetime() {
+function hasLifetimeVip() {
   return studyHubProfile?.["Lifetime-VIP"] === true;
+}
+
+// Older Lifetime-VIP profiles do not have lifetimeVipActive yet. Treat a
+// missing field as equipped so existing owners keep their current access.
+function vipLifetime() {
+  return hasLifetimeVip() && studyHubProfile?.lifetimeVipActive !== false;
 }
 
 function activeVipNow() {
@@ -1312,7 +1319,6 @@ function activeVipNow() {
 }
 
 function vipStillOwned() {
-  if (vipLifetime()) return true;
   if (activeVipNow()) return true;
   return studyHubVipState?.status === "paused" && Number(studyHubVipState.remainingSeconds) > 0;
 }
@@ -1333,8 +1339,7 @@ function formatStudyHubTime(seconds) {
 
 function applyStudyHubAppearance() {
   const profile = studyHubProfile || {};
-  const lifetime = profile["Lifetime-VIP"] === true;
-  const active = lifetime || (
+  const active = vipLifetime() || (
     studyHubVipState?.status === "active" &&
     studyHubVipState?.expiresAt?.toMillis?.() > Date.now()
   );
@@ -1383,25 +1388,36 @@ function renderAccountState() {
   $id("account-provider").textContent = studyHubUser.providerData.map(p => p.providerId === "google.com" ? "Google" : "E-mail").join(" + ") || "Firebase";
   $id("theme-mode-select").value = profile.themeMode === "light" ? "light" : "dark";
 
-  const lifetime = vipLifetime();
+  const lifetimeEntitlement = hasLifetimeVip();
+  const lifetimeActive = vipLifetime();
   const owned = vipStillOwned();
-  const activeOrLifetime = lifetime || activeVipNow();
+  const activeOrLifetime = activeVipNow();
   const statusLabel = $id("account-status-label");
   const statusBadge = $id("account-status-badge");
-  if (statusLabel) statusLabel.textContent = lifetime ? "Lifetime VIP-account" : (activeOrLifetime ? "VIP is actief" : (owned ? "VIP is gepauzeerd" : "Gratis account"));
-  if (statusBadge) {
-    statusBadge.textContent = lifetime ? "LIFETIME VIP" : (activeOrLifetime ? "VIP" : (owned ? "VIP PAUSED" : "FREE"));
-    statusBadge.className = `tag ${activeOrLifetime || owned ? "tag-amber" : "tag-emerald"}`;
+  if (statusLabel) {
+    statusLabel.textContent = lifetimeEntitlement
+      ? (lifetimeActive
+        ? "Lifetime VIP collectible · actief"
+        : (activeOrLifetime ? "VIP-Coupon actief · Lifetime VIP opgeborgen" : (owned ? "Lifetime VIP opgeborgen · coupon gepauzeerd" : "Lifetime VIP collectible · opgeborgen")))
+      : (activeOrLifetime ? "VIP is actief" : (owned ? "VIP is gepauzeerd" : "Gratis account"));
   }
+  if (statusBadge) {
+    statusBadge.textContent = lifetimeEntitlement
+      ? (lifetimeActive ? "LIFETIME VIP · ACTIEF" : (activeOrLifetime ? "VIP · LIFETIME STORED" : "LIFETIME VIP · STORED"))
+      : (activeOrLifetime ? "VIP" : (owned ? "VIP PAUSED" : "FREE"));
+    statusBadge.className = `tag ${activeOrLifetime || owned || lifetimeEntitlement ? "tag-amber" : "tag-emerald"}`;
+  }
+  // Inventory and redemption are available to all signed-in users, including Lifetime VIP.
   const inventoryPanel = document.querySelector(".inventory-panel");
   const codePanel = document.querySelector(".codes-panel-card");
-  if (inventoryPanel) inventoryPanel.classList.toggle("hidden", lifetime);
-  if (codePanel) codePanel.classList.toggle("hidden", lifetime);
-  $id("lifetime-inventory-note").classList.toggle("hidden", !lifetime);
-  $id("lifetime-code-note").classList.toggle("hidden", !lifetime);
-  $id("lifetime-vip-value").textContent = lifetime ? "true" : "false";
+  if (inventoryPanel) inventoryPanel.classList.remove("hidden");
+  if (codePanel) codePanel.classList.remove("hidden");
+  $id("lifetime-inventory-note")?.classList.add("hidden");
+  $id("lifetime-code-note")?.classList.add("hidden");
+  if ($id("lifetime-vip-value")) $id("lifetime-vip-value").textContent = lifetimeEntitlement ? "true" : "false";
 
-  const count = studyHubInventory.reduce((sum, item) => sum + Math.max(0, Number(item.quantity) || 0), 0);
+  const couponCount = studyHubInventory.reduce((sum, item) => sum + Math.max(0, Number(item.quantity) || 0), 0);
+  const count = couponCount + (lifetimeEntitlement ? 1 : 0);
   $id("inventory-count").textContent = `${count} ${count === 1 ? "item" : "items"}`;
   renderInventory();
   renderVipPanel();
@@ -1412,24 +1428,52 @@ function renderInventory() {
   const container = $id("inventory-list");
   if (!container) return;
   container.replaceChildren();
-  const items = studyHubInventory
-    .filter(item => item.type === "VIP-Coupon" && Number(item.quantity) > 0)
-    .sort((a,b) => Number(a.durationSeconds) - Number(b.durationSeconds));
 
-  if (items.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "inventory-empty";
-    empty.textContent = "Je inventory is nog leeg. Wissel een VIP-code in om een voucher te ontvangen.";
-    container.appendChild(empty);
-    return;
+  const couponItems = studyHubInventory
+    .filter(item => item.type === "VIP-Coupon" && Number(item.quantity) > 0)
+    .sort((a, b) => Number(a.durationSeconds) - Number(b.durationSeconds));
+
+  if (hasLifetimeVip()) {
+    const active = vipLifetime();
+    const card = document.createElement("article");
+    card.className = `inventory-item lifetime-collectible${active ? " is-equipped" : " is-stored"}`;
+
+    const art = document.createElement("div");
+    art.className = "voucher-art lifetime-voucher-art";
+    art.setAttribute("aria-label", "Lifetime VIP collectible");
+    art.textContent = "♾️";
+
+    const copy = document.createElement("div");
+    copy.className = "inventory-item-copy";
+    const name = document.createElement("strong");
+    name.textContent = "Lifetime VIP";
+    const detail = document.createElement("small");
+    detail.textContent = active ? "Permanent collectible · Actief" : "Permanent collectible · In inventory";
+    const state = document.createElement("span");
+    state.className = `lifetime-collectible-state${active ? " active" : " inactive"}`;
+    state.textContent = active ? "EQUIPPED" : "STORED";
+    copy.append(name, detail, state);
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = active ? "btn btn-secondary" : "btn btn-emerald";
+    toggle.textContent = active ? "Uitrusten" : "Activeren";
+    const runningCoupon = studyHubVipState?.status === "active" &&
+      studyHubVipState?.expiresAt?.toMillis?.() > Date.now();
+    toggle.disabled = !active && runningCoupon;
+    if (toggle.disabled) toggle.title = "Pauzeer eerst je actieve VIP-Coupon voordat je Lifetime VIP activeert.";
+    toggle.addEventListener("click", toggleLifetimeVip);
+
+    card.append(art, copy, toggle);
+    container.appendChild(card);
   }
 
-  for (const item of items) {
+  for (const item of couponItems) {
     const card = document.createElement("article");
     card.className = "inventory-item";
     const art = document.createElement("div");
     art.className = "voucher-art";
-    art.setAttribute("aria-label", "Gouden VIP-voucher");
+    art.setAttribute("aria-label", "VIP-Coupon voucher");
     art.textContent = "🎟️";
     const copy = document.createElement("div");
     copy.className = "inventory-item-copy";
@@ -1442,13 +1486,43 @@ function renderInventory() {
     useButton.type = "button";
     useButton.className = "btn btn-amber";
     useButton.textContent = "Gebruiken";
-    useButton.disabled = vipLifetime() || (studyHubVipState && (
+    useButton.disabled = vipLifetime() || Boolean(studyHubVipState && (
       (studyHubVipState.status === "active" && studyHubVipState.expiresAt?.toMillis?.() > Date.now()) ||
       studyHubVipState.status === "paused"
     ));
+    if (vipLifetime()) useButton.title = "Uitrust eerst je Lifetime VIP-collectible om een coupon te gebruiken.";
     useButton.addEventListener("click", () => activateVipCoupon(item.id));
     card.append(art, copy, useButton);
     container.appendChild(card);
+  }
+
+  if (!container.children.length) {
+    const empty = document.createElement("div");
+    empty.className = "inventory-empty";
+    empty.textContent = "Je inventory is nog leeg. Wissel een StudyHub-code in om een collectible of VIP-Coupon te ontvangen.";
+    container.appendChild(empty);
+  }
+}
+
+async function toggleLifetimeVip() {
+  if (!studyHubUser || !hasLifetimeVip()) return;
+  const nextActive = !vipLifetime();
+  const runningCoupon = studyHubVipState?.status === "active" &&
+    studyHubVipState?.expiresAt?.toMillis?.() > Date.now();
+  if (nextActive && runningCoupon) {
+    showToast("Pauzeer eerst je actieve VIP-Coupon voordat je Lifetime VIP activeert.");
+    return;
+  }
+  try {
+    await updateDoc(userDocRef(studyHubUser.uid), {
+      lifetimeVipActive: nextActive,
+      updatedAt: serverTimestamp()
+    });
+    showToast(nextActive
+      ? "♾️ Lifetime VIP collectible geactiveerd!"
+      : "Lifetime VIP opgeborgen. Je permanente collectible blijft in je inventory.");
+  } catch (error) {
+    showToast(`Lifetime VIP wijzigen mislukt: ${friendlyFirebaseError(error)}`);
   }
 }
 
@@ -1844,10 +1918,6 @@ async function deleteAdminVipCode(code) {
 
 async function redeemStudyHubCode() {
   if (!studyHubUser || !studyHubProfile) return;
-  if (vipLifetime()) {
-    setCodeMessage("Lifetime VIP-accounts kunnen geen coupons via codes ontvangen.", true);
-    return;
-  }
   const field = $id("redeem-code-input");
   const code = String(field?.value || "").trim().toUpperCase().replace(/\s+/g, "");
   if (code.length < 12) {
@@ -1884,7 +1954,10 @@ async function activateVipCoupon(itemId) {
       const [profileSnap, itemSnap, vipSnap] = await Promise.all([
         transaction.get(userDocRef(studyHubUser.uid)), transaction.get(inventoryRef), transaction.get(vipRef)
       ]);
-      if (!profileSnap.exists() || profileSnap.data()["Lifetime-VIP"] === true) throw new Error("Deze coupon kan niet op dit account worden gebruikt.");
+      const profile = profileSnap.exists() ? profileSnap.data() : null;
+      if (!profile || (profile["Lifetime-VIP"] === true && profile.lifetimeVipActive !== false)) {
+        throw new Error("Uitrust eerst je Lifetime VIP-collectible om een coupon te gebruiken.");
+      }
       if (!itemSnap.exists() || Number(itemSnap.data().quantity) < 1) throw new Error("Je hebt geen coupon van deze duur meer.");
       const oldVip = vipSnap.exists() ? vipSnap.data() : null;
       if (oldVip && oldVip.status === "paused" && Number(oldVip.remainingSeconds) > 0) throw new Error("Hervat eerst je gepauzeerde VIP-tijd.");

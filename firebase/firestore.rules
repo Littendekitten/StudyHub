@@ -17,11 +17,21 @@ service cloud.firestore {
     function vipEntitled(uid) {
       let profile = get(userPath(uid)).data;
       let statePath = vipPath(uid);
-      return profile.get('Lifetime-VIP', false) == true ||
+      let lifetimeEquipped = profile.get('Lifetime-VIP', false) == true &&
+        profile.get('lifetimeVipActive', true) == true;
+      return lifetimeEquipped ||
         (exists(statePath) &&
           get(statePath).data.status == 'active' &&
           get(statePath).data.expiresAt is timestamp &&
           get(statePath).data.expiresAt > request.time);
+    }
+
+    // A Lifetime-VIP owner may use ordinary coupon vouchers after unequipping
+    // the permanent collectible. The entitlement flag itself remains protected.
+    function couponVipAllowed(uid) {
+      let profile = get(userPath(uid)).data;
+      return profile.get('Lifetime-VIP', false) != true ||
+        profile.get('lifetimeVipActive', true) == false;
     }
 
     function validUsername(value) {
@@ -71,18 +81,19 @@ service cloud.firestore {
 
       allow create: if signedInAs(uid) &&
         request.resource.data.keys().hasAll(['username', 'themeMode', 'vipTheme', 'goldModeEnabled', 'premiumMode', 'Lifetime-VIP', 'createdAt', 'updatedAt']) &&
-        request.resource.data.keys().hasOnly(['username', 'themeMode', 'vipTheme', 'goldModeEnabled', 'premiumMode', 'Lifetime-VIP', 'createdAt', 'updatedAt']) &&
+        request.resource.data.keys().hasOnly(['username', 'themeMode', 'vipTheme', 'goldModeEnabled', 'premiumMode', 'Lifetime-VIP', 'lifetimeVipActive', 'createdAt', 'updatedAt']) &&
         validUsername(request.resource.data.username) &&
         request.resource.data.themeMode in ['dark', 'light'] &&
         request.resource.data.vipTheme in ['dark-gold', 'light-gold'] &&
         request.resource.data.goldModeEnabled == false &&
         request.resource.data.premiumMode == false &&
         request.resource.data['Lifetime-VIP'] == false &&
+        (!request.resource.data.keys().hasAny(['lifetimeVipActive']) || request.resource.data.lifetimeVipActive == false) &&
         request.resource.data.createdAt == request.time &&
         request.resource.data.updatedAt == request.time;
 
       allow update: if signedInAs(uid) &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['username', 'themeMode', 'vipTheme', 'goldModeEnabled', 'premiumMode', 'updatedAt']) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['username', 'themeMode', 'vipTheme', 'goldModeEnabled', 'premiumMode', 'lifetimeVipActive', 'updatedAt']) &&
         request.resource.data.get('Lifetime-VIP', false) == resource.data.get('Lifetime-VIP', false) &&
         request.resource.data.get('createdAt', request.time) == resource.data.get('createdAt', request.time) &&
         request.resource.data.updatedAt == request.time &&
@@ -90,7 +101,9 @@ service cloud.firestore {
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['themeMode']) || request.resource.data.themeMode in ['dark', 'light']) &&
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['vipTheme']) || (vipEntitled(uid) && request.resource.data.vipTheme in ['dark-gold', 'light-gold'])) &&
         (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['goldModeEnabled']) || request.resource.data.goldModeEnabled == false || vipEntitled(uid)) &&
-        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['premiumMode']) || request.resource.data.premiumMode == false || vipEntitled(uid));
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['premiumMode']) || request.resource.data.premiumMode == false || vipEntitled(uid)) &&
+        (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['lifetimeVipActive']) ||
+          (resource.data.get('Lifetime-VIP', false) == true && request.resource.data.lifetimeVipActive is bool));
 
       allow delete: if false;
 
@@ -100,7 +113,7 @@ service cloud.firestore {
         allow create, delete: if false;
         // Browser writes may only consume a coupon while activating VIP.
         allow update: if signedInAs(uid) &&
-          get(userPath(uid)).data.get('Lifetime-VIP', false) == false &&
+          couponVipAllowed(uid) &&
           validCouponUse(uid, itemId);
       }
 
@@ -114,18 +127,19 @@ service cloud.firestore {
         allow read: if signedInAs(uid);
 
         allow create: if signedInAs(uid) && vipId == 'current' &&
-          get(userPath(uid)).data.get('Lifetime-VIP', false) == false &&
+          couponVipAllowed(uid) &&
           validCouponActivation(uid);
 
         allow update: if signedInAs(uid) && vipId == 'current' &&
           (
             (
+              couponVipAllowed(uid) &&
               resource.data.status == 'active' &&
               resource.data.expiresAt is timestamp && resource.data.expiresAt <= request.time &&
-              get(userPath(uid)).data.get('Lifetime-VIP', false) == false &&
               validCouponActivation(uid)
             ) ||
             (
+              couponVipAllowed(uid) &&
               resource.data.status == 'active' && resource.data.expiresAt is timestamp && resource.data.expiresAt > request.time &&
               request.resource.data.keys().hasOnly(['status', 'durationSeconds', 'remainingSeconds', 'expiresAt', 'startedAt', 'sourceItemId', 'useId', 'updatedAt']) &&
               request.resource.data.status == 'paused' &&
@@ -139,6 +153,7 @@ service cloud.firestore {
               request.resource.data.updatedAt == request.time
             ) ||
             (
+              couponVipAllowed(uid) &&
               resource.data.status == 'paused' && resource.data.remainingSeconds is int && resource.data.remainingSeconds > 0 &&
               request.resource.data.keys().hasOnly(['status', 'durationSeconds', 'remainingSeconds', 'expiresAt', 'startedAt', 'sourceItemId', 'useId', 'updatedAt']) &&
               request.resource.data.status == 'active' &&

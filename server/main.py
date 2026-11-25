@@ -365,8 +365,8 @@ def redeem_vip_code():
 
         if not profile_snap.exists:
             raise ValueError("Je StudyHub-profiel is niet gevonden. Log opnieuw in.")
-        if profile_snap.to_dict().get("Lifetime-VIP") is True:
-            raise ValueError("Lifetime VIP heeft geen coupons nodig en kan geen codes inwisselen.")
+        # Lifetime-VIP owners may also collect and redeem regular VIP-Coupons.
+        # Their permanent entitlement is independent from coupon inventory.
         if not code_snap.exists:
             raise ValueError("Deze code bestaat niet of is ongeldig.")
 

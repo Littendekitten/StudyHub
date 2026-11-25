@@ -12,7 +12,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="style.css?v=20261125-premium">
+    <link rel="stylesheet" href="style.css?v=20261125-lifetime-collectible">
 </head>
 <body>
 
@@ -786,13 +786,13 @@
             <div class="panel inventory-panel">
               <div class="panel-header"><div><h3>🎒 Inventory</h3><p class="subtitle">Items die je op je account hebt ontvangen.</p></div><span class="tag tag-amber" id="inventory-count">0 items</span></div>
               <div id="inventory-list" class="inventory-list"><p class="muted-note">Je inventory wordt geladen…</p></div>
-              <p id="lifetime-inventory-note" class="info-note hidden">Je hebt Lifetime VIP. Daarom heb je geen VIP-coupons nodig en is je inventory verborgen.</p>
+              <p id="lifetime-inventory-note" class="info-note hidden">Je Lifetime VIP verschijnt hier als permanente collectible. Je kunt hem activeren of uitrusten.</p>
             </div>
 
             <div class="panel codes-panel-card">
               <div class="panel-header"><div><h3>🎟️ Codes</h3><p class="subtitle">Heb je een StudyHub-code gekregen? Wissel hem hier in.</p></div><button class="btn btn-secondary" id="toggle-code-panel" type="button" aria-expanded="false">Code invoeren</button></div>
               <div id="code-entry-panel" class="code-entry-panel hidden"><label for="redeem-code-input">Code</label><div class="account-inline-form"><input id="redeem-code-input" type="text" maxlength="80" autocomplete="off" placeholder="SHVIP-PLAK-HIER-JE-CODE"><button class="btn btn-emerald" id="redeem-code-button" type="button">Inwisselen</button></div><p class="muted-note">Afhankelijk van de code: globaal één keer totaal of één keer per persoon. Een coupon wordt toegevoegd aan je inventory.</p><p id="redeem-code-message" class="account-feedback" role="status" aria-live="polite"></p></div>
-              <p id="lifetime-code-note" class="muted-note hidden">Codes zijn uitgeschakeld voor Lifetime VIP-accounts.</p>
+              <p id="lifetime-code-note" class="muted-note hidden">Ook met Lifetime VIP kun je gewone VIP-Coupons verzamelen via codes.</p>
             </div>
 
             <div id="admin-code-panel" class="panel admin-code-panel hidden">
@@ -836,7 +836,7 @@
             </div>
 
             <div class="panel lifetime-admin-note">
-              <h3>Accountstatus</h3><p class="subtitle">Lifetime-VIP wordt door StudyHub-beheer ingesteld. Je kunt dit niet met een gewone code activeren.</p><p class="account-meta-row"><span>Lifetime-VIP</span><strong id="lifetime-vip-value">false</strong></p>
+              <h3>Accountstatus</h3><p class="subtitle">Lifetime-VIP is een permanent collectible dat alleen door StudyHub-beheer wordt toegekend. Je kunt het vanuit je inventory activeren of opbergen; gewone codes kunnen geen Lifetime-VIP geven.</p><p class="account-meta-row"><span>Lifetime-VIP</span><strong id="lifetime-vip-value">false</strong></p>
             </div>
           </div>
         </section>
@@ -847,6 +847,6 @@
         StudyHub • Havo 2 • Aardrijkskunde & Wiskunde
     </footer>
 
-    <script type="module" src="app.js?v=20261125-premium"></script>
+    <script type="module" src="app.js?v=20261125-lifetime-collectible"></script>
 </body>
 </html>
