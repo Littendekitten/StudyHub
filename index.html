@@ -12,7 +12,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=20261125-premium">
 </head>
 <body>
 
@@ -72,6 +72,26 @@
     </div>
 
     <main>
+
+        <!-- Premium subject navigation: a cleaner, subject-specific study workspace. -->
+        <div id="premium-geo-toolbar" class="premium-subject-toolbar premium-geo-toolbar" aria-label="Premium navigatie Aardrijkskunde">
+          <div class="premium-subject-brand"><span class="premium-subject-brand-icon">🌍</span><span><small>JOUW LEERPLEK</small><strong>Aardrijkskunde</strong></span></div>
+          <div class="premium-subject-tabs">
+            <button type="button" data-premium-tab="tests">▦ Onderwerpen</button>
+            <button type="button" data-premium-tab="generator">✦ Oefentoets</button>
+            <button type="button" data-premium-tab="learn">▤ Begrippen</button>
+            <button type="button" data-premium-tab="summary">▣ Samenvattingen</button>
+          </div>
+        </div>
+        <div id="premium-math-toolbar" class="premium-subject-toolbar premium-math-toolbar" aria-label="Premium navigatie Wiskunde">
+          <div class="premium-subject-brand"><span class="premium-subject-brand-icon">∑</span><span><small>JOUW LEERPLEK</small><strong>Wiskunde</strong></span></div>
+          <div class="premium-subject-tabs">
+            <button type="button" data-premium-tab="math-overview">▦ Hoofdstukken</button>
+            <button type="button" data-premium-tab="math-mix">✦ Oefenmix</button>
+            <button type="button" data-premium-tab="math-formulas">⌗ Formules</button>
+            <button type="button" data-premium-tab="math-videos">▶ Video's</button>
+          </div>
+        </div>
         <section id="section-home" class="home-page">
             <div class="panel home-hero">
                 <div class="home-hero-copy">
@@ -738,7 +758,10 @@
         <section id="section-account" class="hidden account-page">
           <div class="panel account-hero-panel">
             <div><div class="section-eyebrow">STUDYHUB ACCOUNT</div><h2>Account & instellingen</h2><p class="subtitle">Beheer je profiel, uiterlijk, codes, inventory en VIP-status.</p></div>
-            <button class="btn btn-secondary" id="account-back" type="button">← Terug</button>
+            <div class="account-hero-actions">
+              <button class="btn btn-secondary hidden" id="account-admin-menu" type="button">🛠 Admin · Codes</button>
+              <button class="btn btn-secondary" id="account-back" type="button">← Terug</button>
+            </div>
           </div>
 
           <div id="account-guest-lock" class="panel account-locked-panel hidden">
@@ -773,7 +796,7 @@
             </div>
 
             <div id="admin-code-panel" class="panel admin-code-panel hidden">
-              <div class="panel-header"><div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Maak VIP-codes die je veilig met klasgenoten kunt delen. Codes worden gehasht opgeslagen.</p></div><span class="tag tag-purple">ADMIN</span></div>
+              <div class="panel-header admin-code-panel-heading"><div><div class="section-eyebrow">ADMINISTRATIE</div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Maak, bekijk, activeer en verwijder StudyHub-codes.</p></div><div class="admin-code-heading-actions"><span class="tag tag-purple">ADMIN</span><button class="btn btn-secondary" id="admin-code-back" type="button">← Instellingen</button></div></div>
               <div class="admin-code-create-row admin-code-create-row-scoped">
                 <div class="account-form-group"><label for="admin-code-duration">Reward · VIP-Coupon duur</label><select id="admin-code-duration"><option value="3600">1 uur</option><option value="21600">6 uur</option><option value="43200">12 uur</option><option value="86400">1 dag</option><option value="259200">3 dagen</option><option value="604800">7 dagen</option><option value="2592000">30 dagen</option></select></div>
                 <div class="account-form-group"><label for="admin-code-usage-scope">Hoe vaak mag de code worden gebruikt?</label><select id="admin-code-usage-scope"><option value="per_user" selected>Per persoon · iedereen 1 keer</option><option value="global">Globaal · in totaal 1 keer</option></select></div>
@@ -824,6 +847,6 @@
         StudyHub • Havo 2 • Aardrijkskunde & Wiskunde
     </footer>
 
-    <script type="module" src="app.js"></script>
+    <script type="module" src="app.js?v=20261125-premium"></script>
 </body>
 </html>

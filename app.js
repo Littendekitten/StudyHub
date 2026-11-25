@@ -227,6 +227,11 @@ import {
                 }
             }
 
+            document.body.classList.toggle(
+                'premium-subject-context',
+                !isAccountTab && tabName !== 'home' && !isPremiumTab && document.body.classList.contains('premium-mode')
+            );
+
             const sections = ['home', 'premium', 'tests', 'generator', 'quiz', 'grading', 'results', 'learn', 'summary', 'math', 'account'];
             sections.forEach(id => {
                 const el = document.getElementById(`section-${id}`);
@@ -261,6 +266,9 @@ import {
             });
 
             if (tabName === 'learn') renderFlashcards();
+            document.querySelectorAll('[data-premium-tab]').forEach(button => {
+                button.classList.toggle('active', button.getAttribute('data-premium-tab') === tabName);
+            });
             updateInstallButtonVisibility(tabName);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -799,6 +807,13 @@ import {
                 });
             });
 
+            document.querySelectorAll('[data-premium-tab]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const tab = button.getAttribute('data-premium-tab');
+                    if (tab) switchTab(tab);
+                });
+            });
+
             document.querySelectorAll('[data-open-subject]').forEach(card => {
                 const openCard = () => openSubjectCard(card.getAttribute('data-open-subject'));
                 card.addEventListener('click', openCard);
@@ -1128,8 +1143,8 @@ const studyHubFirebaseConfig = {
 };
 
 // Replace this with the exact public URL Render assigns to the StudyHub API.
-// Example: https://studyhub-vip-api.onrender.com
-const STUDYHUB_API_BASE_URL = "https://studyhub-vip-api.onrender.com";
+// Frankfurt API service
+const STUDYHUB_API_BASE_URL = "https://studyhub-22ab.onrender.com";
 
 const studyHubFirebaseApp = initializeApp(studyHubFirebaseConfig);
 const studyHubAuth = getAuth(studyHubFirebaseApp);
@@ -1148,6 +1163,8 @@ let vipTimerHandle = null;
 let expiryToastKey = "";
 let adminCodeNextCursor = null;
 let adminCodeListBusy = false;
+let studyHubIsAdmin = false;
+let studyHubAdminCheckedUid = null;
 
 const $id = (id) => document.getElementById(id);
 const userDocRef = (uid) => doc(studyHubDb, "users", uid);
@@ -1215,6 +1232,10 @@ function continueAsGuest() {
   studyHubProfile = null;
   studyHubInventory = [];
   studyHubVipState = null;
+  studyHubIsAdmin = false;
+  studyHubAdminCheckedUid = null;
+  $id("admin-code-panel")?.classList.add("hidden");
+  $id("account-admin-menu")?.classList.add("hidden");
   stopUserListeners();
   showAppShell("guest");
   showToast("Je gebruikt StudyHub als gast. Accountfuncties blijven vergrendeld.");
@@ -1259,6 +1280,10 @@ function startUserListeners(user) {
   stopProfileListener = onSnapshot(profileRef, (snapshot) => {
     studyHubProfile = snapshot.exists() ? snapshot.data() : null;
     renderAccountState();
+    if (studyHubProfile && studyHubAdminCheckedUid !== user.uid) {
+      studyHubAdminCheckedUid = user.uid;
+      refreshStudyHubAdminAccess();
+    }
   }, (error) => showToast(`Account laden mislukt: ${friendlyFirebaseError(error)}`));
 
   stopInventoryListener = onSnapshot(inventoryCollectionRef(user.uid), (snapshot) => {
@@ -1274,7 +1299,6 @@ function startUserListeners(user) {
 
   if (vipTimerHandle) clearInterval(vipTimerHandle);
   vipTimerHandle = setInterval(refreshVipTimer, 1000);
-  refreshStudyHubAdminAccess();
 }
 
 function vipLifetime() {
@@ -1341,7 +1365,11 @@ function renderAccountState() {
   }
 
   if (!loggedIn) {
+    studyHubIsAdmin = false;
     $id("admin-code-panel")?.classList.add("hidden");
+    $id("account-admin-menu")?.classList.add("hidden");
+    $id("account-content")?.classList.remove("account-admin-codes-open");
+    $id("section-account")?.classList.remove("admin-code-focus");
     applyStudyHubAppearance();
     return;
   }
@@ -1588,19 +1616,52 @@ async function studyHubApiRequest(path, options = {}) {
 
 async function refreshStudyHubAdminAccess() {
   const panel = $id("admin-code-panel");
+  const menuButton = $id("account-admin-menu");
+  studyHubIsAdmin = false;
   if (!panel) return;
-  panel.classList.add("hidden");
+  const managerWasOpen = $id("account-content")?.classList.contains("account-admin-codes-open") === true;
+  panel.classList.toggle("hidden", !managerWasOpen);
+  menuButton?.classList.add("hidden");
   if (!studyHubUser || !studyHubProfile || !studyHubApiConfigured()) return;
   try {
     const result = await studyHubApiRequest("/api/admin/status");
-    panel.classList.toggle("hidden", result.isAdmin !== true);
-    if (result.isAdmin === true) {
+    studyHubIsAdmin = result.isAdmin === true;
+    // Keep the manager itself hidden until the admin opens the Codes menu.
+    panel.classList.toggle("hidden", !(studyHubIsAdmin && managerWasOpen));
+    menuButton?.classList.toggle("hidden", !studyHubIsAdmin);
+    if (studyHubIsAdmin) {
       await refreshAdminVipCodeList({ reset: true });
+    } else {
+      $id("account-content")?.classList.remove("account-admin-codes-open");
+      $id("section-account")?.classList.remove("admin-code-focus");
     }
   } catch (error) {
     // A temporarily sleeping Render Free service must not reveal admin controls.
+    studyHubIsAdmin = false;
+    panel.classList.add("hidden");
+    menuButton?.classList.add("hidden");
     console.info("StudyHub admin status not available yet:", error.message);
   }
+}
+
+function openAdminCodesMenu() {
+  const panel = $id("admin-code-panel");
+  if (!studyHubUser || !studyHubIsAdmin || !panel) {
+    showToast("Dit menu is alleen beschikbaar voor StudyHub-beheerders.");
+    return;
+  }
+  panel.classList.remove("hidden");
+  $id("account-content")?.classList.add("account-admin-codes-open");
+  $id("section-account")?.classList.add("admin-code-focus");
+  refreshAdminVipCodeList({ reset: true });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function closeAdminCodesMenu() {
+  $id("admin-code-panel")?.classList.add("hidden");
+  $id("account-content")?.classList.remove("account-admin-codes-open");
+  $id("section-account")?.classList.remove("admin-code-focus");
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 async function createAdminVipCode() {
@@ -1677,10 +1738,6 @@ function buildAdminCodeCard(code) {
   reward.className = "admin-code-description";
   reward.textContent = `REWARD: ${code.reward || `VIP-Coupon · ${formatStudyHubTime(code.durationSeconds || 0)}`}`;
 
-  const usage = document.createElement("p");
-  usage.className = "admin-code-usage-scope";
-  usage.textContent = code.usageScope === "global" ? "GEBRUIK: GLOBAAL · 1× TOTAAL" : "GEBRUIK: PER PERSOON · 1× ELKE GEBRUIKER";
-
   const actions = document.createElement("div");
   actions.className = "admin-code-actions";
   const toggle = document.createElement("button");
@@ -1696,7 +1753,7 @@ function buildAdminCodeCard(code) {
   remove.addEventListener("click", () => deleteAdminVipCode(code));
   actions.append(toggle, remove);
 
-  card.append(top, reward, usage, actions);
+  card.append(top, reward, actions);
   return card;
 }
 
@@ -2186,8 +2243,13 @@ function initialiseStudyHubAccounts() {
   $id("forgot-password")?.addEventListener("click", handlePasswordReset);
   $id("email-auth-form")?.addEventListener("submit", (event) => { event.preventDefault(); handleEmailSignIn(false); });
 
-  $id("account-button")?.addEventListener("click", () => switchTab("account"));
+  $id("account-button")?.addEventListener("click", () => {
+    switchTab("account");
+    if (studyHubUser) refreshStudyHubAdminAccess();
+  });
   $id("account-back")?.addEventListener("click", () => switchTab(window.studyHubReturnTab || "home"));
+  $id("account-admin-menu")?.addEventListener("click", openAdminCodesMenu);
+  $id("admin-code-back")?.addEventListener("click", closeAdminCodesMenu);
   $id("sign-out")?.addEventListener("click", async () => {
     try {
       localStorage.removeItem("studyhub-guest-mode");
@@ -2230,6 +2292,8 @@ function initialiseStudyHubAccounts() {
       studyHubProfile = null;
       studyHubInventory = [];
       studyHubVipState = null;
+      studyHubIsAdmin = false;
+      studyHubAdminCheckedUid = null;
       stopUserListeners();
       $id("admin-code-panel")?.classList.add("hidden");
       if (localStorage.getItem("studyhub-guest-mode") === "1") {

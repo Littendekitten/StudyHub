@@ -2355,3 +2355,221 @@ body.premium-mode .vip-premium-mark { animation:none !important; }
 body.gold-mode .admin-code-usage-scope { color:#c5b58e; }
 body.premium-mode .admin-code-usage-scope { color:#b7c2d9; }
 @media(max-width:760px) { .admin-code-create-row-scoped { grid-template-columns:minmax(0,1fr); } }
+
+
+/* =====================================================================
+   STUDYHUB UPDATE · Frankfurt API · Premium study navigation
+   ===================================================================== */
+
+/* Gold is deliberately restrained: the regular subject colours stay visible. */
+body.gold-mode {
+  --emerald:#75b59a;
+  --emerald-dark:#34896c;
+  --emerald-bg:rgba(98,171,137,.12);
+  --blue:#81a6d4;
+  --blue-dark:#416f9f;
+  --blue-bg:rgba(105,151,207,.11);
+  --purple:#b09acb;
+  --purple-dark:#8066a7;
+  --purple-bg:rgba(155,126,190,.10);
+  --amber:#c9b27b;
+  --amber-dark:#937b48;
+  --amber-bg:rgba(184,155,94,.11);
+  --border-color:#403b30;
+  --border-light:#625840;
+  --text-main:#f2efe8;
+  --text-muted:#b8b2a5;
+  --text-dim:#8e8879;
+  background-image:radial-gradient(ellipse at 12% 0%,rgba(190,157,87,.025),transparent 34%) !important;
+}
+body.gold-mode .panel,
+body.gold-mode .test-card,
+body.gold-mode .home-stat,
+body.gold-mode .flashcard-front,
+body.gold-mode .flashcard-back,
+body.gold-mode .math-app .chapter-card,
+body.gold-mode .math-app .practice-card,
+body.gold-mode .math-app .info-card,
+body.gold-mode .math-app .quick-panel {
+  border-color:rgba(194,166,108,.12) !important;
+  box-shadow:0 8px 22px rgba(0,0,0,.16) !important;
+}
+body.gold-mode header { border-bottom-color:rgba(194,166,108,.16) !important; }
+body.gold-mode .nav-tab-btn.active {
+  background:var(--bg-card) !important;
+  color:#d7c49a !important;
+  border:1px solid rgba(194,166,108,.22) !important;
+  box-shadow:none !important;
+}
+body.gold-mode .btn-emerald,
+body.gold-mode .btn-gradient,
+body.gold-mode .math-app .btn-primary {
+  background:var(--emerald-dark) !important;
+  color:#fff !important;
+  border-color:rgba(117,181,154,.22) !important;
+}
+body.gold-mode .btn-amber {
+  background:rgba(184,155,94,.15) !important;
+  color:#d7c49a !important;
+  border:1px solid rgba(184,155,94,.24) !important;
+  box-shadow:none !important;
+}
+body.gold-mode .brand-icon,
+body.gold-mode .subject-icon,
+body.gold-mode .account-avatar,
+body.gold-mode .math-app .chapter-icon {
+  background:rgba(184,155,94,.07) !important;
+  border-color:rgba(194,166,108,.18) !important;
+  box-shadow:none !important;
+}
+body.gold-mode .vip-panel,
+body.gold-mode .admin-code-panel,
+body.gold-mode .inventory-panel,
+body.gold-mode .codes-panel-card {
+  border-color:rgba(194,166,108,.23) !important;
+  background:linear-gradient(145deg,#1c1b18,#151512) !important;
+  box-shadow:none !important;
+}
+body.gold-mode .vip-emblem,
+body.gold-mode .vip-premium-mark {
+  background:rgba(184,155,94,.16) !important;
+  color:#d7c49a !important;
+  border:1px solid rgba(194,166,108,.24) !important;
+  box-shadow:none !important;
+}
+body.gold-mode .inventory-item {
+  background:linear-gradient(120deg,rgba(184,155,94,.06),rgba(26,24,19,.92)) !important;
+  border-color:rgba(190,157,87,.20) !important;
+  box-shadow:none !important;
+}
+body.light-gold-mode {
+  --bg-main:#f5f3ed;
+  --bg-card:#ffffff;
+  --bg-card-dark:#faf9f5;
+  --bg-input:#fff;
+  --border-color:#e4dfd2;
+  --border-light:#cfc6b2;
+  --text-main:#252a32;
+  --text-muted:#69717c;
+  --text-dim:#858b93;
+}
+body.light-gold-mode .nav-tab-btn.active { background:#fff !important;color:#806b42 !important;border-color:rgba(160,135,83,.25) !important; }
+body.light-gold-mode .btn-amber { background:rgba(184,155,94,.12) !important;color:#806b42 !important; }
+
+/* Premium uses a distinct indigo/teal learning workspace, separate from Gold Mode. */
+body.premium-mode header nav .subject-nav,
+body.premium-mode header nav .math-nav { display:none !important; }
+body.premium-mode header nav {
+  justify-content:flex-start;
+  gap:.55rem;
+  background:linear-gradient(110deg,rgba(91,108,205,.13),rgba(50,160,153,.08)),var(--bg-card-dark);
+  border-color:rgba(137,152,255,.16);
+}
+body.premium-mode header nav .nav-tab-btn {
+  min-height:43px;
+  padding:.65rem 1rem;
+  border-radius:12px;
+  font-size:.82rem;
+  font-weight:850;
+}
+body.premium-mode header nav #nav-home { order:0; }
+body.premium-mode header nav #nav-premium { order:1; }
+body.premium-mode header nav #account-button { order:2;margin-left:auto; }
+body.premium-mode header nav #nav-premium.active {
+  background:linear-gradient(120deg,#566bd5,#2e8f91) !important;
+  color:#fff !important;
+  border-color:rgba(160,190,255,.28) !important;
+}
+
+.premium-subject-toolbar {
+  display:none;
+  max-width:1220px;
+  margin:0 auto 1.15rem;
+  padding:.75rem;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  border:1px solid rgba(137,152,255,.18);
+  border-radius:17px;
+  background:linear-gradient(110deg,rgba(91,108,205,.12),rgba(50,160,153,.07)),var(--bg-card);
+  box-shadow:0 9px 24px rgba(0,0,0,.12);
+}
+body.premium-mode.premium-subject-context.subject-open:not(.math-open) #premium-geo-toolbar,
+body.premium-mode.premium-subject-context.math-open #premium-math-toolbar { display:flex; }
+.premium-subject-brand { display:flex;align-items:center;gap:.65rem;min-width:max-content;padding:.15rem .35rem; }
+.premium-subject-brand-icon { width:39px;height:39px;display:grid;place-items:center;border-radius:12px;background:rgba(137,152,255,.13);border:1px solid rgba(137,152,255,.22);font-size:1.25rem; }
+.premium-subject-brand small,.premium-subject-brand strong { display:block; }
+.premium-subject-brand small { color:#9aa8dc;font-size:.58rem;font-weight:900;letter-spacing:.13em; }
+.premium-subject-brand strong { color:var(--text-main);font-size:.87rem; }
+.premium-subject-tabs { display:flex;align-items:center;gap:.38rem;min-width:0; }
+.premium-subject-tabs button {
+  min-height:42px;padding:.62rem .82rem;border:1px solid transparent;border-radius:11px;
+  background:transparent;color:var(--text-muted);font:inherit;font-size:.75rem;font-weight:850;white-space:nowrap;cursor:pointer;
+  transition:background .16s,border-color .16s,color .16s,transform .16s;
+}
+.premium-subject-tabs button:hover { background:rgba(137,152,255,.09);border-color:rgba(137,152,255,.16);color:var(--text-main);transform:translateY(-1px); }
+.premium-subject-tabs button.active { background:linear-gradient(120deg,#566bd5,#2e8f91);color:#fff;border-color:rgba(160,190,255,.24);box-shadow:0 4px 12px rgba(72,94,181,.14); }
+body.premium-mode .premium-subject-toolbar { border-color:rgba(137,152,255,.18) !important; }
+body.premium-mode .subject-intro-panel { background:linear-gradient(120deg,rgba(86,107,213,.12),rgba(46,143,145,.06)),var(--bg-card) !important; }
+body.premium-mode .geo-topic-grid .test-card {
+  min-height:255px;display:flex;flex-direction:column;justify-content:space-between;gap:1.1rem;
+  border-radius:18px !important;background:linear-gradient(145deg,var(--bg-card),var(--bg-card-dark)) !important;
+}
+body.premium-mode .geo-topic-grid .test-card h3 { font-size:1.12rem;letter-spacing:-.02em; }
+body.premium-mode .geo-topic-grid .test-card .btn { min-height:46px;border-radius:11px;font-weight:850; }
+body.premium-mode .math-app .hero { border-radius:22px !important; }
+body.premium-mode .math-app .chapter-grid { gap:1rem; }
+body.premium-mode .math-app .chapter-card {
+  border-radius:18px !important;background:linear-gradient(145deg,var(--bg-card),var(--bg-card-dark)) !important;
+  padding:1.15rem !important;transition:transform .16s,border-color .16s,box-shadow .16s;
+}
+body.premium-mode .math-app .chapter-card:hover { transform:translateY(-3px);border-color:rgba(137,152,255,.38) !important; }
+body.premium-mode .math-app .chapter-footer span { color:#aab6ff !important;font-weight:900; }
+body.premium-mode .math-app .btn-primary,
+body.premium-mode .premium-page .btn-primary,
+body.premium-mode .geo-topic-grid .btn {
+  border-radius:12px !important;background:linear-gradient(120deg,#566bd5,#2e8f91) !important;color:#fff !important;
+  border:1px solid rgba(160,190,255,.22) !important;box-shadow:0 5px 14px rgba(61,82,170,.14) !important;font-weight:850;
+}
+body.premium-mode .math-app .btn-light,
+body.premium-mode .premium-page .btn-light { border-radius:12px !important;border:1px solid rgba(137,152,255,.18) !important;background:rgba(137,152,255,.07) !important;color:var(--text-main) !important; }
+body.premium-mode .premium-tool-card { border-radius:20px;border-color:rgba(137,152,255,.18); }
+body.premium-mode .premium-tool-card:nth-child(2) { background:linear-gradient(145deg,rgba(46,143,145,.09),transparent 70%),var(--bg-card-dark); }
+body.premium-mode .premium-tool-card:nth-child(3) { background:linear-gradient(145deg,rgba(86,107,213,.10),transparent 70%),var(--bg-card-dark); }
+body.premium-mode .premium-shortcut { border-radius:14px; }
+body.premium-mode .vip-premium-showcase { border-color:rgba(137,152,255,.22) !important; }
+
+/* Admin Codes is a dedicated settings sub-page, not a card mixed into normal settings. */
+.account-hero-actions { display:flex;align-items:center;justify-content:flex-end;gap:.55rem;flex-wrap:wrap; }
+#account-content.account-admin-codes-open > :not(#admin-code-panel) { display:none !important; }
+#section-account.admin-code-focus #account-admin-menu { display:none !important; }
+.admin-code-panel-heading { align-items:center; }
+.admin-code-heading-actions { display:flex;align-items:center;gap:.55rem;flex-wrap:wrap; }
+.admin-code-heading-actions .btn { min-height:42px; }
+.admin-code-item { border-color:var(--border-color) !important;box-shadow:none !important; }
+.admin-code-item-top { gap:.75rem; }
+.admin-code-status.status-active { background:rgba(16,185,129,.12);color:#65d9b1;border-color:rgba(16,185,129,.22); }
+.admin-code-status.status-inactive { background:rgba(148,163,184,.10);color:#aeb9c8;border-color:rgba(148,163,184,.18); }
+
+@media(max-width:760px) {
+  .premium-subject-toolbar { display:none !important;max-width:none;margin:0 0 .9rem;padding:.65rem;align-items:stretch;flex-direction:column;gap:.55rem; }
+  body.premium-mode.premium-subject-context.subject-open:not(.math-open) #premium-geo-toolbar,
+  body.premium-mode.premium-subject-context.math-open #premium-math-toolbar { display:flex !important; }
+  .premium-subject-brand { padding:.1rem .2rem; }
+  .premium-subject-tabs { overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding-bottom:2px; }
+  .premium-subject-tabs button { flex:0 0 auto;min-height:43px;padding:.65rem .76rem; }
+  .account-hero-actions { width:100%;justify-content:stretch; }
+  .account-hero-actions .btn { flex:1 1 140px;min-height:44px; }
+  .admin-code-panel-heading { align-items:flex-start; }
+  .admin-code-heading-actions { width:100%;justify-content:space-between; }
+  .admin-code-heading-actions .btn { flex:1; }
+  #account-content.account-admin-codes-open > #admin-code-panel { min-width:0; }
+}
+@media(max-width:420px) {
+  .premium-subject-toolbar { border-radius:14px; }
+  .premium-subject-tabs button { font-size:.7rem;padding:.6rem .68rem; }
+  .premium-hero-badge { display:none; }
+}
+
+/* Admin code manager occupies the full settings content width when opened. */
+#account-content.account-admin-codes-open > #admin-code-panel { grid-column:1 / -1; width:100%; }
