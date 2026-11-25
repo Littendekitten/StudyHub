@@ -1742,8 +1742,16 @@ async function createAdminVipCode() {
   const button = $id("admin-create-code");
   const resultPanel = $id("admin-code-result");
   if (!button) return;
+  const codeNameInput = $id("admin-code-name");
+  const codeName = String(codeNameInput?.value || "").trim().replace(/\s+/g, " ");
   const durationSeconds = Number($id("admin-code-duration")?.value || 0);
   const usageScope = $id("admin-code-usage-scope")?.value || "per_user";
+
+  if (codeName.length < 2 || codeName.length > 40 || /[<>\u0000-\u001f]/.test(codeName)) {
+    setAdminCodeMessage("Kies een codenaam van 2 tot 40 tekens.", true);
+    codeNameInput?.focus();
+    return;
+  }
 
   button.disabled = true;
   setAdminCodeMessage("VIP-code veilig aanmaken…", false);
@@ -1751,11 +1759,11 @@ async function createAdminVipCode() {
   try {
     const result = await studyHubApiRequest("/api/admin/codes", {
       method: "POST",
-      body: { durationSeconds, usageScope }
+      body: { name: codeName, durationSeconds, usageScope }
     });
     $id("admin-code-value").value = result.code;
     resultPanel?.classList.remove("hidden");
-    setAdminCodeMessage("Code aangemaakt! Kopieer hem nu; de volledige code wordt maar één keer getoond.", false);
+    setAdminCodeMessage(`“${result.name || codeName}” aangemaakt! Kopieer de code nu; de volledige code wordt maar één keer getoond.`, false);
     await refreshAdminVipCodeList({ reset: true });
   } catch (error) {
     setAdminCodeMessage(error.message || "VIP-code maken is mislukt.", true);
@@ -1799,14 +1807,19 @@ function buildAdminCodeCard(code) {
 
   const top = document.createElement("div");
   top.className = "admin-code-item-top";
-  const reference = document.createElement("strong");
+  const titleWrap = document.createElement("div");
+  titleWrap.className = "admin-code-item-title";
+  const name = document.createElement("strong");
+  name.textContent = code.name || "Naamloze code";
+  const reference = document.createElement("span");
   reference.className = "admin-code-reference";
   reference.textContent = `CODE · …${code.reference || String(code.id || "").slice(-8).toUpperCase()}`;
+  titleWrap.append(name, reference);
 
   const status = document.createElement("span");
   status.className = `admin-code-status status-${code.status || "inactive"}`;
   status.textContent = adminCodeStatusLabel(code.status);
-  top.append(reference, status);
+  top.append(titleWrap, status);
 
   const reward = document.createElement("p");
   reward.className = "admin-code-description";

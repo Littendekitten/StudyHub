@@ -796,7 +796,12 @@
             </div>
 
             <div id="admin-code-panel" class="panel admin-code-panel hidden">
-              <div class="panel-header admin-code-panel-heading"><div><div class="section-eyebrow">ADMINISTRATIE</div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Maak, bekijk, activeer en verwijder StudyHub-codes.</p></div><div class="admin-code-heading-actions"><span class="tag tag-purple">ADMIN</span><button class="btn btn-secondary" id="admin-code-back" type="button">← Instellingen</button></div></div>
+              <div class="panel-header admin-code-panel-heading"><div><div class="section-eyebrow">ADMINISTRATIE</div><h3>🛠️ VIP-codebeheer</h3><p class="subtitle">Geef codes een eigen naam, maak ze aan en beheer ze hier.</p></div><div class="admin-code-heading-actions"><span class="tag tag-purple">ADMIN</span><button class="btn btn-secondary" id="admin-code-back" type="button">← Instellingen</button></div></div>
+              <div class="admin-code-label-field account-form-group">
+                <label for="admin-code-name">Naam van deze code</label>
+                <input id="admin-code-name" type="text" maxlength="40" autocomplete="off" placeholder="Bijv. Klassenactie november" required>
+                <small class="muted-note">Deze naam is alleen zichtbaar in jouw admin-overzicht. De ontvanger ziet de reward.</small>
+              </div>
               <div class="admin-code-create-row admin-code-create-row-scoped">
                 <div class="account-form-group"><label for="admin-code-duration">Reward · VIP-Coupon duur</label><select id="admin-code-duration"><option value="3600">1 uur</option><option value="21600">6 uur</option><option value="43200">12 uur</option><option value="86400">1 dag</option><option value="259200">3 dagen</option><option value="604800">7 dagen</option><option value="2592000">30 dagen</option></select></div>
                 <div class="account-form-group"><label for="admin-code-usage-scope">Hoe vaak mag de code worden gebruikt?</label><select id="admin-code-usage-scope"><option value="per_user" selected>Per persoon · iedereen 1 keer</option><option value="global">Globaal · in totaal 1 keer</option></select></div>
