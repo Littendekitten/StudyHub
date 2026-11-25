@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
   getAuth, setPersistence, browserLocalPersistence, GoogleAuthProvider,
-  signInWithPopup, signInWithRedirect, getRedirectResult,
+  signInWithPopup,
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
   sendPasswordResetEmail, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
@@ -1195,8 +1195,11 @@ function friendlyFirebaseError(error) {
     "auth/invalid-credential": "E-mailadres of wachtwoord klopt niet.",
     "auth/email-already-in-use": "Er bestaat al een account met dit e-mailadres. Probeer in te loggen.",
     "auth/weak-password": "Kies een sterker wachtwoord van minimaal 6 tekens.",
-    "auth/popup-closed-by-user": "Het Google-inlogvenster is gesloten.",
-    "auth/popup-blocked": "Je browser blokkeerde het Google-inlogvenster. Probeer het opnieuw.",
+    "auth/popup-closed-by-user": "Het Google-inlogvenster is gesloten voordat je kon inloggen. Probeer het opnieuw.",
+    "auth/popup-blocked": "Je browser blokkeerde het Google-inlogvenster. Open StudyHub rechtstreeks in Chrome of Samsung Internet en probeer opnieuw.",
+    "auth/popup-unsupported-environment": "Deze browser ondersteunt het Google-inlogvenster niet. Open StudyHub in Chrome of Samsung Internet.",
+    "auth/web-storage-unsupported": "Deze browser blokkeert de opslag die nodig is voor Google-login. Open StudyHub in Chrome of Samsung Internet.",
+    "auth/cancelled-popup-request": "Er staat al een Google-inlogvenster open. Sluit dat venster en probeer opnieuw.",
     "auth/unauthorized-domain": "Dit domein staat nog niet in Firebase Authentication → Settings → Authorized domains.",
     "auth/operation-not-allowed": "Deze inlogmethode staat nog niet aan. Schakel Google of E-mail/wachtwoord in bij Firebase Authentication.",
     "auth/account-exists-with-different-credential": "Er bestaat al een account met dit e-mailadres via een andere inlogmethode.",
@@ -2072,26 +2075,25 @@ async function handleEmailSignIn(createAccount) {
 }
 
 async function handleGoogleSignIn() {
+  const button = $id("google-signin");
+  if (button) button.disabled = true;
+
+  // Do not let a previous guest session silently mask a failed login attempt.
+  localStorage.removeItem("studyhub-guest-mode");
+  setAuthMessage("Google-inloggen wordt geopend…", false);
+
   try {
-    setAuthMessage("Google-inloggen wordt geopend…", false);
-    await setPersistence(studyHubAuth, browserLocalPersistence);
-    const mobileBrowser = /iphone|ipad|ipod|android/i.test(navigator.userAgent || "");
-    if (mobileBrowser) {
-      await signInWithRedirect(studyHubAuth, studyHubGoogleProvider);
-      return;
-    }
-    await signInWithPopup(studyHubAuth, studyHubGoogleProvider);
+    // Use popup on mobile and desktop. Redirect login can silently return signed-out
+    // on Chrome-based browsers when the app domain and Firebase authDomain differ.
+    // The popup call is made directly from the click handler to avoid popup blockers.
+    const credential = await signInWithPopup(studyHubAuth, studyHubGoogleProvider);
+    if (!credential?.user) throw new Error("Google heeft geen gebruikersaccount teruggegeven.");
+    setAuthMessage("Gelukt! Je wordt ingelogd…", false);
   } catch (error) {
-    if (error?.code === "auth/popup-blocked") {
-      try {
-        await signInWithRedirect(studyHubAuth, studyHubGoogleProvider);
-        return;
-      } catch (redirectError) {
-        setAuthMessage(friendlyFirebaseError(redirectError));
-        return;
-      }
-    }
+    console.error("StudyHub Google sign-in failed:", error);
     setAuthMessage(friendlyFirebaseError(error));
+  } finally {
+    if (button) button.disabled = false;
   }
 }
 
@@ -2394,9 +2396,6 @@ function initialiseStudyHubAccounts() {
     }
   });
 
-  getRedirectResult(studyHubAuth).catch((error) => {
-    if (error?.code && error.code !== "auth/no-auth-event") setAuthMessage(friendlyFirebaseError(error));
-  });
 }
 
 document.addEventListener("DOMContentLoaded", initialiseStudyHubAccounts, { once: true });
