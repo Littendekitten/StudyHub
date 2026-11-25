@@ -2624,3 +2624,206 @@ body.light-theme .lifetime-voucher-art {
   .lifetime-collectible .inventory-item-copy { flex: 1 1 calc(100% - 76px); }
   .lifetime-collectible > .btn { min-height: 44px; flex: 1 1 100%; }
 }
+
+/* =====================================================================
+   SUBTLE GOLD THEMES
+   Keep the normal dark/light StudyHub palettes. Gold is reserved for
+   important buttons and their soft focus/hover glow.
+   ===================================================================== */
+
+/* Dark Gold: normal StudyHub dark surfaces and subject colours. */
+body.gold-mode {
+  color-scheme: dark !important;
+  --bg-main:#0b1220 !important;
+  --bg-card:#172338 !important;
+  --bg-card-dark:#0c1628 !important;
+  --bg-input:#101c30 !important;
+  --border-color:#2a3a52 !important;
+  --border-light:#425570 !important;
+  --text-main:#eef4ff !important;
+  --text-muted:#a4b2c8 !important;
+  --text-dim:#71829d !important;
+  --emerald:#34d6a0 !important;
+  --emerald-dark:#0d9f76 !important;
+  --emerald-bg:rgba(52,214,160,.12) !important;
+  --blue:#6f95ff !important;
+  --blue-dark:#4169e1 !important;
+  --blue-bg:rgba(111,149,255,.14) !important;
+  --purple:#b18aff !important;
+  --purple-dark:#8055d8 !important;
+  --purple-bg:rgba(177,138,255,.14) !important;
+  --amber:#f6bf5c !important;
+  --amber-dark:#c88723 !important;
+  --amber-bg:rgba(246,191,92,.13) !important;
+  --brand:#6f95ff !important;
+  --brand-dark:#4169e1 !important;
+  --brand-soft:rgba(111,149,255,.14) !important;
+  background:#0b1220 !important;
+  background-image:none !important;
+  color:#eef4ff !important;
+}
+body.gold-mode header { background:rgba(12,22,40,.94) !important;border-bottom-color:#2a3a52 !important;box-shadow:0 5px 22px rgba(0,0,0,.24) !important; }
+body.gold-mode .brand-icon { color:#fff !important;background:linear-gradient(145deg,#547bf2,#3559cf) !important;border:0 !important;box-shadow:0 7px 16px rgba(65,105,225,.22) !important; }
+body.gold-mode .brand-title,body.gold-mode .home-title,body.gold-mode .home-section-title,body.gold-mode h1,body.gold-mode h2,body.gold-mode h3 { color:#f2f6ff !important; }
+body.gold-mode .brand-sub,body.gold-mode .subtitle,body.gold-mode .home-copy,body.gold-mode .card-desc { color:#a4b2c8 !important; }
+body.gold-mode .study-pill { color:#a9c0ff !important;background:rgba(111,149,255,.12) !important;border-color:rgba(111,149,255,.3) !important; }
+body.gold-mode .home-hero { background:radial-gradient(circle at 90% 12%,rgba(52,214,160,.14),transparent 34%),linear-gradient(120deg,#17263c 0%,#101c30 68%,#14233b 100%) !important;border-color:rgba(52,214,160,.24) !important;box-shadow:0 14px 36px rgba(0,0,0,.22) !important; }
+body.gold-mode .home-title span { color:#63dcb3 !important; }
+body.gold-mode .home-kicker,body.gold-mode .section-eyebrow { color:#57d8ad !important; }
+body.gold-mode .home-visual { border-color:#2d4560 !important;background:radial-gradient(circle at 50% 50%,#1d3150,#101a2d 68%) !important; }
+body.gold-mode .panel,body.gold-mode .test-card,body.gold-mode .home-stat,body.gold-mode .stat-box,body.gold-mode .review-card,body.gold-mode .user-answer-box,body.gold-mode .flashcard-front,body.gold-mode .flashcard-back,body.gold-mode .diagram-box,body.gold-mode .subject-card,body.gold-mode .subject-card-link,body.gold-mode .math-app .stat,body.gold-mode .math-app .chapter-card,body.gold-mode .math-app .quick-panel,body.gold-mode .math-app .practice-card,body.gold-mode .math-app .info-card,body.gold-mode .math-app .video-link,body.gold-mode .vip-panel,body.gold-mode .inventory-panel,body.gold-mode .codes-panel-card,body.gold-mode .admin-code-panel {
+  color:#eef4ff !important;background:#172338 !important;border-color:#2a3a52 !important;box-shadow:0 10px 26px rgba(0,0,0,.20) !important;
+}
+body.gold-mode .home-stat strong,body.gold-mode .stat-val,body.gold-mode .panel h2,body.gold-mode .panel h3,body.gold-mode .test-card h3,body.gold-mode .math-app .hero h1,body.gold-mode .math-app .section-head h2,body.gold-mode .math-app .view-head h2,body.gold-mode .math-app .chapter-card h3,body.gold-mode .math-app .quick-panel h3,body.gold-mode .math-app .info-card h3 { color:#f2f6ff !important; }
+body.gold-mode .nav-tab-btn,body.gold-mode .install-app-btn { color:#b5c2d8 !important;background:#172338 !important;border-color:#30425d !important;box-shadow:none !important; }
+body.gold-mode .nav-tab-btn:hover,body.gold-mode .install-app-btn:hover { color:#fff !important;background:#1b2b45 !important;border-color:#6688db !important; }
+body.gold-mode .nav-tab-btn.active,body.gold-mode .btn-emerald,body.gold-mode .btn-gradient,body.gold-mode .btn-amber,body.gold-mode .card-open-hint,body.gold-mode .math-app .btn-primary,body.gold-mode .premium-subject-tabs button.active {
+  color:#26200f !important;
+  background:linear-gradient(135deg,#d2bf8e,#b79b62) !important;
+  border:1px solid rgba(226,207,163,.58) !important;
+  box-shadow:0 3px 12px rgba(183,151,82,.16),0 0 0 1px rgba(213,190,139,.08) !important;
+  font-weight:800 !important;
+}
+body.gold-mode .nav-tab-btn.active:hover,body.gold-mode .btn-emerald:hover:not(:disabled),body.gold-mode .btn-gradient:hover:not(:disabled),body.gold-mode .btn-amber:hover:not(:disabled),body.gold-mode .math-app .btn-primary:hover:not(:disabled),body.gold-mode .premium-subject-tabs button.active:hover {
+  background:linear-gradient(135deg,#dfcea3,#c2a872) !important;
+  box-shadow:0 5px 16px rgba(197,164,94,.22),0 0 13px rgba(197,164,94,.12) !important;
+}
+body.gold-mode .btn-secondary,body.gold-mode .math-app .btn-light { color:#d5deeb !important;background:#24344c !important;border-color:#3b506e !important;box-shadow:none !important; }
+body.gold-mode .btn-blue { background:#3978de !important;color:#fff !important; }
+body.gold-mode .btn-purple { background:#7958cf !important;color:#fff !important; }
+body.gold-mode select,body.gold-mode input,body.gold-mode textarea,body.gold-mode .math-app .math-generator-fields select { background:#101c30 !important;color:#eef4ff !important;border-color:#3b506e !important; }
+body.gold-mode .mc-option,body.gold-mode .q-pill,body.gold-mode .math-app .answer { background:#101c30 !important;color:#e9f0fc !important;border-color:#344861 !important; }
+body.gold-mode .mc-option:hover,body.gold-mode .math-app .answer:hover:not(:disabled) { background:#172944 !important;border-color:#6688db !important; }
+body.gold-mode .mc-option.selected,body.gold-mode .q-pill.answered,body.gold-mode .math-app .answer.correct { background:rgba(52,214,160,.13) !important;color:#83e9c6 !important;border-color:#34d6a0 !important; }
+body.gold-mode .q-pill.current { background:#4169e1 !important;color:#fff !important;border-color:#6688f1 !important; }
+body.gold-mode .progress-track,body.gold-mode .math-app .progress { background:#0b1628 !important;border-color:#2a3a52 !important; }
+body.gold-mode .progress-fill,body.gold-mode .math-app .progress>span { background:linear-gradient(90deg,#4169e1,#34d6a0) !important; }
+body.gold-mode .grade-circle,body.gold-mode .math-app .result-ring { background:#101c30 !important;color:#f4f7ff !important;border-color:#405baf !important;box-shadow:none !important; }
+body.gold-mode .timer-badge { background:rgba(246,191,92,.12) !important;color:#ffd27c !important;border-color:rgba(246,191,92,.45) !important; }
+body.gold-mode .table.geo-table th,body.gold-mode table.geo-table th { background:#1d2d45 !important;color:#61dcb5 !important; }
+body.gold-mode table.geo-table th,body.gold-mode table.geo-table td { border-color:#344861 !important; }
+body.gold-mode table.geo-table td { color:#d7e1ef !important; }
+body.gold-mode .toast,body.gold-mode .math-app .toast { background:#1a2940 !important;color:#f3f7ff !important;border-color:#3b506e !important;box-shadow:0 14px 36px rgba(0,0,0,.25) !important; }
+body.gold-mode .vip-panel-heading h3,body.gold-mode .vip-panel-heading .vip-eyebrow,body.gold-mode .vip-status-text,body.gold-mode .vip-timer-row strong,body.gold-mode .vip-lifetime-label { color:#f2dcae !important; }
+body.gold-mode .vip-emblem,body.gold-mode .vip-premium-mark { background:#263650 !important;color:#d9c69b !important;border:1px solid rgba(194,166,108,.28) !important;box-shadow:none !important; }
+body.gold-mode .vip-timer-row,body.gold-mode .vip-lifetime-label { background:#101c30 !important;border-color:#2a3a52 !important;color:#c2cee0 !important; }
+body.gold-mode .inventory-item { background:#101c30 !important;border-color:#344861 !important;box-shadow:none !important; }
+body.gold-mode .inventory-item-copy strong { color:#eef4ff !important; }
+body.gold-mode .inventory-item-copy small { color:#a4b2c8 !important; }
+body.gold-mode .voucher-art,body.gold-mode .lifetime-voucher-art { box-shadow:0 4px 12px rgba(183,151,82,.12) !important; }
+body.gold-mode .math-app { --bg:#0b1220;--surface:#151f32;--ink:#f1f5f9;--muted:#a5b2c5;--line:#2b3950;--blue:#6d8cff;--blue2:#496df0;--blue-soft:rgba(109,140,255,.14);--green:#34d399;--green-soft:rgba(52,211,153,.12);--red:#fb7185;--red-soft:rgba(251,113,133,.12);--shadow:0 10px 28px rgba(0,0,0,.2);background:transparent !important;color:#f1f5f9 !important; }
+body.gold-mode .math-app .hero { background:linear-gradient(115deg,#172338 0%,#121e32 64%,#18284a 100%) !important;border-color:#2b3c5b !important;box-shadow:var(--shadow) !important; }
+body.gold-mode .math-app .hero h1,body.gold-mode .math-app .section-head h2,body.gold-mode .math-app .view-head h2,body.gold-mode .math-app .quick-panel h3,body.gold-mode .math-app .info-card h3,body.gold-mode .math-app .result-box h2 { color:#f1f5f9 !important; }
+body.gold-mode .math-app .hero p,body.gold-mode .math-app .section-head p,body.gold-mode .math-app .view-head p,body.gold-mode .math-app .quick-panel p,body.gold-mode .math-app .info-card p,body.gold-mode .math-app .info-card li { color:#a5b2c5 !important; }
+body.gold-mode .math-app .chapter-card,body.gold-mode .math-app .stat,body.gold-mode .math-app .quick-panel,body.gold-mode .math-app .practice-card,body.gold-mode .math-app .info-card,body.gold-mode .math-app .video-link { background:#151f32 !important;border-color:#2b3950 !important;color:#e7eef8 !important;box-shadow:0 8px 24px rgba(0,0,0,.18) !important; }
+body.gold-mode .math-app .chapter-card h3,body.gold-mode .math-app .stat strong { color:#f1f5f9 !important; }
+body.gold-mode .math-app .chapter-card p,body.gold-mode .math-app .muted-note,body.gold-mode .math-app .practice-meta { color:#9eacc1 !important; }
+body.gold-mode .math-app .stat-icon,body.gold-mode .math-app .chapter-icon { background:rgba(109,140,255,.15) !important;color:#a9bbff !important; }
+body.gold-mode .math-app .chapter-tag { color:#aebbd0 !important;background:#202e45 !important;border-color:#3a4b65 !important; }
+body.gold-mode .math-app .math-expression,body.gold-mode .math-app .answer { background:#101b2d !important;color:#dce5f2 !important;border-color:#34435b !important; }
+body.gold-mode .math-app .answer.correct { border-color:#279b7a !important;background:rgba(52,211,153,.13) !important;color:#75e8c0 !important; }
+body.gold-mode .math-app .answer.wrong { border-color:#a6465a !important;background:rgba(251,113,133,.12) !important;color:#ff9cad !important; }
+body.gold-mode .math-app .feedback.good { background:rgba(52,211,153,.1) !important;border-color:rgba(52,211,153,.35) !important;color:#9aefd2 !important; }
+body.gold-mode .math-app .feedback.bad { background:rgba(251,113,133,.1) !important;border-color:rgba(251,113,133,.32) !important;color:#ffb2bf !important; }
+body.gold-mode .math-app .formula { background:rgba(109,140,255,.13) !important;border-color:rgba(109,140,255,.25) !important;color:#bdcaff !important; }
+body.gold-mode .math-app .math-generator-panel { background:#151f32 !important;color:#e7eef8 !important;border-color:#2b3950 !important; }
+body.gold-mode .math-app .math-generator-note { background:rgba(109,140,255,.09) !important;border-color:rgba(109,140,255,.24) !important;color:#b7c5da !important; }
+
+/* Light Gold: keep the normal clean light palette; only action buttons are gold. */
+body.light-gold-mode {
+  color-scheme:light !important;
+  --bg-main:#edf2f8 !important;
+  --bg-card:#fff !important;
+  --bg-card-dark:#e5edf6 !important;
+  --bg-input:#fff !important;
+  --border-color:#d2dce8 !important;
+  --border-light:#b9c7d8 !important;
+  --text-main:#192638 !important;
+  --text-muted:#607189 !important;
+  --text-dim:#8190a5 !important;
+  --emerald:#0f9f83 !important;
+  --emerald-dark:#087e6a !important;
+  --emerald-bg:#e8f8f3 !important;
+  --blue:#4676ee !important;
+  --blue-dark:#315fd4 !important;
+  --blue-bg:#edf3ff !important;
+  --purple:#8663dc !important;
+  --purple-dark:#704ac8 !important;
+  --purple-bg:#f2edff !important;
+  --amber:#d99016 !important;
+  --amber-dark:#b9780e !important;
+  --amber-bg:#fff6e4 !important;
+  --brand:#4169e1 !important;
+  --brand-dark:#2f51c7 !important;
+  --brand-soft:#edf2ff !important;
+  background:#edf2f8 !important;
+  background-image:none !important;
+  color:#192638 !important;
+}
+body.light-gold-mode header { background:rgba(255,255,255,.94) !important;border-bottom-color:#e6ebf3 !important;box-shadow:0 3px 18px rgba(20,38,70,.04) !important; }
+body.light-gold-mode .brand-icon { color:#fff !important;background:linear-gradient(145deg,#547bf2,#3559cf) !important;border:0 !important;box-shadow:0 7px 16px rgba(65,105,225,.16) !important; }
+body.light-gold-mode .brand-title,body.light-gold-mode h1,body.light-gold-mode h2,body.light-gold-mode h3,body.light-gold-mode .home-title,body.light-gold-mode .home-section-title { color:#17243a !important; }
+body.light-gold-mode .brand-sub,body.light-gold-mode .subtitle,body.light-gold-mode .home-copy,body.light-gold-mode .card-desc { color:#64748b !important; }
+body.light-gold-mode .study-pill { color:#3559cf !important;background:#edf2ff !important;border-color:#dbe5ff !important; }
+body.light-gold-mode .home-hero { background:linear-gradient(110deg,#fff 0%,#f6f8ff 65%,#eef4ff 100%) !important;border-color:#e1e8fb !important;box-shadow:0 12px 34px rgba(35,62,120,.07) !important; }
+body.light-gold-mode .home-title span,body.light-gold-mode .home-kicker,body.light-gold-mode .section-eyebrow { color:#0f9f83 !important; }
+body.light-gold-mode .panel,body.light-gold-mode .test-card,body.light-gold-mode .home-stat,body.light-gold-mode .stat-box,body.light-gold-mode .review-card,body.light-gold-mode .user-answer-box,body.light-gold-mode .flashcard-front,body.light-gold-mode .flashcard-back,body.light-gold-mode .diagram-box,body.light-gold-mode .subject-card,body.light-gold-mode .subject-card-link,body.light-gold-mode .math-app .stat,body.light-gold-mode .math-app .chapter-card,body.light-gold-mode .math-app .quick-panel,body.light-gold-mode .math-app .practice-card,body.light-gold-mode .math-app .info-card,body.light-gold-mode .math-app .video-link,body.light-gold-mode .vip-panel,body.light-gold-mode .inventory-panel,body.light-gold-mode .codes-panel-card,body.light-gold-mode .admin-code-panel {
+  color:#192638 !important;background:#fff !important;border-color:#e6ebf3 !important;box-shadow:0 8px 26px rgba(24,43,77,.055) !important;
+}
+body.light-gold-mode .panel h2,body.light-gold-mode .panel h3,body.light-gold-mode .test-card h3,body.light-gold-mode .home-stat strong,body.light-gold-mode .home-section-title { color:#17243a !important; }
+body.light-gold-mode .nav-tab-btn,body.light-gold-mode .install-app-btn { color:#53627a !important;background:#fff !important;border-color:#e4e9f2 !important;box-shadow:none !important; }
+body.light-gold-mode .nav-tab-btn:hover,body.light-gold-mode .install-app-btn:hover { color:#2f51c7 !important;border-color:#cbd8ff !important;background:#f6f8ff !important; }
+body.light-gold-mode .nav-tab-btn.active,body.light-gold-mode .btn-emerald,body.light-gold-mode .btn-gradient,body.light-gold-mode .btn-amber,body.light-gold-mode .card-open-hint,body.light-gold-mode .math-app .btn-primary,body.light-gold-mode .premium-subject-tabs button.active {
+  color:#332711 !important;background:linear-gradient(135deg,#e7d6ac,#cbb57e) !important;border:1px solid rgba(166,135,75,.38) !important;
+  box-shadow:0 3px 12px rgba(166,135,75,.13),0 0 0 1px rgba(166,135,75,.06) !important;font-weight:800 !important;
+}
+body.light-gold-mode .nav-tab-btn.active:hover,body.light-gold-mode .btn-emerald:hover:not(:disabled),body.light-gold-mode .btn-gradient:hover:not(:disabled),body.light-gold-mode .btn-amber:hover:not(:disabled),body.light-gold-mode .math-app .btn-primary:hover:not(:disabled),body.light-gold-mode .premium-subject-tabs button.active:hover { background:linear-gradient(135deg,#eee0be,#d7c18e) !important;box-shadow:0 5px 15px rgba(166,135,75,.18),0 0 12px rgba(166,135,75,.10) !important; }
+body.light-gold-mode .btn-secondary,body.light-gold-mode .math-app .btn-light { background:#f1f4fa !important;color:#52647d !important;border-color:#dce4ef !important;box-shadow:none !important; }
+body.light-gold-mode .btn-blue { background:#3978de !important;color:#fff !important; }
+body.light-gold-mode .btn-purple { background:#7958cf !important;color:#fff !important; }
+body.light-gold-mode select,body.light-gold-mode input,body.light-gold-mode textarea,body.light-gold-mode .math-app .math-generator-fields select { background:#fff !important;color:#172337 !important;border-color:#c8d4e2 !important; }
+body.light-gold-mode .mc-option,body.light-gold-mode .q-pill,body.light-gold-mode .math-app .answer { background:#fff !important;color:#354761 !important;border-color:#dce4ef !important; }
+body.light-gold-mode .mc-option:hover,body.light-gold-mode .math-app .answer:hover:not(:disabled) { background:#f6f8ff !important;border-color:#cbd8ff !important; }
+body.light-gold-mode .mc-option.selected,body.light-gold-mode .q-pill.answered,body.light-gold-mode .math-app .answer.correct { background:#effaf6 !important;color:#087e6a !important;border-color:#75cfb3 !important; }
+body.light-gold-mode .q-pill.current { background:#4169e1 !important;color:#fff !important; }
+body.light-gold-mode .progress-track,body.light-gold-mode .math-app .progress { background:#edf1f7 !important;border-color:#d7e0eb !important; }
+body.light-gold-mode .progress-fill,body.light-gold-mode .math-app .progress>span { background:linear-gradient(90deg,#4169e1,#34d6a0) !important; }
+body.light-gold-mode .grade-circle,body.light-gold-mode .math-app .result-ring { background:#f7f9ff !important;color:#3159cf !important;border-color:#405baf !important;box-shadow:none !important; }
+body.light-gold-mode .timer-badge { background:#fff6e4 !important;color:#b9780e !important;border-color:#e9c77f !important; }
+body.light-gold-mode .table.geo-table th,body.light-gold-mode table.geo-table th { background:#edf2ff !important;color:#3559cf !important; }
+body.light-gold-mode table.geo-table th,body.light-gold-mode table.geo-table td { border-color:#d7e0eb !important; }
+body.light-gold-mode table.geo-table td { color:#354761 !important; }
+body.light-gold-mode .toast,body.light-gold-mode .math-app .toast { background:#fff !important;color:#263a58 !important;border-color:#d7e0eb !important;box-shadow:0 10px 26px rgba(24,43,77,.08) !important; }
+body.light-gold-mode .vip-panel-heading h3,body.light-gold-mode .vip-panel-heading .vip-eyebrow,body.light-gold-mode .vip-status-text,body.light-gold-mode .vip-timer-row strong,body.light-gold-mode .vip-lifetime-label { color:#354761 !important; }
+body.light-gold-mode .vip-emblem,body.light-gold-mode .vip-premium-mark { background:#edf2ff !important;color:#4169e1 !important;border:1px solid #dbe5ff !important;box-shadow:none !important; }
+body.light-gold-mode .vip-timer-row,body.light-gold-mode .vip-lifetime-label { background:#f7f9fd !important;border-color:#d7e0eb !important;color:#607189 !important; }
+body.light-gold-mode .inventory-item { background:#f8fafc !important;border-color:#e1e8f0 !important;box-shadow:none !important; }
+body.light-gold-mode .inventory-item-copy strong { color:#192638 !important; }
+body.light-gold-mode .inventory-item-copy small { color:#607189 !important; }
+body.light-gold-mode .voucher-art,body.light-gold-mode .lifetime-voucher-art { box-shadow:0 4px 12px rgba(166,135,75,.12) !important; }
+body.light-gold-mode .math-app { --bg:#edf2f8;--surface:#fff;--ink:#1a2940;--muted:#61738c;--line:#d7e0eb;--blue:#4169e1;--blue2:#3159cf;--blue-soft:#edf2ff;--green:#0b9277;--green-soft:#e9f8f3;--red:#c84460;--red-soft:#fff0f3;--shadow:0 10px 28px rgba(24,43,77,.07);background:#edf2f8 !important;color:#1a2940 !important; }
+body.light-gold-mode .math-app .topbar { background:rgba(255,255,255,.94) !important;border-color:#d7e0eb !important; }
+body.light-gold-mode .math-app .brand-name,body.light-gold-mode .math-app .hero h1,body.light-gold-mode .math-app .section-head h2,body.light-gold-mode .math-app .chapter-card h3,body.light-gold-mode .math-app .quick-panel h3,body.light-gold-mode .math-app .view-head h2,body.light-gold-mode .math-app .question,body.light-gold-mode .math-app .info-card h3,body.light-gold-mode .math-app .result-box h2 { color:#1a2940 !important; }
+body.light-gold-mode .math-app .brand-sub,body.light-gold-mode .math-app .hero p,body.light-gold-mode .math-app .section-head p,body.light-gold-mode .math-app .chapter-card p,body.light-gold-mode .math-app .quick-panel p,body.light-gold-mode .math-app .view-head p,body.light-gold-mode .math-app .muted-note,body.light-gold-mode .math-app .practice-meta,body.light-gold-mode .math-app .info-card p,body.light-gold-mode .math-app .steps { color:#61738c !important; }
+body.light-gold-mode .math-app .hero,body.light-gold-mode .math-app .stat,body.light-gold-mode .math-app .chapter-card,body.light-gold-mode .math-app .quick-panel,body.light-gold-mode .math-app .practice-card,body.light-gold-mode .math-app .info-card,body.light-gold-mode .math-app .video-link { background:#fff !important;border-color:#d7e0eb !important;color:#1a2940 !important;box-shadow:0 8px 24px rgba(24,43,77,.06) !important; }
+body.light-gold-mode .math-app .hero { background:linear-gradient(112deg,#fff 0%,#f5f8ff 65%,#eaf0ff 100%) !important; }
+body.light-gold-mode .math-app .hero-chip,body.light-gold-mode .math-app .math-expression { background:#f0f4ff !important;border-color:#d9e3fb !important;color:#35559b !important; }
+body.light-gold-mode .math-app .chapter-icon { background:#edf2ff !important;color:#4169e1 !important; }
+body.light-gold-mode .math-app .chapter-tag,body.light-gold-mode .math-app .grade-pill { background:#edf2ff !important;color:#3559cf !important;border-color:#dce5ff !important; }
+body.light-gold-mode .math-app .back-link { color:#526780 !important; }
+body.light-gold-mode .math-app .back-link:hover { background:#f0f4fa !important;color:#3159cf !important; }
+body.light-gold-mode .math-app .answer { background:#fff !important;color:#354761 !important;border-color:#dce4ef !important; }
+body.light-gold-mode .math-app .answer .letter { background:#f0f3f9 !important;color:#7b8aa2 !important; }
+body.light-gold-mode .math-app .answer.correct { background:#effaf6 !important;color:#087e6a !important;border-color:#75cfb3 !important; }
+body.light-gold-mode .math-app .answer.wrong { background:#fff5f6 !important;color:#bd3c57 !important;border-color:#f0a4b3 !important; }
+body.light-gold-mode .math-app .feedback { background:#f7f9fd !important;color:#3d506a !important;border-color:#dfe6ef !important; }
+body.light-gold-mode .math-app .feedback.good { background:#effaf6 !important;color:#087e6a !important;border-color:#d0f1e5 !important; }
+body.light-gold-mode .math-app .feedback.bad { background:#fff7f7 !important;color:#a43b50 !important;border-color:#f8dce2 !important; }
+body.light-gold-mode .math-app .formula { background:#f2f5ff !important;color:#294fae !important;border-color:#dce5ff !important; }
+body.light-gold-mode .math-app .summary-accordion { background:#fff !important;border-color:#d7e0eb !important; }
+body.light-gold-mode .math-app .summary-accordion > summary,body.light-gold-mode .math-app .summary-content,body.light-gold-mode .math-app .summary-content h4,body.light-gold-mode .math-app .summary-content b { color:#3f526c !important; }
+body.light-gold-mode .math-app .summary-accordion[open] > summary { background:#f2f6fd !important;border-color:#d7e0eb !important; }
+body.light-gold-mode .math-app .math-generator-panel,body.light-gold-mode .math-app .math-generator-note { background:#fff !important;color:#3d506a !important;border-color:#d7e0eb !important; }
+body.light-gold-mode .math-app .math-generator-fields label,body.light-gold-mode .math-app .math-generator-note strong { color:#263a58 !important; }
+body.light-gold-mode .math-app .math-generator-fields select { background:#fff !important;color:#263a58 !important;border-color:#d7e0eb !important; }
+
