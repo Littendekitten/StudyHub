@@ -207,6 +207,7 @@ import {
            ========================================================================== */
         function switchTab(tabName) {
             const isMathTab = tabName.startsWith('math-');
+            const isFrenchTab = tabName.startsWith('french-');
             const isAccountTab = tabName === 'account';
             const isPremiumTab = tabName === 'premium';
 
@@ -215,15 +216,19 @@ import {
             } else {
                 window.studyHubCurrentTab = tabName;
                 if (tabName === 'home' || isPremiumTab) {
-                    document.body.classList.remove('subject-open', 'math-open');
+                    document.body.classList.remove('subject-open', 'math-open', 'french-open');
                 } else if (isMathTab) {
                     document.body.classList.add('subject-open', 'math-open');
+                    document.body.classList.remove('french-open');
+                } else if (isFrenchTab) {
+                    document.body.classList.add('subject-open', 'french-open');
+                    document.body.classList.remove('math-open');
                 } else {
-                    if (!document.body.classList.contains('subject-open') || document.body.classList.contains('math-open')) {
+                    if (!document.body.classList.contains('subject-open') || document.body.classList.contains('math-open') || document.body.classList.contains('french-open')) {
                         showToast('Open eerst een vak via de startpagina.');
                         return;
                     }
-                    document.body.classList.remove('math-open');
+                    document.body.classList.remove('math-open', 'french-open');
                 }
             }
 
@@ -232,7 +237,7 @@ import {
                 !isAccountTab && tabName !== 'home' && !isPremiumTab && document.body.classList.contains('premium-mode')
             );
 
-            const sections = ['home', 'premium', 'tests', 'generator', 'quiz', 'grading', 'results', 'learn', 'summary', 'math', 'account'];
+            const sections = ['home', 'premium', 'tests', 'generator', 'quiz', 'grading', 'results', 'learn', 'summary', 'math', 'french', 'account'];
             sections.forEach(id => {
                 const el = document.getElementById(`section-${id}`);
                 if (el) el.classList.add('hidden');
@@ -251,6 +256,15 @@ import {
                 if (typeof window.showMathView === 'function') {
                     window.showMathView(mathViews[tabName] || 'overviewView');
                 }
+            } else if (isFrenchTab) {
+                const frenchSection = document.getElementById('section-french');
+                if (frenchSection) frenchSection.classList.remove('hidden');
+                const frenchViews = ['overview', 'vocabulary', 'sentences', 'grammar', 'quiz'];
+                frenchViews.forEach(view => {
+                    const panel = document.getElementById(`french-view-${view}`);
+                    if (panel) panel.classList.toggle('hidden', tabName !== `french-${view}`);
+                });
+                if (typeof window.renderFrenchView === 'function') window.renderFrenchView(tabName);
             } else {
                 const target = document.getElementById(`section-${tabName}`);
                 if (target) target.classList.remove('hidden');
@@ -261,13 +275,15 @@ import {
                 const activeMathTab = tabName === 'math-formulas' || tabName === 'math-videos' || tabName === 'math-mix'
                     ? tabName
                     : 'math-overview';
-                const active = isMathTab ? candidate === activeMathTab : candidate === tabName;
+                const activeFrenchTab = tabName === 'french-quiz' ? 'french-overview' : tabName.startsWith('french-') ? tabName : 'french-overview';
+                const active = isMathTab ? candidate === activeMathTab : isFrenchTab ? candidate === activeFrenchTab : candidate === tabName;
                 btn.classList.toggle('active', active);
             });
 
             if (tabName === 'learn') renderFlashcards();
+            const premiumActiveTab = tabName === 'french-quiz' ? 'french-overview' : tabName;
             document.querySelectorAll('[data-premium-tab]').forEach(button => {
-                button.classList.toggle('active', button.getAttribute('data-premium-tab') === tabName);
+                button.classList.toggle('active', button.getAttribute('data-premium-tab') === premiumActiveTab);
             });
             updateInstallButtonVisibility(tabName);
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -276,10 +292,12 @@ import {
         function openSubjectCard(subject) {
             if (subject === 'aardrijkskunde') {
                 document.body.classList.add('subject-open');
-                document.body.classList.remove('math-open');
+                document.body.classList.remove('math-open', 'french-open');
                 switchTab('tests');
             } else if (subject === 'wiskunde') {
                 switchTab('math-overview');
+            } else if (subject === 'frans') {
+                switchTab('french-overview');
             }
         }
 
@@ -789,6 +807,272 @@ import {
                 container.appendChild(el);
             });
         }
+
+/* ==========================================================================
+   FRANS MODULE · gegevens uit french-data.js, volledig lokaal
+   ========================================================================== */
+const frenchStudyData = window.FRENCH_STUDY_DATA || {
+  vocabulary: [], sentences: [], grammar: [], lexicalGrammar: []
+};
+let frenchQuizState = { mode: 'vocabulary', questions: [], index: 0, score: 0, answered: false, complete: false };
+
+function frenchElement(id) { return document.getElementById(id); }
+function frenchUnitLabel(unit) { return unit ? `H${unit}` : 'Frans'; }
+function frenchCreateFlashcard(item, typeLabel) {
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = 'french-flashcard';
+  card.setAttribute('aria-pressed', 'false');
+  card.setAttribute('aria-label', `Toon de Nederlandse vertaling van ${item.fr}`);
+
+  const term = document.createElement('span');
+  term.className = 'french-flashcard-term';
+  term.textContent = item.fr;
+
+  const answer = document.createElement('span');
+  answer.className = 'french-flashcard-answer';
+  answer.textContent = item.nl;
+
+  const hint = document.createElement('span');
+  hint.className = 'french-flashcard-hint';
+  const left = document.createElement('span');
+  left.textContent = `${typeLabel} · ${frenchUnitLabel(item.unit)}`;
+  const right = document.createElement('span');
+  right.textContent = 'Draai ↻';
+  hint.append(left, right);
+  card.append(term, answer, hint);
+
+  card.addEventListener('click', () => {
+    const flipped = card.classList.toggle('is-flipped');
+    card.setAttribute('aria-pressed', String(flipped));
+    right.textContent = flipped ? 'Terug ↺' : 'Draai ↻';
+  });
+  return card;
+}
+
+function frenchRenderCollection({ source, unitId, searchId, countId, gridId, label }) {
+  const unit = frenchElement(unitId)?.value || 'all';
+  const query = (frenchElement(searchId)?.value || '').trim().toLocaleLowerCase('nl');
+  const grid = frenchElement(gridId);
+  const count = frenchElement(countId);
+  if (!grid || !count) return;
+
+  const rows = source.filter(item => {
+    const matchUnit = unit === 'all' || String(item.unit) === unit;
+    const matchQuery = !query || `${item.fr} ${item.nl} ${item.group || ''}`.toLocaleLowerCase('nl').includes(query);
+    return matchUnit && matchQuery;
+  });
+
+  grid.replaceChildren();
+  count.textContent = `${rows.length} ${label}`;
+  if (!rows.length) {
+    const empty = document.createElement('div');
+    empty.className = 'french-empty-state';
+    empty.textContent = 'Geen resultaten gevonden. Probeer een andere zoekterm of hoofdstuk.';
+    grid.append(empty);
+    return;
+  }
+  rows.forEach(item => grid.append(frenchCreateFlashcard(item, label === 'zinnen' ? 'Zin' : label === 'woorden' ? 'Woord' : 'Grammatica')));
+}
+
+function renderFrenchVocabulary() {
+  frenchRenderCollection({
+    source: frenchStudyData.vocabulary,
+    unitId: 'french-vocab-unit', searchId: 'french-vocab-search',
+    countId: 'french-vocab-count', gridId: 'french-vocab-grid', label: 'woorden'
+  });
+}
+
+function renderFrenchSentences() {
+  frenchRenderCollection({
+    source: frenchStudyData.sentences,
+    unitId: 'french-sentence-unit', searchId: 'french-sentence-search',
+    countId: 'french-sentence-count', gridId: 'french-sentence-grid', label: 'zinnen'
+  });
+}
+
+function renderFrenchGrammar() {
+  const sourceChoice = frenchElement('french-grammar-source')?.value || 'all';
+  const source = sourceChoice === 'grammar'
+    ? frenchStudyData.grammar
+    : sourceChoice === 'lexicalGrammar'
+      ? frenchStudyData.lexicalGrammar
+      : [...frenchStudyData.grammar, ...frenchStudyData.lexicalGrammar];
+  frenchRenderCollection({
+    source,
+    unitId: 'french-grammar-unit', searchId: 'french-grammar-search',
+    countId: 'french-grammar-count', gridId: 'french-grammar-grid', label: 'grammatica-items'
+  });
+}
+
+window.renderFrenchView = function(tabName) {
+  if (tabName === 'french-vocabulary') renderFrenchVocabulary();
+  if (tabName === 'french-sentences') renderFrenchSentences();
+  if (tabName === 'french-grammar') renderFrenchGrammar();
+};
+
+function frenchShuffle(values) {
+  const result = [...values];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function frenchQuizSource(mode) {
+  if (mode === 'vocabulary') return frenchStudyData.vocabulary;
+  if (mode === 'grammar') return [...frenchStudyData.grammar, ...frenchStudyData.lexicalGrammar];
+  if (mode === 'sentences') return frenchStudyData.sentences;
+  return [...frenchStudyData.vocabulary, ...frenchStudyData.sentences, ...frenchStudyData.grammar, ...frenchStudyData.lexicalGrammar];
+}
+
+function startFrenchQuiz(mode = 'vocabulary') {
+  const source = frenchQuizSource(mode).filter(item => item.fr && item.nl);
+  const distinct = [];
+  const seen = new Set();
+  source.forEach(item => {
+    const key = `${item.fr}\u0000${item.nl}`;
+    if (!seen.has(key)) { seen.add(key); distinct.push(item); }
+  });
+  if (distinct.length < 4) {
+    showToast('Er zijn niet genoeg items om een quiz te maken.');
+    return;
+  }
+
+  const chosen = frenchShuffle(distinct).slice(0, Math.min(10, distinct.length));
+  frenchQuizState = {
+    mode, questions: chosen.map(item => {
+      const askFrench = Math.random() < 0.5;
+      const correct = askFrench ? item.nl : item.fr;
+      const distractors = frenchShuffle([...new Set(distinct
+        .filter(other => other !== item)
+        .map(other => askFrench ? other.nl : other.fr)
+        .filter(value => value && value !== correct))]).slice(0, 3);
+      const options = frenchShuffle([...distractors, correct]);
+      return {
+        prompt: askFrench ? `Wat betekent “${item.fr}”?` : `Hoe zeg je “${item.nl}” in het Frans?`,
+        direction: askFrench ? 'VERTAAL NAAR HET NEDERLANDS' : 'VERTAAL NAAR HET FRANS',
+        correct, options, source: item.fr
+      };
+    }),
+    index: 0, score: 0, answered: false, complete: false
+  };
+  switchTab('french-quiz');
+  renderFrenchQuizQuestion();
+}
+
+function renderFrenchQuizQuestion() {
+  const state = frenchQuizState;
+  const progress = frenchElement('french-quiz-progress');
+  const fill = frenchElement('french-quiz-progress-fill');
+  const direction = frenchElement('french-quiz-direction');
+  const question = frenchElement('french-quiz-question');
+  const options = frenchElement('french-quiz-options');
+  const feedback = frenchElement('french-quiz-feedback');
+  const score = frenchElement('french-quiz-score');
+  const next = frenchElement('french-quiz-next');
+  if (!progress || !fill || !direction || !question || !options || !feedback || !score || !next) return;
+
+  if (state.complete) {
+    progress.textContent = 'Quiz afgerond';
+    fill.style.width = '100%';
+    direction.textContent = 'JOUW RESULTAAT';
+    question.textContent = `Je hebt ${state.score} van de ${state.questions.length} vragen goed!`;
+    options.replaceChildren();
+    feedback.textContent = state.score === state.questions.length
+      ? 'Fantastisch! Alles goed. 🎉'
+      : 'Goed geoefend! Bekijk de kaarten nog eens en probeer opnieuw.';
+    score.textContent = `Eindscore: ${state.score}/${state.questions.length}`;
+    next.disabled = false;
+    next.textContent = 'Opnieuw oefenen ↻';
+    return;
+  }
+
+  const item = state.questions[state.index];
+  progress.textContent = `Vraag ${state.index + 1} van ${state.questions.length}`;
+  fill.style.width = `${(state.index / state.questions.length) * 100}%`;
+  direction.textContent = item.direction;
+  question.textContent = item.prompt;
+  options.replaceChildren();
+  feedback.textContent = '';
+  score.textContent = `Score: ${state.score}`;
+  next.disabled = true;
+  next.textContent = state.index === state.questions.length - 1 ? 'Bekijk resultaat →' : 'Volgende vraag →';
+
+  item.options.forEach(optionText => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'french-quiz-option';
+    button.textContent = optionText;
+    button.addEventListener('click', () => {
+      if (state.answered) return;
+      state.answered = true;
+      const correct = optionText === item.correct;
+      if (correct) state.score++;
+      [...options.querySelectorAll('button')].forEach(option => {
+        option.disabled = true;
+        if (option.textContent === item.correct) option.classList.add('correct');
+        else if (option === button && !correct) option.classList.add('incorrect');
+      });
+      feedback.textContent = correct ? 'Helemaal goed! ✓' : `Nog niet helemaal. Het juiste antwoord is: ${item.correct}`;
+      score.textContent = `Score: ${state.score}`;
+      next.disabled = false;
+    });
+    options.append(button);
+  });
+  state.answered = false;
+}
+
+function initialiseFrenchStudy() {
+  document.querySelectorAll('[data-french-view]').forEach(button => {
+    button.addEventListener('click', () => {
+      const view = button.getAttribute('data-french-view');
+      if (view) switchTab(view);
+    });
+  });
+
+  ['french-vocab-unit', 'french-vocab-search'].forEach(id => {
+    frenchElement(id)?.addEventListener(id.endsWith('unit') ? 'change' : 'input', renderFrenchVocabulary);
+  });
+  ['french-sentence-unit', 'french-sentence-search'].forEach(id => {
+    frenchElement(id)?.addEventListener(id.endsWith('unit') ? 'change' : 'input', renderFrenchSentences);
+  });
+  ['french-grammar-source', 'french-grammar-unit', 'french-grammar-search'].forEach(id => {
+    frenchElement(id)?.addEventListener(id.endsWith('search') ? 'input' : 'change', renderFrenchGrammar);
+  });
+
+  const launch = () => startFrenchQuiz(frenchElement('french-quiz-mode')?.value || 'vocabulary');
+  frenchElement('french-start-quiz')?.addEventListener('click', launch);
+  frenchElement('french-quiz-launch')?.addEventListener('click', launch);
+  frenchElement('french-quiz-stop')?.addEventListener('click', () => switchTab('french-overview'));
+  frenchElement('french-quiz-next')?.addEventListener('click', () => {
+    if (frenchQuizState.complete) {
+      startFrenchQuiz(frenchQuizState.mode);
+      return;
+    }
+    if (!frenchQuizState.answered) return;
+    if (frenchQuizState.index < frenchQuizState.questions.length - 1) {
+      frenchQuizState.index++;
+      frenchQuizState.answered = false;
+    } else {
+      frenchQuizState.complete = true;
+    }
+    renderFrenchQuizQuestion();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initialiseFrenchStudy);
+
+'''
+
+app = Path('/mnt/data/_french_work/app.js')
+source = app.read_text(encoding='utf-8')
+marker = '        /* ==========================================================================\n           9. INITIALIZE ALL EVENT LISTENERS SAFELY'
+assert source.count(marker) == 1, 'French runtime insertion marker not unique'
+source = source.replace(marker, french_runtime if False else open('/tmp/french-runtime.js', encoding='utf-8').read() + marker)
+app.write_text(source, encoding='utf-8')
+print('Inserted French runtime logic')
 
         /* ==========================================================================
            9. INITIALIZE ALL EVENT LISTENERS SAFELY
@@ -2268,7 +2552,14 @@ function updatePremiumToolsUI() {
 function launchPremiumRandomChallenge() {
   if (!document.body.classList.contains("premium-mode")) return;
   const requested = $id("premium-challenge-subject")?.value || "random";
-  const subject = requested === "random" ? (Math.random() < 0.5 ? "geo" : "math") : requested;
+  const subject = requested === "random" ? ["geo", "math", "french"][Math.floor(Math.random() * 3)] : requested;
+  if (subject === "french") {
+    openSubjectCard("frans");
+    const mode = $id("french-quiz-mode");
+    if (mode) mode.value = "all";
+    startFrenchQuiz("all");
+    return;
+  }
   if (subject === "math") {
     switchTab("math-mix");
     const topic = ["all", "1", "3", "4", "6"][Math.floor(Math.random() * 5)];
@@ -2316,6 +2607,7 @@ function initialisePremiumTools() {
     switchTab("summary");
   });
   $id("premium-open-math-formulas")?.addEventListener("click", () => switchTab("math-formulas"));
+  $id("premium-open-french")?.addEventListener("click", () => openSubjectCard("frans"));
   updatePremiumToolsUI();
 }
 

@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StudyHub | Havo 2</title>
     <meta id="theme-color-meta" name="theme-color" content="#0d1626">
-    <meta name="description" content="StudyHub: oefenen voor havo 2 met Aardrijkskunde en Wiskunde.">
+    <meta name="description" content="StudyHub: oefenen voor havo 2 met Aardrijkskunde, Wiskunde en Frans.">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="style.css?v=20261125-subtle-gold">
+    <link rel="stylesheet" href="style.css?v=20261126-french">
 </head>
 <body>
 
@@ -56,6 +56,10 @@
                 <button class="nav-tab-btn math-nav" id="nav-math-mix" data-tab="math-mix">🎲 Oefenmix</button>
                 <button class="nav-tab-btn math-nav" id="nav-math-formulas" data-tab="math-formulas">📐 Formules</button>
                 <button class="nav-tab-btn math-nav" id="nav-math-videos" data-tab="math-videos">▶️ Uitlegvideo's</button>
+                <button class="nav-tab-btn french-nav" id="nav-french-overview" data-tab="french-overview">🇫🇷 Frans</button>
+                <button class="nav-tab-btn french-nav" id="nav-french-vocabulary" data-tab="french-vocabulary">🗂️ Woorden</button>
+                <button class="nav-tab-btn french-nav" id="nav-french-sentences" data-tab="french-sentences">💬 Zinnen</button>
+                <button class="nav-tab-btn french-nav" id="nav-french-grammar" data-tab="french-grammar">📖 Grammatica</button>
                 <button class="nav-tab-btn subject-nav" id="nav-tests" data-tab="tests">🌍 Aardrijkskunde</button>
                 <button class="nav-tab-btn subject-nav" id="nav-generator" data-tab="generator">🎲 Oefenmix</button>
                 <button class="nav-tab-btn subject-nav" id="nav-learn" data-tab="learn">🗂️ Begrippen</button>
@@ -92,6 +96,15 @@
             <button type="button" data-premium-tab="math-videos">▶ Video's</button>
           </div>
         </div>
+        <div id="premium-french-toolbar" class="premium-subject-toolbar premium-french-toolbar" aria-label="Premium navigatie Frans">
+          <div class="premium-subject-brand"><span class="premium-subject-brand-icon">🇫🇷</span><span><small>JOUW LEERPLEK</small><strong>Frans</strong></span></div>
+          <div class="premium-subject-tabs">
+            <button type="button" data-premium-tab="french-overview">▦ Overzicht</button>
+            <button type="button" data-premium-tab="french-vocabulary">▤ Woorden</button>
+            <button type="button" data-premium-tab="french-sentences">💬 Zinnen</button>
+            <button type="button" data-premium-tab="french-grammar">📖 Grammatica</button>
+          </div>
+        </div>
         <section id="section-home" class="home-page">
             <div class="panel home-hero">
                 <div class="home-hero-copy">
@@ -108,8 +121,8 @@
             </div>
 
             <div class="home-stats">
-                <div class="home-stat"><span class="stat-icon">📚</span><div><strong>2</strong><span>Vakken beschikbaar</span></div></div>
-                <div class="home-stat"><span class="stat-icon">🧩</span><div><strong>8</strong><span>Hoofdstukken om te oefenen</span></div></div>
+                <div class="home-stat"><span class="stat-icon">📚</span><div><strong>3</strong><span>Vakken beschikbaar</span></div></div>
+                <div class="home-stat"><span class="stat-icon">🧩</span><div><strong>16</strong><span>Hoofdstukken om te oefenen</span></div></div>
                 <div class="home-stat"><span class="stat-icon">⚡</span><div><strong>100%</strong><span>Oefenen op jouw tempo</span></div></div>
             </div>
 
@@ -136,14 +149,14 @@
                     </div>
                     <div class="card-open-hint math-open-hint"><span>Open Wiskunde</span><span aria-hidden="true">→</span></div>
                 </div>
-                <div class="test-card subject-card coming-soon">
+                <div class="test-card subject-card subject-card-link french-subject-card" role="button" tabindex="0" aria-label="Open het vak Frans" data-open-subject="frans">
                     <div>
-                        <div class="subject-icon physics-icon">⚛️</div>
-                        <div class="card-meta"><span class="tag tag-purple">Binnenkort</span><span class="subject-level">HAVO 2</span></div>
-                        <h3>Natuurkunde</h3>
-                        <p class="card-desc">Een plek voor formules, berekeningen, oefenvragen en proefwerkvoorbereiding.</p>
+                        <div class="subject-icon french-icon">🇫🇷</div>
+                        <div class="card-meta"><span class="tag tag-purple">Beschikbaar</span><span class="subject-level">HAVO 2</span></div>
+                        <h3>Frans</h3>
+                        <p class="card-desc">Vocabulaire, voorbeeldzinnen en grammatica. Leer woorden, oefen vertalingen en herhaal hoofdstuk 1 t/m 8.</p>
                     </div>
-                    <div class="coming-soon-label">Wordt voorbereid</div>
+                    <div class="card-open-hint french-open-hint"><span>Open Frans</span><span aria-hidden="true">→</span></div>
                 </div>
             </div>
         </section>
@@ -185,7 +198,7 @@
             <article class="premium-tool-card premium-challenge-card">
               <div class="premium-tool-heading"><span class="premium-tool-icon">⚡</span><div><h2>Random Challenge</h2><p>Laat StudyHub een vak en hoofdstuk kiezen.</p></div></div>
               <label for="premium-challenge-subject">Kies een vak</label>
-              <select id="premium-challenge-subject"><option value="random">Verrassingsmix · beide vakken</option><option value="geo">Aardrijkskunde</option><option value="math">Wiskunde</option></select>
+              <select id="premium-challenge-subject"><option value="random">Verrassingsmix · alle vakken</option><option value="geo">Aardrijkskunde</option><option value="math">Wiskunde</option><option value="french">Frans</option></select>
               <button class="btn btn-primary premium-challenge-button" id="premium-random-challenge" type="button">🎲 Start een challenge</button>
               <p class="premium-tool-status">Je krijgt een korte oefensessie met een willekeurig onderwerp.</p>
             </article>
@@ -195,6 +208,7 @@
               <div class="premium-shortcut-list">
                 <button class="premium-shortcut" id="premium-open-geo-summary" type="button"><span>🌍</span><span><strong>Aardrijkskunde</strong><small>Hoofdstuk 1 samenvattingen</small></span><span>→</span></button>
                 <button class="premium-shortcut" id="premium-open-math-formulas" type="button"><span>∑</span><span><strong>Wiskunde</strong><small>Formules en rekenregels</small></span><span>→</span></button>
+                <button class="premium-shortcut" id="premium-open-french" type="button"><span>🇫🇷</span><span><strong>Frans</strong><small>Woorden, zinnen en grammatica</small></span><span>→</span></button>
               </div>
             </article>
           </div>
@@ -754,6 +768,76 @@
         </section>
 
 
+        <!-- FRANS: vocabulaire, zinnen, grammatica en offline oefenquiz -->
+        <section id="section-french" class="french-app hidden" aria-label="Frans oefenen">
+          <section id="french-view-overview" class="french-view">
+            <div class="french-hero">
+              <div class="french-hero-copy">
+                <div class="french-eyebrow">STUDYHUB · FRANS · HAVO 2</div>
+                <h1>Bonjour! <span>On va apprendre.</span></h1>
+                <p>Leer Franse woorden, oefen voorbeeldzinnen en herhaal de grammatica. Alles staat overzichtelijk bij elkaar en werkt ook offline.</p>
+                <div class="french-hero-actions">
+                  <button class="btn btn-emerald" id="french-start-quiz" type="button">🎯 Start oefenquiz</button>
+                  <button class="btn btn-secondary" type="button" data-french-view="french-vocabulary">🗂️ Bekijk woorden</button>
+                </div>
+              </div>
+              <div class="french-hero-art" aria-hidden="true"><span>🇫🇷</span><strong>FR</strong><small>PARLE · APPRENDS · RÉUSSIS</small></div>
+            </div>
+
+            <div class="french-stats">
+              <div class="french-stat"><strong>264</strong><span>woorden en uitdrukkingen</span></div>
+              <div class="french-stat"><strong>36</strong><span>voorbeeldzinnen</span></div>
+              <div class="french-stat"><strong>330</strong><span>grammatica-items</span></div>
+            </div>
+
+            <div class="french-section-heading"><div><div class="section-eyebrow">KIES JE ONDERDEEL</div><h2>Wat wil je oefenen?</h2></div><p>Klik op een onderdeel om te beginnen.</p></div>
+            <div class="french-launch-grid">
+              <button class="french-launch-card" type="button" data-french-view="french-vocabulary"><span class="french-launch-icon">🗂️</span><strong>Vocabulaire</strong><small>264 Franse woorden met Nederlandse vertaling</small><span class="french-launch-arrow">Open woorden →</span></button>
+              <button class="french-launch-card" type="button" data-french-view="french-sentences"><span class="french-launch-icon">💬</span><strong>Zinnen</strong><small>36 voorbeeldzinnen uit de lesstof</small><span class="french-launch-arrow">Open zinnen →</span></button>
+              <button class="french-launch-card" type="button" data-french-view="french-grammar"><span class="french-launch-icon">📖</span><strong>Grammatica</strong><small>Werkwoorden, grammatica en getallen</small><span class="french-launch-arrow">Open grammatica →</span></button>
+            </div>
+
+            <div class="french-quiz-launch panel">
+              <div><div class="section-eyebrow">ACTIEF OEFENEN</div><h3>Test wat je al weet</h3><p class="subtitle">Maak een korte meerkeuzequiz met vragen uit je eigen vocabulairebestand.</p></div>
+              <div class="french-quiz-launch-controls"><label for="french-quiz-mode">Onderdeel</label><select id="french-quiz-mode"><option value="vocabulary">Vocabulaire</option><option value="grammar">Grammatica</option><option value="sentences">Zinnen</option><option value="all">Alles door elkaar</option></select><button class="btn btn-emerald" id="french-quiz-launch" type="button">Start quiz →</button></div>
+            </div>
+            <p class="french-source-note">De Franse leerstof is overgenomen uit het door jou geüploade bestand <strong>Vocabulaire LSJ 1hv deel B incl. grammaire</strong>. De quiz werkt lokaal en gebruikt geen externe AI.</p>
+          </section>
+
+          <section id="french-view-vocabulary" class="french-view hidden">
+            <div class="french-view-heading"><div><div class="section-eyebrow">FRANS · VOCABULAIRE</div><h2>Woorden leren</h2><p class="subtitle">Klik op een kaart om de Nederlandse vertaling te bekijken.</p></div><button class="btn btn-secondary" type="button" data-french-view="french-overview">← Terug</button></div>
+            <div class="french-filter-bar"><label>Hoofdstuk<select id="french-vocab-unit"><option value="all">Alle hoofdstukken</option><option value="5">Hoofdstuk 5</option><option value="6">Hoofdstuk 6</option><option value="7">Hoofdstuk 7</option></select></label><label class="french-search-label">Zoeken<input id="french-vocab-search" type="search" placeholder="Zoek een Frans of Nederlands woord..."></label></div>
+            <div class="french-list-heading"><span id="french-vocab-count">264 woorden</span><span>🔄 Klik op een kaart om te draaien</span></div>
+            <div id="french-vocab-grid" class="french-card-grid"></div>
+          </section>
+
+          <section id="french-view-sentences" class="french-view hidden">
+            <div class="french-view-heading"><div><div class="section-eyebrow">FRANS · PHRASES</div><h2>Voorbeeldzinnen</h2><p class="subtitle">Bekijk de Franse zin en draai de kaart om de Nederlandse vertaling te zien.</p></div><button class="btn btn-secondary" type="button" data-french-view="french-overview">← Terug</button></div>
+            <div class="french-filter-bar"><label>Hoofdstuk<select id="french-sentence-unit"><option value="all">Alle hoofdstukken</option><option value="5">Hoofdstuk 5</option><option value="6">Hoofdstuk 6</option><option value="7">Hoofdstuk 7</option></select></label><label class="french-search-label">Zoeken<input id="french-sentence-search" type="search" placeholder="Zoek een Franse of Nederlandse zin..."></label></div>
+            <div class="french-list-heading"><span id="french-sentence-count">36 zinnen</span><span>💬 Vertalingen uit je bestand</span></div>
+            <div id="french-sentence-grid" class="french-card-grid french-sentence-grid"></div>
+          </section>
+
+          <section id="french-view-grammar" class="french-view hidden">
+            <div class="french-view-heading"><div><div class="section-eyebrow">FRANS · GRAMMAIRE</div><h2>Grammatica oefenen</h2><p class="subtitle">Herhaal werkwoordsvormen, grammaticale voorbeelden en de lexicale grammatica.</p></div><button class="btn btn-secondary" type="button" data-french-view="french-overview">← Terug</button></div>
+            <div class="french-filter-bar french-grammar-filters"><label>Onderdeel<select id="french-grammar-source"><option value="all">Alle grammatica</option><option value="grammar">Grammatica</option><option value="lexicalGrammar">Grammatica lexicale</option></select></label><label>Hoofdstuk<select id="french-grammar-unit"><option value="all">Alle hoofdstukken</option><option value="1">Hoofdstuk 1</option><option value="2">Hoofdstuk 2</option><option value="3">Hoofdstuk 3</option><option value="4">Hoofdstuk 4</option><option value="5">Hoofdstuk 5</option><option value="6">Hoofdstuk 6</option><option value="7">Hoofdstuk 7</option><option value="8">Hoofdstuk 8</option></select></label><label class="french-search-label">Zoeken<input id="french-grammar-search" type="search" placeholder="Zoek een vorm of vertaling..."></label></div>
+            <div class="french-list-heading"><span id="french-grammar-count">330 grammatica-items</span><span>📖 Klik op een kaart voor de betekenis</span></div>
+            <div id="french-grammar-grid" class="french-card-grid"></div>
+          </section>
+
+          <section id="french-view-quiz" class="french-view hidden">
+            <div class="french-view-heading"><div><div class="section-eyebrow">FRANS · OEFENQUIZ</div><h2>Test jezelf</h2><p class="subtitle" id="french-quiz-progress">Vraag 1 van 10</p></div><button class="btn btn-secondary" id="french-quiz-stop" type="button">Stoppen</button></div>
+            <div class="french-quiz-card panel">
+              <div class="french-quiz-progress-track"><span id="french-quiz-progress-fill"></span></div>
+              <div class="french-quiz-question-label" id="french-quiz-direction">VERTAAL NAAR HET NEDERLANDS</div>
+              <h3 id="french-quiz-question">Wat betekent ...?</h3>
+              <div id="french-quiz-options" class="french-quiz-options"></div>
+              <p id="french-quiz-feedback" class="french-quiz-feedback" role="status" aria-live="polite"></p>
+              <div class="french-quiz-footer"><span id="french-quiz-score">Score: 0</span><button class="btn btn-emerald" id="french-quiz-next" type="button" disabled>Volgende vraag →</button></div>
+            </div>
+          </section>
+        </section>
+
         <!-- ACCOUNT, SETTINGS, INVENTORY AND VIP -->
         <section id="section-account" class="hidden account-page">
           <div class="panel account-hero-panel">
@@ -849,9 +933,10 @@
     </main>
 
     <footer>
-        StudyHub • Havo 2 • Aardrijkskunde & Wiskunde
+        StudyHub • Havo 2 • Aardrijkskunde, Wiskunde & Frans
     </footer>
 
-    <script type="module" src="app.js?v=20261125-google-popup-fix"></script>
+    <script src="french-data.js?v=20261126-french"></script>
+    <script type="module" src="app.js?v=20261126-french"></script>
 </body>
 </html>
