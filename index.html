@@ -12,7 +12,7 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="style.css?v=20261126-french">
+    <link rel="stylesheet" href="style.css?v=20261126-authfix">
 </head>
 <body>
 
@@ -27,7 +27,7 @@
         <form id="email-auth-form" class="auth-form" autocomplete="on">
           <label for="auth-email">E-mailadres</label><input id="auth-email" type="email" autocomplete="email" placeholder="jij@voorbeeld.nl" required>
           <label for="auth-password">Wachtwoord</label><input id="auth-password" type="password" autocomplete="current-password" minlength="6" placeholder="Minimaal 6 tekens" required>
-          <div class="auth-actions"><button class="btn btn-emerald" id="email-signin" type="button">Inloggen</button><button class="btn btn-secondary" id="email-create" type="button">Account maken</button></div>
+          <div class="auth-actions"><button class="btn btn-emerald" id="email-signin" type="submit">Inloggen</button><button class="btn btn-secondary" id="email-create" type="submit">Account maken</button></div>
           <button class="text-button" id="forgot-password" type="button">Wachtwoord vergeten?</button>
         </form>
         <p id="auth-error" class="auth-message" role="status" aria-live="polite"></p>
@@ -937,6 +937,6 @@
     </footer>
 
     <script src="french-data.js?v=20261126-french"></script>
-    <script type="module" src="app.js?v=20261126-french"></script>
+    <script type="module" src="app.js?v=20261126-authfix"></script>
 </body>
 </html>

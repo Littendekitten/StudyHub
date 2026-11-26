@@ -2942,3 +2942,9 @@ body.light-gold-mode .french-hero { background:radial-gradient(circle at 88% 18%
 .french-flashcard.is-flipped .french-flashcard-answer { display:block; }
 
 @media (max-width:760px) { body.premium-mode.premium-subject-context.french-open #premium-french-toolbar { display:flex !important; } }
+
+
+/* Authentication loading state */
+.auth-google-btn:disabled, .auth-actions .btn:disabled, .text-button:disabled {
+  opacity: .58; cursor: wait; transform: none; box-shadow: none;
+}

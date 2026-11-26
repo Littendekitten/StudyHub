@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 import {
-  getAuth, setPersistence, browserLocalPersistence, GoogleAuthProvider,
-  signInWithPopup,
+  getAuth, setPersistence, browserLocalPersistence, browserSessionPersistence,
+  inMemoryPersistence, GoogleAuthProvider, signInWithPopup,
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
   sendPasswordResetEmail, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
@@ -1432,6 +1432,26 @@ const STUDYHUB_API_BASE_URL = "https://studyhub-22ab.onrender.com";
 
 const studyHubFirebaseApp = initializeApp(studyHubFirebaseConfig);
 const studyHubAuth = getAuth(studyHubFirebaseApp);
+// Set auth persistence once, before the auth-state listener and before any
+// sign-in action. Fall back gracefully in private/restricted browser modes.
+const studyHubAuthReady = (async () => {
+  const choices = [
+    { persistence: browserLocalPersistence, label: "local" },
+    { persistence: browserSessionPersistence, label: "session" },
+    { persistence: inMemoryPersistence, label: "memory" }
+  ];
+  let lastError = null;
+  for (const choice of choices) {
+    try {
+      await setPersistence(studyHubAuth, choice.persistence);
+      return choice.label;
+    } catch (error) {
+      lastError = error;
+      console.warn(`StudyHub auth persistence '${choice.label}' is unavailable:`, error);
+    }
+  }
+  throw lastError || new Error("Firebase Authentication kon niet worden voorbereid.");
+})();
 const studyHubDb = getFirestore(studyHubFirebaseApp);
 const studyHubGoogleProvider = new GoogleAuthProvider();
 studyHubGoogleProvider.setCustomParameters({ prompt: "select_account" });
@@ -1488,7 +1508,14 @@ function friendlyFirebaseError(error) {
     "auth/operation-not-allowed": "Deze inlogmethode staat nog niet aan. Schakel Google of E-mail/wachtwoord in bij Firebase Authentication.",
     "auth/account-exists-with-different-credential": "Er bestaat al een account met dit e-mailadres via een andere inlogmethode.",
     "auth/too-many-requests": "Te veel pogingen achter elkaar. Probeer het later opnieuw.",
-    "auth/network-request-failed": "Geen verbinding. Controleer je internet en probeer opnieuw."
+    "auth/network-request-failed": "Geen verbinding. Controleer je internet en probeer opnieuw.",
+    "auth/user-disabled": "Dit account is uitgeschakeld. Neem contact op met de beheerder.",
+    "auth/invalid-api-key": "De Firebase-configuratie klopt niet. Controleer de Firebase web-appinstellingen.",
+    "auth/app-not-authorized": "Deze website is niet geautoriseerd voor deze Firebase-app.",
+    "auth/internal-error": "Firebase gaf een interne fout. Vernieuw de pagina en probeer opnieuw.",
+    "permission-denied": "Firebase Firestore blokkeert de toegang tot je profiel. Publiceer de meegeleverde Firestore-regels in Firebase Console.",
+    "unavailable": "Firebase is tijdelijk niet bereikbaar. Controleer je verbinding en probeer opnieuw.",
+    "failed-precondition": "De Firebase-database is nog niet goed ingesteld. Controleer de Firestore-configuratie."
   };
   return messages[code] || error?.message || "Er ging iets mis. Probeer het opnieuw.";
 }
@@ -1539,7 +1566,9 @@ function stopUserListeners() {
 
 function makeDefaultUsername(user) {
   const raw = (user.displayName || user.email?.split("@")[0] || "StudyHub leerling").trim();
-  return raw.replace(/[<>]/g, "").slice(0, 24) || "StudyHub leerling";
+  const cleaned = raw.replace(/[<>]/g, "").trim().slice(0, 24);
+  // Firestore rules require usernames to contain at least two characters.
+  return cleaned.length >= 2 ? cleaned : "Leerling";
 }
 
 async function ensureStudyHubProfile(user) {
@@ -1554,7 +1583,8 @@ async function ensureStudyHubProfile(user) {
         goldModeEnabled: false,
         premiumMode: false,
         "Lifetime-VIP": false,
-        lifetimeVipActive: false,
+        // Keep new profiles compatible with existing Firestore rules. The
+        // lifetimeVipActive field is only written when a Lifetime-VIP owner toggles it.
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
@@ -2340,36 +2370,62 @@ async function resumeVipTimer() {
   }
 }
 
+let studyHubAuthActionRunning = false;
+
+function setAuthControlsDisabled(disabled) {
+  ["google-signin", "email-signin", "email-create", "forgot-password"].forEach((id) => {
+    const button = $id(id);
+    if (button) button.disabled = disabled;
+  });
+}
+
 async function handleEmailSignIn(createAccount) {
-  const email = String($id("auth-email").value || "").trim();
-  const password = String($id("auth-password").value || "");
+  if (studyHubAuthActionRunning) return;
+  const email = String($id("auth-email")?.value || "").trim();
+  const password = String($id("auth-password")?.value || "");
   if (!email || !password) {
     setAuthMessage("Vul je e-mailadres en wachtwoord in.");
     return;
   }
+  if (createAccount && password.length < 6) {
+    setAuthMessage("Kies voor een nieuw account een wachtwoord van minimaal 6 tekens.");
+    return;
+  }
+
+  studyHubAuthActionRunning = true;
+  setAuthControlsDisabled(true);
   try {
     setAuthMessage(createAccount ? "Account wordt aangemaakt…" : "Je wordt ingelogd…", false);
-    await setPersistence(studyHubAuth, browserLocalPersistence);
-    if (createAccount) await createUserWithEmailAndPassword(studyHubAuth, email, password);
-    else await signInWithEmailAndPassword(studyHubAuth, email, password);
-    setAuthMessage("Gelukt! Je wordt doorgestuurd…", false);
+    await studyHubAuthReady;
+    localStorage.removeItem("studyhub-guest-mode");
+    if (createAccount) {
+      await createUserWithEmailAndPassword(studyHubAuth, email, password);
+    } else {
+      await signInWithEmailAndPassword(studyHubAuth, email, password);
+    }
+    setAuthMessage("Gelukt! Je wordt ingelogd…", false);
   } catch (error) {
+    console.error(`StudyHub email ${createAccount ? "sign-up" : "sign-in"} failed:`, error);
     setAuthMessage(friendlyFirebaseError(error));
+  } finally {
+    studyHubAuthActionRunning = false;
+    setAuthControlsDisabled(false);
   }
 }
 
 async function handleGoogleSignIn() {
-  const button = $id("google-signin");
-  if (button) button.disabled = true;
+  if (studyHubAuthActionRunning) return;
+  studyHubAuthActionRunning = true;
+  setAuthControlsDisabled(true);
 
   // Do not let a previous guest session silently mask a failed login attempt.
   localStorage.removeItem("studyhub-guest-mode");
   setAuthMessage("Google-inloggen wordt geopend…", false);
 
   try {
-    // Use popup on mobile and desktop. Redirect login can silently return signed-out
-    // on Chrome-based browsers when the app domain and Firebase authDomain differ.
-    // The popup call is made directly from the click handler to avoid popup blockers.
+    // The auth-ready promise is prepared during page startup. The popup therefore
+    // opens from this user click without racing Firebase persistence setup.
+    await studyHubAuthReady;
     const credential = await signInWithPopup(studyHubAuth, studyHubGoogleProvider);
     if (!credential?.user) throw new Error("Google heeft geen gebruikersaccount teruggegeven.");
     setAuthMessage("Gelukt! Je wordt ingelogd…", false);
@@ -2377,17 +2433,19 @@ async function handleGoogleSignIn() {
     console.error("StudyHub Google sign-in failed:", error);
     setAuthMessage(friendlyFirebaseError(error));
   } finally {
-    if (button) button.disabled = false;
+    studyHubAuthActionRunning = false;
+    setAuthControlsDisabled(false);
   }
 }
 
 async function handlePasswordReset() {
-  const email = String($id("auth-email").value || "").trim();
+  const email = String($id("auth-email")?.value || "").trim();
   if (!email) {
     setAuthMessage("Vul eerst je e-mailadres in.");
     return;
   }
   try {
+    await studyHubAuthReady;
     await sendPasswordResetEmail(studyHubAuth, email);
     setAuthMessage("Als dit e-mailadres een account heeft, is een resetmail verstuurd.", false);
   } catch (error) {
@@ -2612,17 +2670,28 @@ function initialisePremiumTools() {
 }
 
 function initialiseStudyHubAccounts() {
-  // Restore local auth persistence before showing the first-run choice.
-  setPersistence(studyHubAuth, browserLocalPersistence).catch(console.warn);
+  // Keep the auth controls disabled until Firebase persistence has been selected.
+  setAuthControlsDisabled(true);
+  setAuthMessage("StudyHub maakt verbinding met Firebase…", false);
+  studyHubAuthReady.then(() => {
+    setAuthControlsDisabled(false);
+    setAuthMessage("");
+  }).catch((error) => {
+    console.error("StudyHub Authentication initialisation failed:", error);
+    setAuthControlsDisabled(false);
+    setAuthMessage(`Firebase-login kon niet worden voorbereid: ${friendlyFirebaseError(error)}`);
+  });
   window.studyHubCurrentTab = "home";
 
   $id("continue-guest")?.addEventListener("click", continueAsGuest);
   $id("sign-in-from-account")?.addEventListener("click", showLoginOverlay);
   $id("google-signin")?.addEventListener("click", handleGoogleSignIn);
-  $id("email-signin")?.addEventListener("click", () => handleEmailSignIn(false));
-  $id("email-create")?.addEventListener("click", () => handleEmailSignIn(true));
   $id("forgot-password")?.addEventListener("click", handlePasswordReset);
-  $id("email-auth-form")?.addEventListener("submit", (event) => { event.preventDefault(); handleEmailSignIn(false); });
+  $id("email-auth-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const createAccount = event.submitter?.id === "email-create";
+    handleEmailSignIn(createAccount);
+  });
 
   $id("account-button")?.addEventListener("click", () => {
     switchTab("account");
@@ -2655,7 +2724,7 @@ function initialiseStudyHubAccounts() {
   $id("pause-vip-button")?.addEventListener("click", pauseVipTimer);
   $id("resume-vip-button")?.addEventListener("click", resumeVipTimer);
 
-  onAuthStateChanged(studyHubAuth, async (user) => {
+  studyHubAuthReady.then(() => onAuthStateChanged(studyHubAuth, async (user) => {
     if (user) {
       studyHubUser = user;
       localStorage.removeItem("studyhub-guest-mode");
@@ -2665,7 +2734,10 @@ function initialiseStudyHubAccounts() {
         showAppShell("user");
       } catch (error) {
         console.error("StudyHub profile initialisation failed:", error);
-        setAuthMessage(`Inloggen lukte, maar je profiel kon niet worden geladen: ${friendlyFirebaseError(error)}`);
+        const profileMessage = error?.code === "permission-denied"
+          ? "Je Firebase-account is aangemeld, maar Firestore weigert het profiel. Publiceer firebase/firestore.rules uit deze update in Firebase Console."
+          : `Je bent aangemeld, maar je profiel kon niet worden geladen: ${friendlyFirebaseError(error)}`;
+        setAuthMessage(profileMessage);
         showAppShell("user");
       }
     } else {
@@ -2686,6 +2758,10 @@ function initialiseStudyHubAccounts() {
         renderAccountState();
       }
     }
+  })).catch((error) => {
+    console.error("StudyHub auth listener could not start:", error);
+    setAuthMessage(`Firebase-login kon niet starten: ${friendlyFirebaseError(error)}`);
+    setAuthControlsDisabled(false);
   });
 
 }
